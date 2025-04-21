@@ -1,46 +1,53 @@
 <template>
-  <BaseLayout>
-
-    <view class="main-container">
-   
-      <TnTitle title="上传图片" mode="vLine"/>
-
-
-
-      <TnTitle title="提示词"  mode="vLine"/>
-      <up-textarea v-model="value1" placeholder="请输入提示词"/>
-
-
-    </view>
-    <GetUserInfoPopup/>
-  </BaseLayout>
+   <BaseLayout>
+  
+      <view class="main-container">
+        <!--首页轮播图-->
+        <TnTitle title="上传图片" mode="vLine" />
+  
+  
+  
+  
+  
+  
+        <TnTitle title="提示词" mode="vLine" />
+        <up-textarea v-model="value1" placeholder="请输入提示词" />
+      </view>
+      <GetUserInfoPopup />
+    </BaseLayout>
 </template>
 
 <script setup lang="ts">
-import BaseLayout from "@/layouts/BaseLayout.vue";
-import AppSwiper from '@/components/home/AppSwiper.vue'
-
-import GetUserInfoPopup from "@/components/GetUserInfoPopup.vue";
-
-
+import BaseLayout from '@/layouts/BaseLayout.vue'
+import GetUserInfoPopup from '@/components/GetUserInfoPopup.vue'
 import TnTitle from '@tuniao/tnui-vue3-uniapp/components/title/src/title.vue'
-import TnImageUpload from '@tuniao/tnui-vue3-uniapp/components/image-upload/src/image-upload.vue'
+
+import { useAppStore } from '@/stores/appStore.ts'
+import { ref } from 'vue'
+// import BaseLayout from "@/layouts/BaseLayout.vue";
+// import AppSwiper from '@/components/home/AppSwiper.vue'
+
+// import GetUserInfoPopup from "@/components/GetUserInfoPopup.vue";
+
+
+// import TnTitle from '@tuniao/tnui-vue3-uniapp/components/title/src/title.vue'
+// import TnImageUpload from '@tuniao/tnui-vue3-uniapp/components/image-upload/src/image-upload.vue'
 
 
 
 // import io from '@hyoga/uni-socket.io';
 
-import {useAppStore} from "@/stores/appStore.ts";
-import {ref} from 'vue';
+// import {useAppStore} from "@/stores/appStore.ts";
+// import {ref} from 'vue';
 
 const title = 'FuziAi'
 const value1 = ref('22222222222222222')
 
 
-const {toggleShowExecuting}=useAppStore()
-const handleSubmitTask =async () => {
-  const userinfo=await uni.getUserInfo()
-  console.log("userinfo",userinfo)
+const { toggleShowExecuting } = useAppStore()
+const handleSubmitTask = async () => {
+  const userinfo = await uni.getUserInfo()
+  console.log('userinfo', userinfo)
   // 请求登录
   uni.login({
     provider: 'weixin',

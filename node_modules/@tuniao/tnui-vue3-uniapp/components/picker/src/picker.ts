@@ -39,6 +39,27 @@ export const pickerProps = buildProps({
     default: () => [],
   },
   /**
+   * @description 允许滑动结束前点击confirm按钮
+   */
+  allowConfirmBeforeScrollEnd: {
+    type: Boolean,
+    default: false,
+  },
+  /**
+   * @description 是否在手指松开时立即触发 change 事件。若不开启则会在滚动动画结束后触发 change 事件。
+   */
+  immediateChange: {
+    type: Boolean,
+    default: true,
+  },
+  /**
+   * @description indicator的高度, 单位px
+   */
+  indicatorHeight: {
+    type: Number,
+    default: 44,
+  },
+  /**
    * @description picker选项的数据label属性名
    */
   labelKey: {
@@ -69,6 +90,8 @@ export const pickerEmits = {
   [CHANGE_EVENT]: (value: PickerValueType, index: number, item: any) => true,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   confirm: (value: PickerValueType, item: any) => true,
+  pickstart: () => true,
+  pickend: () => true,
   cancel: () => true,
   close: () => true,
 }

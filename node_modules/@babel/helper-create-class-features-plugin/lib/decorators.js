@@ -4,11 +4,20 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = _default;
+exports.hasDecorators = hasDecorators;
+exports.hasOwnDecorators = hasOwnDecorators;
 var _core = require("@babel/core");
 var _helperReplaceSupers = require("@babel/helper-replace-supers");
 var _helperSkipTransparentExpressionWrappers = require("@babel/helper-skip-transparent-expression-wrappers");
 var _fields = require("./fields.js");
 var _misc = require("./misc.js");
+function hasOwnDecorators(node) {
+  var _node$decorators;
+  return !!((_node$decorators = node.decorators) != null && _node$decorators.length);
+}
+function hasDecorators(node) {
+  return hasOwnDecorators(node) || node.body.body.some(hasOwnDecorators);
+}
 function incrementId(id, idx = id.length - 1) {
   if (idx === -1) {
     id.unshift(65);
@@ -360,15 +369,17 @@ function createPrivateBrandCheckClosure(brandName) {
   return _core.types.arrowFunctionExpression([_core.types.identifier("_")], _core.types.binaryExpression("in", _core.types.cloneNode(brandName), _core.types.identifier("_")));
 }
 function usesPrivateField(expression) {
-  try {
-    _core.types.traverseFast(expression, node => {
-      if (_core.types.isPrivateName(node)) {
-        throw null;
-      }
-    });
-    return false;
-  } catch (_unused) {
-    return true;
+  {
+    try {
+      _core.types.traverseFast(expression, node => {
+        if (_core.types.isPrivateName(node)) {
+          throw null;
+        }
+      });
+      return false;
+    } catch (_unused) {
+      return true;
+    }
   }
 }
 function convertToComputedKey(path) {
@@ -421,7 +432,7 @@ function checkPrivateMethodUpdateError(path, decoratedPrivateMethods) {
   });
 }
 function transformClass(path, state, constantSuper, ignoreFunctionLength, className, propertyVisitor, version) {
-  var _path$node$id, _classDecorationsId;
+  var _path$node$id;
   const body = path.get("body.body");
   const classDecorators = path.node.decorators;
   let hasElementDecorators = false;
@@ -440,19 +451,21 @@ function transformClass(path, state, constantSuper, ignoreFunctionLength, classN
   const classIdName = (_path$node$id = path.node.id) == null ? void 0 : _path$node$id.name;
   const setClassName = typeof className === "object" ? className : undefined;
   const usesFunctionContextOrYieldAwait = decorator => {
-    try {
-      _core.types.traverseFast(decorator, node => {
-        if (_core.types.isThisExpression(node) || _core.types.isSuper(node) || _core.types.isYieldExpression(node) || _core.types.isAwaitExpression(node) || _core.types.isIdentifier(node, {
-          name: "arguments"
-        }) || classIdName && _core.types.isIdentifier(node, {
-          name: classIdName
-        }) || _core.types.isMetaProperty(node) && node.meta.name !== "import") {
-          throw null;
-        }
-      });
-      return false;
-    } catch (_unused2) {
-      return true;
+    {
+      try {
+        _core.types.traverseFast(decorator, node => {
+          if (_core.types.isThisExpression(node) || _core.types.isSuper(node) || _core.types.isYieldExpression(node) || _core.types.isAwaitExpression(node) || _core.types.isIdentifier(node, {
+            name: "arguments"
+          }) || classIdName && _core.types.isIdentifier(node, {
+            name: classIdName
+          }) || _core.types.isMetaProperty(node) && node.meta.name !== "import") {
+            throw null;
+          }
+        });
+        return false;
+      } catch (_unused2) {
+        return true;
+      }
     }
   };
   const instancePrivateNames = [];
@@ -479,11 +492,9 @@ function transformClass(path, state, constantSuper, ignoreFunctionLength, classN
           }
         default:
           if (elementNode.static) {
-            var _staticInitLocal;
-            (_staticInitLocal = staticInitLocal) != null ? _staticInitLocal : staticInitLocal = generateLetUidIdentifier(scopeParent, "initStatic");
+            staticInitLocal != null ? staticInitLocal : staticInitLocal = generateLetUidIdentifier(scopeParent, "initStatic");
           } else {
-            var _protoInitLocal;
-            (_protoInitLocal = protoInitLocal) != null ? _protoInitLocal : protoInitLocal = generateLetUidIdentifier(scopeParent, "initProto");
+            protoInitLocal != null ? protoInitLocal : protoInitLocal = generateLetUidIdentifier(scopeParent, "initProto");
           }
           break;
       }
@@ -545,8 +556,7 @@ function transformClass(path, state, constantSuper, ignoreFunctionLength, classN
         } else if (scopeParent.isStatic(expression.object)) {
           object = _core.types.cloneNode(expression.object);
         } else {
-          var _decoratorReceiverId;
-          (_decoratorReceiverId = decoratorReceiverId) != null ? _decoratorReceiverId : decoratorReceiverId = generateLetUidIdentifier(scopeParent, "obj");
+          decoratorReceiverId != null ? decoratorReceiverId : decoratorReceiverId = generateLetUidIdentifier(scopeParent, "obj");
           object = _core.types.assignmentExpression("=", _core.types.cloneNode(decoratorReceiverId), expression.object);
           expression.object = _core.types.cloneNode(decoratorReceiverId);
         }
@@ -984,7 +994,7 @@ function transformClass(path, state, constantSuper, ignoreFunctionLength, classN
     }
     computedKeyAssignments = [];
   }
-  applyDecsBody.push(_core.types.expressionStatement(createLocalsAssignment(elementLocals, classLocals, elementDecorations, (_classDecorationsId = classDecorationsId) != null ? _classDecorationsId : _core.types.arrayExpression(classDecorations), _core.types.numericLiteral(classDecorationsFlag), needsInstancePrivateBrandCheck ? lastInstancePrivateName : null, setClassName, _core.types.cloneNode(superClass), state, version)));
+  applyDecsBody.push(_core.types.expressionStatement(createLocalsAssignment(elementLocals, classLocals, elementDecorations, classDecorationsId != null ? classDecorationsId : _core.types.arrayExpression(classDecorations), _core.types.numericLiteral(classDecorationsFlag), needsInstancePrivateBrandCheck ? lastInstancePrivateName : null, setClassName, _core.types.cloneNode(superClass), state, version)));
   if (staticInitLocal) {
     applyDecsBody.push(_core.types.expressionStatement(_core.types.callExpression(_core.types.cloneNode(staticInitLocal), [_core.types.thisExpression()])));
   }
@@ -1256,12 +1266,12 @@ function _default({
   const ignoreFunctionLength = (_assumption2 = assumption("ignoreFunctionLength")) != null ? _assumption2 : loose;
   const namedEvaluationVisitor = NamedEvaluationVisitoryFactory(isDecoratedAnonymousClassExpression, visitClass);
   function visitClass(path, state, className) {
-    var _className, _node$id;
+    var _node$id;
     if (VISITED.has(path)) return;
     const {
       node
     } = path;
-    (_className = className) != null ? _className : className = (_node$id = node.id) == null ? void 0 : _node$id.name;
+    className != null ? className : className = (_node$id = node.id) == null ? void 0 : _node$id.name;
     const newPath = transformClass(path, state, constantSuper, ignoreFunctionLength, className, namedEvaluationVisitor, version);
     if (newPath) {
       VISITED.add(newPath);

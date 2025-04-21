@@ -23,22 +23,7 @@
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
-.u-empty.data-v-0573594d,
-.u-empty__wrap.data-v-0573594d,
-.u-tabs.data-v-0573594d,
-.u-tabs__wrapper.data-v-0573594d,
-.u-tabs__wrapper__scroll-view-wrapper.data-v-0573594d,
-.u-tabs__wrapper__scroll-view.data-v-0573594d,
-.u-tabs__wrapper__nav.data-v-0573594d,
-.u-tabs__wrapper__nav__line.data-v-0573594d,
-.up-empty.data-v-0573594d,
-.up-empty__wrap.data-v-0573594d,
-.up-tabs.data-v-0573594d,
-.up-tabs__wrapper.data-v-0573594d,
-.up-tabs__wrapper__scroll-view-wrapper.data-v-0573594d,
-.up-tabs__wrapper__scroll-view.data-v-0573594d,
-.up-tabs__wrapper__nav.data-v-0573594d,
-.up-tabs__wrapper__nav__line.data-v-0573594d {
+.u-empty.data-v-0573594d,.u-empty__wrap.data-v-0573594d,.u-tabs.data-v-0573594d,.u-tabs__wrapper.data-v-0573594d,.u-tabs__wrapper__scroll-view-wrapper.data-v-0573594d,.u-tabs__wrapper__scroll-view.data-v-0573594d,.u-tabs__wrapper__nav.data-v-0573594d,.u-tabs__wrapper__nav__line.data-v-0573594d,.up-empty.data-v-0573594d,.up-empty__wrap.data-v-0573594d,.up-tabs.data-v-0573594d,.up-tabs__wrapper.data-v-0573594d,.up-tabs__wrapper__scroll-view-wrapper.data-v-0573594d,.up-tabs__wrapper__scroll-view.data-v-0573594d,.up-tabs__wrapper__nav.data-v-0573594d,.up-tabs__wrapper__nav__line.data-v-0573594d {
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
@@ -61,84 +46,56 @@
  * slide-left：左滑进入
  * slide-right：右滑进入
  */
-.u-fade-enter-active.data-v-0573594d,
-.u-fade-leave-active.data-v-0573594d {
+.u-fade-enter-active.data-v-0573594d,.u-fade-leave-active.data-v-0573594d {
   transition-property: opacity;
 }
-.u-fade-enter.data-v-0573594d,
-.u-fade-leave-to.data-v-0573594d {
+.u-fade-enter.data-v-0573594d,.u-fade-leave-to.data-v-0573594d {
   opacity: 0;
 }
-.u-fade-zoom-enter.data-v-0573594d,
-.u-fade-zoom-leave-to.data-v-0573594d {
+.u-fade-zoom-enter.data-v-0573594d,.u-fade-zoom-leave-to.data-v-0573594d {
   transform: scale(0.95);
   opacity: 0;
 }
-.u-fade-zoom-enter-active.data-v-0573594d,
-.u-fade-zoom-leave-active.data-v-0573594d {
+.u-fade-zoom-enter-active.data-v-0573594d,.u-fade-zoom-leave-active.data-v-0573594d {
   transition-property: transform, opacity;
 }
-.u-fade-down-enter-active.data-v-0573594d,
-.u-fade-down-leave-active.data-v-0573594d,
-.u-fade-left-enter-active.data-v-0573594d,
-.u-fade-left-leave-active.data-v-0573594d,
-.u-fade-right-enter-active.data-v-0573594d,
-.u-fade-right-leave-active.data-v-0573594d,
-.u-fade-up-enter-active.data-v-0573594d,
-.u-fade-up-leave-active.data-v-0573594d {
+.u-fade-down-enter-active.data-v-0573594d,.u-fade-down-leave-active.data-v-0573594d,.u-fade-left-enter-active.data-v-0573594d,.u-fade-left-leave-active.data-v-0573594d,.u-fade-right-enter-active.data-v-0573594d,.u-fade-right-leave-active.data-v-0573594d,.u-fade-up-enter-active.data-v-0573594d,.u-fade-up-leave-active.data-v-0573594d {
   transition-property: opacity, transform;
 }
-.u-fade-up-enter.data-v-0573594d,
-.u-fade-up-leave-to.data-v-0573594d {
+.u-fade-up-enter.data-v-0573594d,.u-fade-up-leave-to.data-v-0573594d {
   transform: translate3d(0, 100%, 0);
   opacity: 0;
 }
-.u-fade-down-enter.data-v-0573594d,
-.u-fade-down-leave-to.data-v-0573594d {
+.u-fade-down-enter.data-v-0573594d,.u-fade-down-leave-to.data-v-0573594d {
   transform: translate3d(0, -100%, 0);
   opacity: 0;
 }
-.u-fade-left-enter.data-v-0573594d,
-.u-fade-left-leave-to.data-v-0573594d {
+.u-fade-left-enter.data-v-0573594d,.u-fade-left-leave-to.data-v-0573594d {
   transform: translate3d(-100%, 0, 0);
   opacity: 0;
 }
-.u-fade-right-enter.data-v-0573594d,
-.u-fade-right-leave-to.data-v-0573594d {
+.u-fade-right-enter.data-v-0573594d,.u-fade-right-leave-to.data-v-0573594d {
   transform: translate3d(100%, 0, 0);
   opacity: 0;
 }
-.u-slide-down-enter-active.data-v-0573594d,
-.u-slide-down-leave-active.data-v-0573594d,
-.u-slide-left-enter-active.data-v-0573594d,
-.u-slide-left-leave-active.data-v-0573594d,
-.u-slide-right-enter-active.data-v-0573594d,
-.u-slide-right-leave-active.data-v-0573594d,
-.u-slide-up-enter-active.data-v-0573594d,
-.u-slide-up-leave-active.data-v-0573594d {
+.u-slide-down-enter-active.data-v-0573594d,.u-slide-down-leave-active.data-v-0573594d,.u-slide-left-enter-active.data-v-0573594d,.u-slide-left-leave-active.data-v-0573594d,.u-slide-right-enter-active.data-v-0573594d,.u-slide-right-leave-active.data-v-0573594d,.u-slide-up-enter-active.data-v-0573594d,.u-slide-up-leave-active.data-v-0573594d {
   transition-property: transform;
 }
-.u-slide-up-enter.data-v-0573594d,
-.u-slide-up-leave-to.data-v-0573594d {
+.u-slide-up-enter.data-v-0573594d,.u-slide-up-leave-to.data-v-0573594d {
   transform: translate3d(0, 100%, 0);
 }
-.u-slide-down-enter.data-v-0573594d,
-.u-slide-down-leave-to.data-v-0573594d {
+.u-slide-down-enter.data-v-0573594d,.u-slide-down-leave-to.data-v-0573594d {
   transform: translate3d(0, -100%, 0);
 }
-.u-slide-left-enter.data-v-0573594d,
-.u-slide-left-leave-to.data-v-0573594d {
+.u-slide-left-enter.data-v-0573594d,.u-slide-left-leave-to.data-v-0573594d {
   transform: translate3d(-100%, 0, 0);
 }
-.u-slide-right-enter.data-v-0573594d,
-.u-slide-right-leave-to.data-v-0573594d {
+.u-slide-right-enter.data-v-0573594d,.u-slide-right-leave-to.data-v-0573594d {
   transform: translate3d(100%, 0, 0);
 }
-.u-zoom-enter-active.data-v-0573594d,
-.u-zoom-leave-active.data-v-0573594d {
+.u-zoom-enter-active.data-v-0573594d,.u-zoom-leave-active.data-v-0573594d {
   transition-property: transform;
 }
-.u-zoom-enter.data-v-0573594d,
-.u-zoom-leave-to.data-v-0573594d {
+.u-zoom-enter.data-v-0573594d,.u-zoom-leave-to.data-v-0573594d {
   transform: scale(0.95);
 }

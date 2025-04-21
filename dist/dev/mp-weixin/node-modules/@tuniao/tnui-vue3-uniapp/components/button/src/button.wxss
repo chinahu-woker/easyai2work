@@ -123,5 +123,5 @@
   border-radius: 0rpx;
   align-items: normal;
   justify-content: normal;
-  text-align: unset;
+  text-align: inherit;
 }

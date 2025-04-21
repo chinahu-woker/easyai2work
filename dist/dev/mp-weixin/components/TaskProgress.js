@@ -32,7 +32,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   setup(__props) {
     const currentSwiperIndex = common_vendor.ref(0);
     common_vendor.watch(currentSwiperIndex, () => {
-      console.log("currentSwiperIndex", currentSwiperIndex.value);
+      common_vendor.index.__f__("log", "at components/TaskProgress.vue:14", "currentSwiperIndex", currentSwiperIndex.value);
     });
     const { localTasks } = common_vendor.storeToRefs(stores_appStore.useAppStore());
     const AllList = common_vendor.computed(() => {
@@ -103,7 +103,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     common_vendor.onShow(() => {
       const excIndex = handleFindExecutingTaskIndex();
-      console.log("task onshow", excIndex);
+      common_vendor.index.__f__("log", "at components/TaskProgress.vue:112", "task onshow", excIndex);
       if (excIndex !== -1) {
         currentSwiperIndex.value = handleFindExecutingTaskIndex();
       }
@@ -120,15 +120,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const imageRegex = /\.(jpg|jpeg|png|gif|bmp)$/i;
       const videoRegex = /\.(mp4|avi|mov|mkv|flv|wmv)$/i;
       if (!input) {
-        console.log("==============", "是空值");
+        common_vendor.index.__f__("log", "at components/TaskProgress.vue:135", "==============", "是空值");
         return 0;
       }
       if (checkContent(input) == 1) {
         if (imageRegex.test(input)) {
-          console.log("==============", "是图片");
+          common_vendor.index.__f__("log", "at components/TaskProgress.vue:141", "==============", "是图片");
           return 1;
         } else if (videoRegex.test(input)) {
-          console.log("==============", "是视频");
+          common_vendor.index.__f__("log", "at components/TaskProgress.vue:146", "==============", "是视频");
           return 2;
         }
       }
@@ -150,7 +150,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }]);
     common_vendor.computed(() => {
       var _a, _b, _c, _d, _e, _f, _g, _h;
-      console.log("----------------------------{{generateParams}}----------------", localTasks.value[currentSwiperIndex.value]);
+      common_vendor.index.__f__("log", "at components/TaskProgress.vue:170", "----------------------------{{generateParams}}----------------", localTasks.value[currentSwiperIndex.value]);
       const output = (_a = localTasks.value[currentSwiperIndex.value]) == null ? void 0 : _a.output[currentSwiperIndex.value];
       const contentType = judgeContent(output);
       allValueList.value = [];
@@ -167,10 +167,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           textImg: " "
           // 替换为实际图片路径
         });
-        console.log("----------------------------{{generateParams}}------allValueList----------", allValueList.value);
+        common_vendor.index.__f__("log", "at components/TaskProgress.vue:186", "----------------------------{{generateParams}}------allValueList----------", allValueList.value);
         StringImag.value = output;
         StringCont.value = "";
-        console.log("----------output---showOrSleep.value = 0;---------", output);
+        common_vendor.index.__f__("log", "at components/TaskProgress.vue:189", "----------output---showOrSleep.value = 0;---------", output);
       } else if (contentType === 2) {
         allValueList.value.push({
           class: "video",
@@ -184,7 +184,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         showOrSleep.value = 1;
         StringCont.value = "";
         StringImag.value = "output";
-        console.log("----------output---showOrSleep.value = 1;---------", output);
+        common_vendor.index.__f__("log", "at components/TaskProgress.vue:201", "----------output---showOrSleep.value = 1;---------", output);
       } else if (contentType === 3) {
         allValueList.value.push({
           class: "text",
@@ -197,14 +197,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         });
         showOrSleep.value = 2;
         StringCont.value = output;
-        console.log("----------output---showOrSleep.value = 2;---------", output, allValueList);
+        common_vendor.index.__f__("log", "at components/TaskProgress.vue:213", "----------output---showOrSleep.value = 2;---------", output, allValueList);
         StringImag.value = (_h = (_g = localTasks.value[currentSwiperIndex.value]) == null ? void 0 : _g.params) == null ? void 0 : _h.image_path_mask;
       }
     });
     const handlePreview = () => {
       const currentTask = localTasks.value[currentSwiperIndex.value];
       if (currentTask && currentTask.status === 1) {
-        console.log("preview");
+        common_vendor.index.__f__("log", "at components/TaskProgress.vue:288", "preview");
         common_vendor.index.previewImage({ urls: currentTask.output });
       }
     };
@@ -221,17 +221,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     common_vendor.ref(false);
     function handleClick(e, StringTxt) {
       if (e.index == 0) {
-        console.log("---------------(e)------------", e);
+        common_vendor.index.__f__("log", "at components/TaskProgress.vue:305", "---------------(e)------------", e);
         common_vendor.index.setClipboardData({
           data: StringTxt,
           // 需要设置到剪切板的内容
           showToast: true,
           // 是否显示提示，默认为true
           success: function() {
-            console.log("复制成功");
+            common_vendor.index.__f__("log", "at components/TaskProgress.vue:310", "复制成功");
           },
           fail: function(err) {
-            console.error("复制失败", err);
+            common_vendor.index.__f__("error", "at components/TaskProgress.vue:313", "复制失败", err);
           }
         });
       } else if (e.index == 1) {
@@ -242,7 +242,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     function change(e) {
       current.value = e.detail.current;
     }
-    console.log("--------****************------------", AllList, localTasks);
+    common_vendor.index.__f__("log", "at components/TaskProgress.vue:338", "--------****************------------", AllList, localTasks);
     return (_ctx, _cache) => {
       return common_vendor.e({
         a: common_vendor.p({
@@ -331,3 +331,4 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
 });
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-defa837f"]]);
 wx.createComponent(Component);
+//# sourceMappingURL=../../.sourcemap/mp-weixin/components/TaskProgress.js.map

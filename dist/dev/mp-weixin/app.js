@@ -2,7 +2,6 @@
 Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
 const common_vendor = require("./common/vendor.js");
 const stores_appStore = require("./stores/appStore.js");
-const components_common_share = require("./components/common/share.js");
 if (!Math) {
   "./pages/index/index.js";
   "./pages/creative/creative.js";
@@ -15,36 +14,37 @@ if (!Math) {
   "./pages/draw/draw_info/draw_info.js";
   "./pages/console/console.js";
 }
-const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
+const _sfc_defineComponent = common_vendor.defineComponent({
   __name: "App",
   setup(__props) {
-    common_vendor.onLoad(() => {
-      console.log("App onLoad");
-    });
     common_vendor.onShow(() => {
-      console.log("App onShow");
+      common_vendor.index.__f__("log", "at App.vue:9", "App onShow");
     });
     common_vendor.onHide(() => {
-      console.log("App onHide");
+      common_vendor.index.__f__("log", "at App.vue:12", "App onHide");
     });
     stores_appStore.useAppStore().init();
     const socketState = common_vendor.reactive({ socket: null, isInitialized: false });
     common_vendor.provide("socketState", socketState);
-    const { uniPlatform } = common_vendor.index.getSystemInfoSync();
-    console.log("平台信息", uniPlatform);
+    common_vendor.index.getSystemInfo({
+      success: (res) => {
+        common_vendor.index.__f__("log", "at App.vue:23", "平台信息", res.uniPlatform);
+      }
+    });
     return () => {
     };
   }
 });
+_sfc_defineComponent.__runtimeHooks = 6;
 function createApp() {
-  const app = common_vendor.createSSRApp(_sfc_main);
+  const app = common_vendor.createSSRApp(_sfc_defineComponent);
   const pinia = common_vendor.createPinia();
   app.use(pinia);
   app.use(common_vendor.uviewPlus);
-  app.mixin(components_common_share.share);
   return {
     app
   };
 }
 createApp().app.mount("#app");
 exports.createApp = createApp;
+//# sourceMappingURL=../.sourcemap/mp-weixin/app.js.map

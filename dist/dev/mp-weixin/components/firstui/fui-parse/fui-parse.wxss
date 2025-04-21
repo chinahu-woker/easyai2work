@@ -79,39 +79,13 @@
 		font-size: 12px;
 		margin-bottom: .04em;
 }
-.fuiParse-h1.data-v-231dc595,
-	.fuiParse-h1 text.data-v-231dc595,
-	.fuiParse-h2.data-v-231dc595,
-	.fuiParse-h2 text.data-v-231dc595,
-	.fuiParse-h3.data-v-231dc595,
-	.fuiParse-h3 text.data-v-231dc595,
-	.fuiParse-h4.data-v-231dc595,
-	.fuiParse-h4 text.data-v-231dc595,
-	.fuiParse-h5.data-v-231dc595,
-	.fuiParse-h5 text.data-v-231dc595,
-	.fuiParse-h6.data-v-231dc595,
-	.fuiParse-h6 text.data-v-231dc595,
-	.fuiParse-b.data-v-231dc595,
-	.fuiParse-b text.data-v-231dc595,
-	.fuiParse-strong.data-v-231dc595,
-	.fuiParse-strong text.data-v-231dc595 {
+.fuiParse-h1.data-v-231dc595,.fuiParse-h1 text.data-v-231dc595,.fuiParse-h2.data-v-231dc595,.fuiParse-h2 text.data-v-231dc595,.fuiParse-h3.data-v-231dc595,.fuiParse-h3 text.data-v-231dc595,.fuiParse-h4.data-v-231dc595,.fuiParse-h4 text.data-v-231dc595,.fuiParse-h5.data-v-231dc595,.fuiParse-h5 text.data-v-231dc595,.fuiParse-h6.data-v-231dc595,.fuiParse-h6 text.data-v-231dc595,.fuiParse-b.data-v-231dc595,.fuiParse-b text.data-v-231dc595,.fuiParse-strong.data-v-231dc595,.fuiParse-strong text.data-v-231dc595 {
 		font-weight: bold;
 }
-.fuiParse-i.data-v-231dc595,
-	.fuiParse-i text.data-v-231dc595,
-	.fuiParse-cite.data-v-231dc595,
-	.fuiParse-em.data-v-231dc595,
-	.fuiParse-em text.data-v-231dc595,
-	.fuiParse-var.data-v-231dc595,
-	.fuiParse-address.data-v-231dc595,
-	.fuiParse-address text.data-v-231dc595 {
+.fuiParse-i.data-v-231dc595,.fuiParse-i text.data-v-231dc595,.fuiParse-cite.data-v-231dc595,.fuiParse-em.data-v-231dc595,.fuiParse-em text.data-v-231dc595,.fuiParse-var.data-v-231dc595,.fuiParse-address.data-v-231dc595,.fuiParse-address text.data-v-231dc595 {
 		font-style: italic
 }
-.fuiParse-pre.data-v-231dc595,
-	.fuiParse-tt.data-v-231dc595,
-	.fuiParse-code.data-v-231dc595,
-	.fuiParse-kbd.data-v-231dc595,
-	.fuiParse-samp.data-v-231dc595 {
+.fuiParse-pre.data-v-231dc595,.fuiParse-tt.data-v-231dc595,.fuiParse-code.data-v-231dc595,.fuiParse-kbd.data-v-231dc595,.fuiParse-samp.data-v-231dc595 {
 		font-family: monospace
 }
 .fuiParse-pre.data-v-231dc595 {
@@ -134,9 +108,7 @@
 .fuiParse-big.data-v-231dc595 {
 		font-size: 1.17em
 }
-.fuiParse-small.data-v-231dc595,
-	.fuiParse-sub.data-v-231dc595,
-	.fuiParse-sup.data-v-231dc595 {
+.fuiParse-small.data-v-231dc595,.fuiParse-sub.data-v-231dc595,.fuiParse-sup.data-v-231dc595 {
 		font-size: .83em
 }
 .fuiParse-sub.data-v-231dc595 {
@@ -145,16 +117,14 @@
 .fuiParse-sup.data-v-231dc595 {
 		vertical-align: super
 }
-.fuiParse-s.data-v-231dc595,
-	.fuiParse-strike.data-v-231dc595,
-	.fuiParse-del.data-v-231dc595 {
+.fuiParse-s.data-v-231dc595,.fuiParse-strike.data-v-231dc595,.fuiParse-del.data-v-231dc595 {
+		-webkit-text-decoration: line-through;
 		text-decoration: line-through
 }
 
 	/*fuiParse-自定义个性化的css样式*/
 	/*增加video的css样式*/
-.fuiParse-strong.data-v-231dc595,
-	.fuiParse-s.data-v-231dc595 {
+.fuiParse-strong.data-v-231dc595,.fuiParse-s.data-v-231dc595 {
 		display: inline
 }
 .fuiParse-a.data-v-231dc595 {
@@ -176,13 +146,11 @@
 		background: #f5f5f5;
 		border-left: 3px solid #dbdbdb;
 }
-.fuiParse-code.data-v-231dc595,
-	.fuiParse-code-style.data-v-231dc595 {
+.fuiParse-code.data-v-231dc595,.fuiParse-code-style.data-v-231dc595 {
 		background: #f5f5f5;
 		line-height: 1.75;
 }
-.fuiParse-li.data-v-231dc595,
-	.fuiParse-li-inner.data-v-231dc595 {
+.fuiParse-li.data-v-231dc595,.fuiParse-li-inner.data-v-231dc595 {
 		align-items: baseline;
 		margin: 10rpx 0;
 }
@@ -191,8 +159,7 @@
 		align-items: center;
 		line-height: 20px;
 }
-.fuiParse-li-circle.data-v-231dc595,
-	.fuiParse-ol-number.data-v-231dc595 {
+.fuiParse-li-circle.data-v-231dc595,.fuiParse-ol-number.data-v-231dc595 {
 		margin: 10rpx 10rpx 10rpx 0;
 }
 .fuiParse-li-circle.data-v-231dc595 {
@@ -220,6 +187,7 @@
 		margin-right: 5px;
 }
 .fuiParse-u.data-v-231dc595 {
+		-webkit-text-decoration: underline;
 		text-decoration: underline;
 }
 .fuiParse-hide.data-v-231dc595 {
@@ -242,21 +210,17 @@
 		flex-direction: row;
 		border-right: 1px solid #e0e0e0;
 }
-.fuiParse-th.data-v-231dc595,
-	.fuiParse-td.data-v-231dc595 {
+.fuiParse-th.data-v-231dc595,.fuiParse-td.data-v-231dc595 {
 		flex: 1;
 		padding: 5px;
 		font-size: 28rpx;
 		word-break: break-all;
 		text-align: center;
 }
-.fuiParse-th image.data-v-231dc595,
-	.fuiParse-td image.data-v-231dc595,
-	.fuiParse-td .fuiParse-img.data-v-231dc595 {
+.fuiParse-th image.data-v-231dc595,.fuiParse-td image.data-v-231dc595,.fuiParse-td .fuiParse-img.data-v-231dc595 {
 		width: 100% !important;
 }
-.fuiParse-th-container.data-v-231dc595,
-	.fuiParse-td-container.data-v-231dc595 {
+.fuiParse-th-container.data-v-231dc595,.fuiParse-td-container.data-v-231dc595 {
 		border-left: 1px solid #e0e0e0;
 		border-top: 1px solid #e0e0e0
 }
@@ -273,8 +237,7 @@
 .fuiParse-figure.data-v-231dc595 {
 		overflow: hidden;
 }
-.fuiParse-ol-inner.data-v-231dc595,
-	.fuiParse-ul-inner.data-v-231dc595 {
+.fuiParse-ol-inner.data-v-231dc595,.fuiParse-ul-inner.data-v-231dc595 {
 
 		display: flex;
 

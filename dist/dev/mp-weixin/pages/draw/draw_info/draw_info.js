@@ -19,6 +19,7 @@ const _easycom_fui_button = () => "../../../components/firstui/fui-button/fui-bu
 if (!Math) {
   (_easycom_fui_icon + _easycom_fui_nav_bar + _easycom_fui_background_image + _easycom_fui_section + _easycom_fui_button)();
 }
+const backGroundImage = "https://chinahu-ai-server.oss-cn-chengdu.aliyuncs.com/aidraw/image/temps/67873d6c232a3c5d52240dd6/Home2.jpg";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "draw_info",
   setup(__props) {
@@ -32,18 +33,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       handleFindComponentName,
       handleSubmitTaskTask
     } = composables_useWorkFlow.useWorkFlow();
-    console.log("-------------useWorkFlow()----------------", composables_useWorkFlow.useWorkFlow());
+    common_vendor.index.__f__("log", "at pages/draw/draw_info/draw_info.vue:68", "-------------useWorkFlow()----------------", composables_useWorkFlow.useWorkFlow());
     const workflowId = common_vendor.ref("");
     common_vendor.onLoad(async () => {
       const currentPage = getCurrentPages().pop();
       const query = currentPage == null ? void 0 : currentPage.options;
       workflowId.value = query.id;
-      handleGetWorkFlwById(query.id).then(() => console.log("///////////////////", workflow.value));
+      handleGetWorkFlwById(query.id).then(() => common_vendor.index.__f__("log", "at pages/draw/draw_info/draw_info.vue:78", "///////////////////", workflow.value));
       socketInit();
     });
     function to_apps(item_id) {
       if (!composables_useCommon.isLogin.value) {
-        console.log("-------------isLogin-----------", composables_useCommon.isLogin);
+        common_vendor.index.__f__("log", "at pages/draw/draw_info/draw_info.vue:83", "-------------isLogin-----------", composables_useCommon.isLogin);
         common_vendor.index.showToast(
           {
             icon: "error",
@@ -57,7 +58,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }
         );
       } else {
-        console.log("我点击啦~~~~~~~~", item_id);
+        common_vendor.index.__f__("log", "at pages/draw/draw_info/draw_info.vue:99", "我点击啦~~~~~~~~", item_id);
         common_vendor.index.navigateTo({ url: "/pages/draw/apps/apps?id=" + item_id });
       }
     }
@@ -88,6 +89,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return 2;
     }
     return (_ctx, _cache) => {
+      var _a, _b, _c;
       return common_vendor.e({
         a: common_vendor.p({
           name: "arrowleft"
@@ -95,13 +97,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         b: common_vendor.o(leftClick),
         c: common_vendor.p({
           background: "transparent",
-          title: common_vendor.unref(workflow).title
+          title: (_a = common_vendor.unref(workflow)) == null ? void 0 : _a.title
         }),
         d: common_vendor.p({
-          src: "@/src/static/Home2 (1).jpgHome2(1).jpg"
+          src: backGroundImage
         }),
-        e: linkType(common_vendor.unref(workflow).cover) == 0
-      }, linkType(common_vendor.unref(workflow).cover) == 0 ? {
+        e: linkType((_b = common_vendor.unref(workflow)) == null ? void 0 : _b.cover) == 0
+      }, linkType((_c = common_vendor.unref(workflow)) == null ? void 0 : _c.cover) == 0 ? {
         f: common_vendor.o(
           //@ts-ignore
           (...args) => _ctx.showGallery && _ctx.showGallery(...args)
@@ -130,3 +132,4 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
 });
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-1bef2961"]]);
 wx.createPage(MiniProgramPage);
+//# sourceMappingURL=../../../../.sourcemap/mp-weixin/pages/draw/draw_info/draw_info.js.map

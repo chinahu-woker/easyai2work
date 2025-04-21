@@ -18,7 +18,7 @@ const refreshUserInfo = (user = getLoginInfo()) => utils_request.request(`/users
 });
 const isLogin = common_vendor.computed(() => {
   const { user } = common_vendor.storeToRefs(stores_appStore.useAppStore());
-  console.log("storeToRefs(useAppStore())", user.value);
+  common_vendor.index.__f__("log", "at composables/useCommon.ts:38", "storeToRefs(useAppStore())", user.value);
   common_vendor.index.setStorageSync("userInfo", user.value);
   common_vendor.index.setStorageSync("refreshToken", user.value.refresh_token);
   common_vendor.index.setStorageSync("my_invite_code", user.value.my_invite_code);
@@ -46,3 +46,4 @@ exports.loginOut = loginOut;
 exports.refreshUserInfo = refreshUserInfo;
 exports.saveLoginInfo = saveLoginInfo;
 exports.updateUserInfo = updateUserInfo;
+//# sourceMappingURL=../../.sourcemap/mp-weixin/composables/useCommon.js.map

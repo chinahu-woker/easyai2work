@@ -23,6 +23,10 @@
   }
   @include e(operation-btn) {
     padding: 0rpx 30rpx;
+
+    @include m(disabled) {
+      color: var(--tn-color-gray) !important;
+    }
   }
   /* 顶部操作区域 end */
 
@@ -51,6 +55,9 @@
   @include e(picker-view) {
     flex-grow: 1;
     height: 100%;
+
+    // :deep(.tn-picker-indicator) {
+    // }
   }
   /* picker-view 样式 end */
 }

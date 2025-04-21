@@ -7,6 +7,11 @@
   background-color: var(--tn-color-white);
   display: flex;
 
+  @include m(static) {
+    background-color: transparent;
+    box-shadow: none;
+  }
+
   /* 普通键盘 start */
   @include e(normal-container) {
     padding: 10rpx 10rpx 20rpx 10rpx;

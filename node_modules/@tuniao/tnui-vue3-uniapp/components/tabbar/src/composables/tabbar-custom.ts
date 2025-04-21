@@ -19,7 +19,12 @@ export const useTabbarCustomStyle = (props: TabbarProps) => {
     const cls: string[] = [ns.b()]
 
     // 是否固定在底部
-    if (props.fixed) cls.push(ns.m('fixed'))
+    if (props.fixed) {
+      cls.push(ns.m('fixed'))
+      if (props.hiddenFixedTabbar) {
+        cls.push(ns.m('fixed-hidden'))
+      }
+    }
 
     // 是否预留安全距离
     if (props.safeAreaInsetBottom) cls.push('tn-u-safe-area')

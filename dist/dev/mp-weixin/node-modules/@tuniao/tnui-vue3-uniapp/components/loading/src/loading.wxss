@@ -92,52 +92,52 @@
   background-color: currentColor;
 }
 .tn-loading__flower--item.data-v-8c5f91f0:nth-of-type(1) {
-  opacity: calc(1 / 12 * 1);
-  transform: rotate(calc(360deg / 12 * 1));
+  opacity: calc(0.0833333333 * 1);
+  transform: rotate(calc(30deg * 1));
 }
 .tn-loading__flower--item.data-v-8c5f91f0:nth-of-type(2) {
-  opacity: calc(1 / 12 * 2);
-  transform: rotate(calc(360deg / 12 * 2));
+  opacity: calc(0.0833333333 * 2);
+  transform: rotate(calc(30deg * 2));
 }
 .tn-loading__flower--item.data-v-8c5f91f0:nth-of-type(3) {
-  opacity: calc(1 / 12 * 3);
-  transform: rotate(calc(360deg / 12 * 3));
+  opacity: calc(0.0833333333 * 3);
+  transform: rotate(calc(30deg * 3));
 }
 .tn-loading__flower--item.data-v-8c5f91f0:nth-of-type(4) {
-  opacity: calc(1 / 12 * 4);
-  transform: rotate(calc(360deg / 12 * 4));
+  opacity: calc(0.0833333333 * 4);
+  transform: rotate(calc(30deg * 4));
 }
 .tn-loading__flower--item.data-v-8c5f91f0:nth-of-type(5) {
-  opacity: calc(1 / 12 * 5);
-  transform: rotate(calc(360deg / 12 * 5));
+  opacity: calc(0.0833333333 * 5);
+  transform: rotate(calc(30deg * 5));
 }
 .tn-loading__flower--item.data-v-8c5f91f0:nth-of-type(6) {
-  opacity: calc(1 / 12 * 6);
-  transform: rotate(calc(360deg / 12 * 6));
+  opacity: calc(0.0833333333 * 6);
+  transform: rotate(calc(30deg * 6));
 }
 .tn-loading__flower--item.data-v-8c5f91f0:nth-of-type(7) {
-  opacity: calc(1 / 12 * 7);
-  transform: rotate(calc(360deg / 12 * 7));
+  opacity: calc(0.0833333333 * 7);
+  transform: rotate(calc(30deg * 7));
 }
 .tn-loading__flower--item.data-v-8c5f91f0:nth-of-type(8) {
-  opacity: calc(1 / 12 * 8);
-  transform: rotate(calc(360deg / 12 * 8));
+  opacity: calc(0.0833333333 * 8);
+  transform: rotate(calc(30deg * 8));
 }
 .tn-loading__flower--item.data-v-8c5f91f0:nth-of-type(9) {
-  opacity: calc(1 / 12 * 9);
-  transform: rotate(calc(360deg / 12 * 9));
+  opacity: calc(0.0833333333 * 9);
+  transform: rotate(calc(30deg * 9));
 }
 .tn-loading__flower--item.data-v-8c5f91f0:nth-of-type(10) {
-  opacity: calc(1 / 12 * 10);
-  transform: rotate(calc(360deg / 12 * 10));
+  opacity: calc(0.0833333333 * 10);
+  transform: rotate(calc(30deg * 10));
 }
 .tn-loading__flower--item.data-v-8c5f91f0:nth-of-type(11) {
-  opacity: calc(1 / 12 * 11);
-  transform: rotate(calc(360deg / 12 * 11));
+  opacity: calc(0.0833333333 * 11);
+  transform: rotate(calc(30deg * 11));
 }
 .tn-loading__flower--item.data-v-8c5f91f0:nth-of-type(12) {
-  opacity: calc(1 / 12 * 12);
-  transform: rotate(calc(360deg / 12 * 12));
+  opacity: calc(0.0833333333 * 12);
+  transform: rotate(calc(30deg * 12));
 }
 .tn-loading--animation.data-v-8c5f91f0 {
   animation-name: rotate-8c5f91f0;

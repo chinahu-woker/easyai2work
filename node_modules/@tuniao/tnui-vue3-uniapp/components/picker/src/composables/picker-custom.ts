@@ -5,7 +5,10 @@ import type { CSSProperties } from 'vue'
 import type { PickerProps } from '../picker'
 
 export type PickerOperationBtnType = 'cancel' | 'confirm'
-export type PickerOperationBtnClass = (type: PickerOperationBtnType) => string
+export type PickerOperationBtnClass = (
+  type: PickerOperationBtnType,
+  disabled: boolean
+) => string
 export type PickerOperationBtnStyle = (
   type: PickerOperationBtnType
 ) => CSSProperties
@@ -30,11 +33,15 @@ export const usePickerCustomStyle = (props: PickerProps) => {
 
   // 取消/确认按钮对应的类
   const operationBtnClass = computed<PickerOperationBtnClass>(() => {
-    return (type: PickerOperationBtnType) => {
+    return (type: PickerOperationBtnType, disabled: boolean) => {
       const cls: string[] = [
         ns.e('operation-btn'),
         ns.em('operation-btn', type),
       ]
+
+      if (!props.allowConfirmBeforeScrollEnd && disabled) {
+        cls.push(ns.em('operation-btn', 'disabled'))
+      }
 
       if (type === 'cancel') {
         if (cancelColorClass.value) cls.push(cancelColorClass.value)

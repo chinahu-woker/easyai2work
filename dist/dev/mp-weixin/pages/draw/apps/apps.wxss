@@ -43,18 +43,18 @@
   position: relative;
   padding-top: 80rpx;
   /* 顶部导航栏的高度 + 小间距 */
-  padding-bottom: 120px;
+  padding-bottom: 120rpx;
   /* 底部导航栏的高度 + 小间距 */
 }
 
 /* 居中按钮样式 */
 .floating-button.data-v-6cf62e12 {
   width: 80%;
-  position: fixed;
-  bottom: 70px;
+  position: fixed !important;
+  bottom: 70rpx;
   /* 底部导航栏的高度 + 小间距 */
-  left: 50%;
-  transform: translateX(-50%);
+  left: 50% !important;
+  transform: translateX(-50%) !important;
   z-index: 10;
   /* 确保按钮在底部导航栏上方 */
 }
@@ -65,10 +65,10 @@
 }
 .cart.data-v-6cf62e12 {
   position: absolute;
-  top: 50px;
-  right: 30px;
+  top: 50rpx;
+  right: 30rpx;
   background-color: #f0f0f0;
-  padding: 10px;
+  padding: 10rpx;
 }
 .add-icon.data-v-6cf62e12 {
   position: absolute;
@@ -82,7 +82,7 @@
   animation: moveAnimation 1s ease-in-out forwards;
 }
 .content-default.data-v-6cf62e12 {
-  z-index: 996;
+  position: relative !important; /* 避免绝对定位影响 */
   width: 100rpx;
   height: 100rpx;
   background: linear-gradient(360deg, #857ed1 0%, #4338CA 100%);

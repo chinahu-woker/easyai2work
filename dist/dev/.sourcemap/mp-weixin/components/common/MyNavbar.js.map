@@ -1,0 +1,1 @@
+{"version":3,"file":"MyNavbar.js","sources":["../uniComponent:/Rjov5oiR55qE5byA5rqQ6aG555uuL215c2VsZi1hY2dpL3NyYy9jb21wb25lbnRzL2NvbW1vbi9NeU5hdmJhci52dWU"],"sourcesContent":["import Component from 'F:/我的开源项目/myself-acgi/src/components/common/MyNavbar.vue'\nwx.createComponent(Component)"],"names":["Component"],"mappings":";;;;;;;;;;;;;;;;;;;;;;;AACA,GAAG,gBAAgBA,SAAS;"}

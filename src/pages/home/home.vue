@@ -9,6 +9,7 @@
   <AppTags/>
 
   <AppWaterFall/>
+  <div class="bg-blue"></div>
 
 </template>
 <script setup lang="ts">

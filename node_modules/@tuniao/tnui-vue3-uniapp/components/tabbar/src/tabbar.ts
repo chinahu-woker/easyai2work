@@ -25,6 +25,20 @@ export const tabbarProps = buildProps({
     default: '100rpx',
   },
   /**
+   * @description 凸起按钮的最大尺寸，单位 px
+   */
+  bulgeMaxSize: {
+    type: Number,
+    default: 80,
+  },
+  /**
+   * @description 凸起按钮的尺寸比例，取值范围 0 ~ 1
+   */
+  bulgeSizePercent: {
+    type: Number,
+    default: 0.75,
+  },
+  /**
    * @description tabbar背景颜色，如果需要设置毛玻璃的背景颜色，只能传递rgba的颜色值
    */
   bgColor: String,
@@ -73,6 +87,13 @@ export const tabbarProps = buildProps({
   zIndex: {
     type: Number,
     default: ZIndex.tabbar,
+  },
+  /**
+   * @description 隐藏固定在底部的tabbar
+   */
+  hiddenFixedTabbar: {
+    type: Boolean,
+    default: false,
   },
 })
 

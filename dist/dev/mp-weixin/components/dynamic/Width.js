@@ -23,7 +23,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   setup(__props) {
     const props = __props;
     const modelValue = common_vendor.useModel(__props, "modelValue");
-    console.log(111111, props.options);
+    common_vendor.index.__f__("log", "at components/dynamic/Width.vue:25", 111111, props.options);
     return (_ctx, _cache) => {
       return {
         a: common_vendor.o(($event) => modelValue.value = $event),
@@ -37,3 +37,4 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   }
 });
 wx.createComponent(_sfc_main);
+//# sourceMappingURL=../../../.sourcemap/mp-weixin/components/dynamic/Width.js.map

@@ -27,6 +27,7 @@ const { keyboardData, carKeyboardData } = useKeyboardData(
 
 <template>
   <TnPopup
+    v-if="!props.static"
     v-model="showKeyboard"
     open-direction="bottom"
     bg-color="transparent"
@@ -147,6 +148,99 @@ const { keyboardData, carKeyboardData } = useKeyboardData(
       </template>
     </view>
   </TnPopup>
+  <view v-else :class="[ns.b(), ns.e(mode), ns.m(static ? 'static' : '')]">
+    <!-- 普通键盘 -->
+    <template v-if="mode !== 'car'">
+      <!-- 左边操作区域 -->
+      <view class="left" :class="ns.e('normal-container')">
+        <view
+          v-for="(item, index) in keyboardData"
+          :key="index"
+          class="normal-item"
+          :class="[
+            {
+              full: keyboardData.length === 10 && index === 9,
+              fill: keyboardData.length === 11 && index === 9,
+              disabled: item.disabled,
+            },
+          ]"
+          :hover-class="item.disabled ? '' : 'keyboard-btn-hover'"
+          :hover-stay-time="150"
+          @tap.stop="keyboardClickEvent(item.value, item.disabled)"
+        >
+          {{ item.value }}
+        </view>
+      </view>
+      <!-- 右边操作区域 -->
+      <view class="right" :class="ns.e('normal-container')">
+        <view
+          class="normal-item delete"
+          hover-class="keyboard-btn-hover"
+          :hover-stay-time="150"
+          @touchstart.stop.prevent="handleBackspaceEvent"
+          @touchend.stop.prevent="clearBackspaceLongPressEvent"
+        >
+          <TnIcon name="backspace-fill" />
+        </view>
+        <view
+          class="normal-item confirm"
+          hover-class="keyboard-btn-hover"
+          :hover-stay-time="150"
+          @tap.stop="keyboardClickEvent('confirm', false)"
+        >
+          确认
+        </view>
+      </view>
+    </template>
+
+    <!-- 汽车键盘 -->
+    <template v-if="mode === 'car'">
+      <view :class="[ns.e('car-container')]">
+        <!-- 行数据 -->
+        <view
+          v-for="(item, index) in carKeyboardData"
+          :key="index"
+          class="column-data"
+        >
+          <!-- 如果是最后一行，显示切换按钮 -->
+          <view
+            v-if="index === 3"
+            class="car-item switch-mode"
+            hover-class="keyboard-btn-hover"
+            :hover-stay-time="150"
+            @tap.stop="carKeyboardSwitchLang"
+          >
+            {{ carKeyboardLang === 'cn' ? 'ABC' : '返回' }}
+          </view>
+
+          <!-- 列数据 -->
+          <view
+            v-for="(rowData, rowIndex) in item"
+            :key="rowIndex"
+            class="car-item"
+            :class="[{ disabled: rowData.disabled }]"
+            :hover-class="rowData.disabled ? '' : 'keyboard-btn-hover'"
+            :hover-stay-time="150"
+            @tap.stop="keyboardClickEvent(rowData.value, rowData.disabled)"
+          >
+            {{ rowData.value }}
+          </view>
+
+          <!-- 如果是最后一行，显示删除按钮 -->
+          <view
+            v-if="index === 3"
+            class="car-item delete"
+            hover-class="keyboard-btn-hover"
+            :hover-stay-time="150"
+            @touchstart.stop.prevent="handleBackspaceEvent"
+            @touchend.stop.prevent="clearBackspaceLongPressEvent"
+          >
+            <TnIcon name="backspace-fill" />
+          </view>
+        </view>
+      </view>
+    </template>
+  </view>
 </template>
 
 <style lang="scss" scoped>

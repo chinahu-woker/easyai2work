@@ -7,7 +7,7 @@ exports.FEATURES = void 0;
 exports.enableFeature = enableFeature;
 exports.isLoose = isLoose;
 exports.shouldTransform = shouldTransform;
-var _decorators = require("./decorators-2018-09.js");
+var _decorators = require("./decorators.js");
 const FEATURES = exports.FEATURES = Object.freeze({
   fields: 1 << 1,
   privateMethods: 1 << 2,

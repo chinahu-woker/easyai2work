@@ -11,7 +11,10 @@ const {
   showPicker,
   pickerData,
   currentPickerIndex,
+  isPickerScrolling,
   closePopupEvent,
+  pickerViewPickStartEvent,
+  pickerViewPickerEndEvent,
   pickerViewChangeEvent,
   confirmEvent,
   cancelEvent,
@@ -53,7 +56,7 @@ defineExpose({
       <view :class="[ns.e('operation'), ns.is('only-confirm', !showCancel)]">
         <view
           v-if="showCancel"
-          :class="[operationBtnClass('cancel')]"
+          :class="[operationBtnClass('cancel', false)]"
           :style="operationBtnStyle('cancel')"
           @tap.stop="cancelEvent"
         >
@@ -62,7 +65,7 @@ defineExpose({
           </slot>
         </view>
         <view
-          :class="[operationBtnClass('confirm')]"
+          :class="[operationBtnClass('confirm', isPickerScrolling)]"
           :style="operationBtnStyle('confirm')"
           @tap.stop="confirmEvent"
         >
@@ -78,7 +81,12 @@ defineExpose({
           v-if="showPicker"
           :class="[ns.e('picker-view')]"
           :value="currentPickerIndex"
+          :indicator-style="`height: ${props.indicatorHeight || 44}px;`"
+          indicator-class="tn-picker-indicator"
+          :immediate-change="immediateChange"
           @change="pickerViewChangeEvent"
+          @pickstart="pickerViewPickStartEvent"
+          @pickend="pickerViewPickerEndEvent"
         >
           <picker-view-column
             v-for="(item, index) in pickerData"

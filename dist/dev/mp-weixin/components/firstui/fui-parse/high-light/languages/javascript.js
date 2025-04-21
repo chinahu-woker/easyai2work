@@ -252,3 +252,4 @@ function javascript(hljs) {
   };
 }
 exports.javascript = javascript;
+//# sourceMappingURL=../../../../../../.sourcemap/mp-weixin/components/firstui/fui-parse/high-light/languages/javascript.js.map

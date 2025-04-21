@@ -1,1 +1,1 @@
-<view class="{{['fui-parse__group', 'data-v-a3d2dfb4', virtualHostClass]}}" style="{{virtualHostStyle}}"><slot></slot></view>
+<view class="{{['fui-parse__group', 'data-v-a3d2dfb4', virtualHostClass]}}" style="{{virtualHostStyle}}" hidden="{{virtualHostHidden}}" id="{{virtualHostId}}"><slot></slot></view>

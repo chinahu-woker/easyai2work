@@ -6,9 +6,12 @@ import { useStep, useStepCustomStyle } from './composables'
 const props = defineProps(stepProps)
 defineEmits(stepEmits)
 
-const { isActive, stepMode, itemClickEvent } = useStep(props)
-const { ns, stepClass, stepStyle, modeClass, modeStyle, lineClass, lineStyle } =
-  useStepCustomStyle(props, isActive, stepMode)
+const { isActive, stepMode, itemComponentId, itemClickEvent } = useStep(props)
+const { ns, stepClass, stepStyle, modeClass, modeStyle } = useStepCustomStyle(
+  props,
+  isActive,
+  stepMode
+)
 </script>
 
 // #ifdef MP-WEIXIN
@@ -27,7 +30,7 @@ export default {
     <!-- 步骤内容容器 -->
     <view :class="[ns.e('container')]" @tap.stop="itemClickEvent">
       <!-- 模式 -->
-      <view :class="[ns.e('mode-item')]">
+      <view :id="itemComponentId" :class="[ns.e('mode-item')]">
         <slot>
           <!-- 点模式 -->
           <view
@@ -80,9 +83,6 @@ export default {
       <!-- 标题 -->
       <view v-if="title" :class="[ns.e('mode-title')]">{{ title }}</view>
     </view>
-
-    <!-- 横线 -->
-    <view :class="[lineClass]" :style="lineStyle" />
   </view>
 </template>
 

@@ -139,7 +139,7 @@
   transform: translateX(-50%) rotate(0);
   animation: rotate-0f651093 4s linear infinite;
 }
-.tn-image-upload-item__progress--wave + .tn-image-upload-item__progress--wave.data-v-0f651093 {
+.tn-image-upload-item__progress--wave+.tn-image-upload-item__progress--wave.data-v-0f651093 {
   z-index: 3;
   background-color: rgba(170, 170, 170, 0.8);
   border-radius: 47%;

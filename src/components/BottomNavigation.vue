@@ -6,6 +6,7 @@ import {storeToRefs} from "pinia";
 import {useAppStore} from "@/stores/appStore.ts";
 import { onMounted } from 'vue';
 
+const {tabbarIndex}=storeToRefs(useAppStore())
 
 onMounted(() => {
     // 获取当前选中的 Tab 索引
@@ -17,7 +18,6 @@ onMounted(() => {
 });	
 
 const currentTab2 = 0  
-const {tabbarIndex}=storeToRefs(useAppStore())
 
 //处理导航栏点击事件
 const changeHomePage = (index: number) => {

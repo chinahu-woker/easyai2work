@@ -7,7 +7,6 @@ exports.ArgumentPlaceholder = ArgumentPlaceholder;
 exports.ArrayPattern = exports.ArrayExpression = ArrayExpression;
 exports.BigIntLiteral = BigIntLiteral;
 exports.BooleanLiteral = BooleanLiteral;
-exports.DecimalLiteral = DecimalLiteral;
 exports.Identifier = Identifier;
 exports.NullLiteral = NullLiteral;
 exports.NumericLiteral = NumericLiteral;
@@ -208,14 +207,6 @@ function BigIntLiteral(node) {
     return;
   }
   this.word(node.value + "n");
-}
-function DecimalLiteral(node) {
-  const raw = this.getPossibleRaw(node);
-  if (!this.format.minified && raw !== undefined) {
-    this.word(raw);
-    return;
-  }
-  this.word(node.value + "m");
 }
 const validTopicTokenSet = new Set(["^^", "@@", "^", "%", "#"]);
 function TopicReference() {

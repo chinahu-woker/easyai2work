@@ -16,7 +16,8 @@ function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 function _extends() { _extends = Object.assign ? Object.assign.bind() : function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
 const {
-  types: t
+  types: t,
+  template: template
 } = _babel.default || _babel;
 const presetEnvCompat = "#__secret_key__@babel/preset-env__compatibility";
 const runtimeCompat = "#__secret_key__@babel/runtime__compatibility";
@@ -161,7 +162,9 @@ var _default = (0, _helperDefinePolyfillProvider.default)(function ({
       })) return;
       if (meta.kind === "property") {
         // We can't compile destructuring and updateExpression.
-        if (!path.isMemberExpression()) return;
+        if (!path.isMemberExpression() && !path.isOptionalMemberExpression()) {
+          return;
+        }
         if (!path.isReferenced()) return;
         if (path.parentPath.isUpdateExpression()) return;
         if (t.isSuper(path.node.object)) {
@@ -206,19 +209,52 @@ var _default = (0, _helperDefinePolyfillProvider.default)(function ({
         const id = maybeInjectPure(resolved.desc, resolved.name, utils,
         // @ts-expect-error
         meta.object);
-        if (id) path.replaceWith(id);
+        if (id) {
+          path.replaceWith(id);
+          let {
+            parentPath
+          } = path;
+          if (parentPath.isOptionalMemberExpression() || parentPath.isOptionalCallExpression()) {
+            do {
+              const parentAsNotOptional = parentPath;
+              parentAsNotOptional.type = parentAsNotOptional.node.type = parentPath.type === "OptionalMemberExpression" ? "MemberExpression" : "CallExpression";
+              delete parentAsNotOptional.node.optional;
+              ({
+                parentPath
+              } = parentPath);
+            } while ((parentPath.isOptionalMemberExpression() || parentPath.isOptionalCallExpression()) && !parentPath.node.optional);
+          }
+        }
       } else if (resolved.kind === "instance") {
         const id = maybeInjectPure(resolved.desc, `${resolved.name}InstanceProperty`, utils,
         // @ts-expect-error
         meta.object);
         if (!id) return;
         const {
-          node
+          node,
+          parent
         } = path;
-        if (t.isCallExpression(path.parent, {
-          callee: node
-        })) {
-          (0, _utils.callMethod)(path, id);
+        if (t.isOptionalCallExpression(parent) && parent.callee === node) {
+          const wasOptional = parent.optional;
+          parent.optional = !wasOptional;
+          if (!wasOptional) {
+            const check = (0, _utils.extractOptionalCheck)(path.scope, node);
+            const [thisArg, thisArg2] = (0, _utils.maybeMemoizeContext)(node, path.scope);
+            path.replaceWith(check(template.expression.ast`
+                  Function.call.bind(${id}(${thisArg}), ${thisArg2})
+                `));
+          } else if (t.isOptionalMemberExpression(node)) {
+            const check = (0, _utils.extractOptionalCheck)(path.scope, node);
+            (0, _utils.callMethod)(path, id, true, check);
+          } else {
+            (0, _utils.callMethod)(path, id, true);
+          }
+        } else if (t.isCallExpression(parent) && parent.callee === node) {
+          (0, _utils.callMethod)(path, id, false);
+        } else if (t.isOptionalMemberExpression(node)) {
+          const check = (0, _utils.extractOptionalCheck)(path.scope, node);
+          path.replaceWith(check(t.callExpression(id, [node.object])));
+          if (t.isOptionalMemberExpression(parent)) parent.optional = true;
         } else {
           path.replaceWith(t.callExpression(id, [node.object]));
         }

@@ -46,7 +46,11 @@ export default {
           :key="index"
           :class="[ns.e('swiper-item')]"
         >
-          <slot :active="index === currentSwiperIndex" :data="item" />
+          <slot
+            :active="index === currentSwiperIndex"
+            :data="item"
+            :index="index"
+          />
         </swiper-item>
       </swiper>
     </view>

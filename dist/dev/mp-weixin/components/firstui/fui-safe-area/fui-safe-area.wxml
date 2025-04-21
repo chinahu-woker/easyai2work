@@ -1,1 +1,1 @@
-<view class="{{['fui-safe__area-wrap', 'data-v-37358499', a && 'fui-safe__area-weex', virtualHostClass]}}" style="{{'background:' + b + ';' + virtualHostStyle}}"></view>
+<view class="{{['fui-safe__area-wrap', 'data-v-37358499', a && 'fui-safe__area-weex', virtualHostClass]}}" style="{{'background:' + b + ';' + virtualHostStyle}}" hidden="{{virtualHostHidden}}" id="{{virtualHostId}}"></view>

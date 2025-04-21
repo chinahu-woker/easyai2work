@@ -232,20 +232,22 @@
 		// 都不是，返回 2（未知类型）
 		return 2;
 	}
+	const backGroundImage = 'https://chinahu-ai-server.oss-cn-chengdu.aliyuncs.com/aidraw/image/temps/67873d6c232a3c5d52240dd6/Home2.jpg'
+
 </script>
 
 <template>
 	<view>
-		<fui-nav-bar background="transparent" :title="workflow.title " @leftClick="leftClick">
+		<fui-nav-bar background="transparent" :title="workflow?.title " @leftClick="leftClick">
 			<fui-icon name="arrowleft"></fui-icon>
 
 		</fui-nav-bar>
 		<fui-background-image
-			src="@/src/static/Home2 (1).jpgHome2(1).jpg">
+			:src="backGroundImage">
 		</fui-background-image>
 
 		<view style="text-align: center; margin-top: 15%;">
-			<view v-if="linkType(workflow.cover) == 0">
+			<view v-if="linkType(workflow?.cover) == 0">
 				<view style="margin-top: 6%;">
 					<image @click="showGallery" style="width: 50%; height: 300px; background-color:transparent;"
 						:mode="scaleToFill" :src="workflow.cover" :show-menu-by-longpress='true'></image>

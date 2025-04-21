@@ -190,7 +190,7 @@ export type EmittedFile = EmittedAsset | EmittedChunk | EmittedPrebuiltChunk;
 
 export type EmitFile = (emittedFile: EmittedFile) => string;
 
-interface ModuleInfo extends ModuleOptions {
+export interface ModuleInfo extends ModuleOptions {
 	ast: ProgramNode | null;
 	code: string | null;
 	dynamicImporters: readonly string[];
@@ -212,7 +212,10 @@ interface ModuleInfo extends ModuleOptions {
 
 export type GetModuleInfo = (moduleId: string) => ModuleInfo | null;
 
-export type CustomPluginOptions = Record<string, any>;
+// eslint-disable-next-line @typescript-eslint/consistent-indexed-object-style -- this is an interface so that it can be extended by plugins
+export interface CustomPluginOptions {
+	[plugin: string]: any;
+}
 
 type LoggingFunctionWithPosition = (
 	log: RollupLog | string | (() => RollupLog | string),
@@ -269,6 +272,20 @@ export interface PluginContextMeta {
 	watchMode: boolean;
 }
 
+export type StringOrRegExp = string | RegExp;
+
+export type StringFilter<Value = StringOrRegExp> =
+	| MaybeArray<Value>
+	| {
+			include?: MaybeArray<Value>;
+			exclude?: MaybeArray<Value>;
+	  };
+
+export interface HookFilter {
+	id?: StringFilter;
+	code?: StringFilter;
+}
+
 export interface ResolvedId extends ModuleOptions {
 	external: boolean | 'absolute';
 	id: string;
@@ -277,7 +294,7 @@ export interface ResolvedId extends ModuleOptions {
 
 export type ResolvedIdMap = Record<string, ResolvedId>;
 
-interface PartialResolvedId extends Partial<PartialNull<ModuleOptions>> {
+export interface PartialResolvedId extends Partial<PartialNull<ModuleOptions>> {
 	external?: boolean | 'absolute' | 'relative';
 	id: string;
 	resolvedBy?: string;
@@ -397,11 +414,28 @@ export type PluginImpl<O extends object = object, A = any> = (options?: O) => Pl
 
 export type OutputBundle = Record<string, OutputAsset | OutputChunk>;
 
+export type PreRenderedChunkWithFileName = PreRenderedChunk & { fileName: string };
+
+export interface ImportedInternalChunk {
+	type: 'internal';
+	fileName: string;
+	resolvedImportPath: string;
+	chunk: PreRenderedChunk;
+}
+
+export interface ImportedExternalChunk {
+	type: 'external';
+	fileName: string;
+	resolvedImportPath: string;
+}
+
+export type DynamicImportTargetChunk = ImportedInternalChunk | ImportedExternalChunk;
+
 export interface FunctionPluginHooks {
 	augmentChunkHash: (this: PluginContext, chunk: RenderedChunk) => string | void;
 	buildEnd: (this: PluginContext, error?: Error) => void;
 	buildStart: (this: PluginContext, options: NormalizedInputOptions) => void;
-	closeBundle: (this: PluginContext) => void;
+	closeBundle: (this: PluginContext, error?: Error) => void;
 	closeWatcher: (this: PluginContext) => void;
 	generateBundle: (
 		this: PluginContext,
@@ -422,6 +456,9 @@ export interface FunctionPluginHooks {
 			format: InternalModuleFormat;
 			moduleId: string;
 			targetModuleId: string | null;
+			chunk: PreRenderedChunkWithFileName;
+			targetChunk: PreRenderedChunkWithFileName | null;
+			getTargetChunkImports: () => DynamicImportTargetChunk[] | null;
 		}
 	) => { left: string; right: string } | NullValue;
 	renderError: (this: PluginContext, error?: Error) => void;
@@ -501,13 +538,22 @@ type MakeAsync<Function_> = Function_ extends (
 	: never;
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-type ObjectHook<T, O = {}> = T | ({ handler: T; order?: 'pre' | 'post' | null } & O);
+export type ObjectHook<T, O = {}> = T | ({ handler: T; order?: 'pre' | 'post' | null } & O);
+
+export type HookFilterExtension<K extends keyof FunctionPluginHooks> = K extends 'transform'
+	? { filter?: HookFilter }
+	: K extends 'load'
+		? { filter?: Pick<HookFilter, 'id'> }
+		: K extends 'resolveId'
+			? { filter?: { id?: StringFilter<RegExp> } }
+			: // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+				{};
 
 export type PluginHooks = {
 	[K in keyof FunctionPluginHooks]: ObjectHook<
 		K extends AsyncPluginHooks ? MakeAsync<FunctionPluginHooks[K]> : FunctionPluginHooks[K],
 		// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-		K extends ParallelPluginHooks ? { sequential?: boolean } : {}
+		HookFilterExtension<K> & (K extends ParallelPluginHooks ? { sequential?: boolean } : {})
 	>;
 };
 
@@ -969,6 +1015,7 @@ export interface WatcherOptions {
 	exclude?: string | RegExp | (string | RegExp)[];
 	include?: string | RegExp | (string | RegExp)[];
 	skipWrite?: boolean;
+	onInvalidate?: (id: string) => void;
 }
 
 export interface RollupWatchOptions extends InputOptions {

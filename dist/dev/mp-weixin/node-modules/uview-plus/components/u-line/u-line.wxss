@@ -23,22 +23,7 @@
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
-.u-empty.data-v-bbd9963c,
-.u-empty__wrap.data-v-bbd9963c,
-.u-tabs.data-v-bbd9963c,
-.u-tabs__wrapper.data-v-bbd9963c,
-.u-tabs__wrapper__scroll-view-wrapper.data-v-bbd9963c,
-.u-tabs__wrapper__scroll-view.data-v-bbd9963c,
-.u-tabs__wrapper__nav.data-v-bbd9963c,
-.u-tabs__wrapper__nav__line.data-v-bbd9963c,
-.up-empty.data-v-bbd9963c,
-.up-empty__wrap.data-v-bbd9963c,
-.up-tabs.data-v-bbd9963c,
-.up-tabs__wrapper.data-v-bbd9963c,
-.up-tabs__wrapper__scroll-view-wrapper.data-v-bbd9963c,
-.up-tabs__wrapper__scroll-view.data-v-bbd9963c,
-.up-tabs__wrapper__nav.data-v-bbd9963c,
-.up-tabs__wrapper__nav__line.data-v-bbd9963c {
+.u-empty.data-v-bbd9963c,.u-empty__wrap.data-v-bbd9963c,.u-tabs.data-v-bbd9963c,.u-tabs__wrapper.data-v-bbd9963c,.u-tabs__wrapper__scroll-view-wrapper.data-v-bbd9963c,.u-tabs__wrapper__scroll-view.data-v-bbd9963c,.u-tabs__wrapper__nav.data-v-bbd9963c,.u-tabs__wrapper__nav__line.data-v-bbd9963c,.up-empty.data-v-bbd9963c,.up-empty__wrap.data-v-bbd9963c,.up-tabs.data-v-bbd9963c,.up-tabs__wrapper.data-v-bbd9963c,.up-tabs__wrapper__scroll-view-wrapper.data-v-bbd9963c,.up-tabs__wrapper__scroll-view.data-v-bbd9963c,.up-tabs__wrapper__nav.data-v-bbd9963c,.up-tabs__wrapper__nav__line.data-v-bbd9963c {
   display: flex;
   flex-direction: column;
   flex-shrink: 0;

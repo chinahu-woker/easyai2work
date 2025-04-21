@@ -31,6 +31,7 @@
 .image-grid.data-v-a0679471 {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
+  grid-gap: 20rpx;
   gap: 20rpx;
 }
 .image-item.data-v-a0679471 {

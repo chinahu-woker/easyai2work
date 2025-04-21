@@ -19,3 +19,4 @@ var EventType = /* @__PURE__ */ ((EventType2) => {
   return EventType2;
 })(EventType || {});
 exports.EventType = EventType;
+//# sourceMappingURL=../../.sourcemap/mp-weixin/types/event.types.js.map

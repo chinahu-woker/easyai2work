@@ -4,7 +4,8 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.minVersions = exports.legacyBabel7SyntaxPlugins = exports.default = void 0;
-var _babel7AvailablePlugins = require("./babel-7-available-plugins.cjs");
+var _pluginSyntaxImportAssertions = require("@babel/plugin-syntax-import-assertions");
+var _pluginSyntaxImportAttributes = require("@babel/plugin-syntax-import-attributes");
 var _pluginTransformAsyncGeneratorFunctions = require("@babel/plugin-transform-async-generator-functions");
 var _pluginTransformAsyncToGenerator = require("@babel/plugin-transform-async-to-generator");
 var _pluginTransformArrowFunctions = require("@babel/plugin-transform-arrow-functions");
@@ -160,9 +161,9 @@ let legacyBabel7SyntaxPlugins = exports.legacyBabel7SyntaxPlugins = void 0;
     "syntax-optional-chaining": syntax("optionalChaining"),
     "syntax-private-property-in-object": syntax("privateIn"),
     "syntax-top-level-await": syntax("topLevelAwait"),
-    "syntax-unicode-sets-regex": () => require("@babel/plugin-syntax-unicode-sets-regex"),
-    "syntax-import-assertions": _babel7AvailablePlugins["syntax-import-assertions"],
-    "syntax-import-attributes": _babel7AvailablePlugins["syntax-import-attributes"]
+    "syntax-import-assertions": () => _pluginSyntaxImportAssertions.default,
+    "syntax-import-attributes": () => _pluginSyntaxImportAttributes.default,
+    "syntax-unicode-sets-regex": () => require("@babel/plugin-syntax-unicode-sets-regex")
   };
   Object.assign(availablePlugins, legacyBabel7SyntaxPluginsLoaders);
   exports.legacyBabel7SyntaxPlugins = legacyBabel7SyntaxPlugins = new Set(Object.keys(legacyBabel7SyntaxPluginsLoaders));

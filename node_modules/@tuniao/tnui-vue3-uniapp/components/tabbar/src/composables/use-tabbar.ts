@@ -148,7 +148,7 @@ export const useTabbar = (props: TabbarProps) => {
       if (itemRectInfo?.maxWidth) {
         width = itemRectInfo.maxWidth
       }
-      bulgeRectInfo.value.width = width * 0.75
+      bulgeRectInfo.value.width = width * props.bulgeSizePercent
       bulgeRectInfo.value.height = bulgeRectInfo.value.width
       bulgeRectInfo.value.left =
         left - (tabbarRectLeft || 0) + itemRectInfo.width / 2

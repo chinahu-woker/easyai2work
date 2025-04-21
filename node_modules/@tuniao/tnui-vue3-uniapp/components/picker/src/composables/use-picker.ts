@@ -130,6 +130,10 @@ export const usePicker = (props: PickerProps) => {
     }
   }
 
+  // 记录picker是否正在滚动
+  const isPickerScrolling = ref(false)
+  let isBeforeConfirm = false
+
   // picker选择器的数据
   const pickerData = ref<PickerData>([])
   // 当前选中picker-view的索引
@@ -221,6 +225,7 @@ export const usePicker = (props: PickerProps) => {
     },
     {
       immediate: true,
+      deep: true,
     }
   )
 
@@ -286,6 +291,16 @@ export const usePicker = (props: PickerProps) => {
     }
   )
 
+  // picker-view滑动事件
+  const pickerViewPickStartEvent = () => {
+    isPickerScrolling.value = true
+    emit('pickstart')
+  }
+  const pickerViewPickerEndEvent = () => {
+    isPickerScrolling.value = false
+    emit('pickend')
+  }
+
   // picker-view选择发生改变事件
   let changeTimer: ReturnType<typeof setTimeout> | null = null
   let continuousChangeStatus = false
@@ -339,7 +354,10 @@ export const usePicker = (props: PickerProps) => {
     const value = _getCurrentPickerValue()
     const originData = _getCurrentPickerOriginData()
     emit(CHANGE_EVENT, value, changePickerColumnIndex, originData)
-    // emit(UPDATE_MODEL_EVENT, value)
+    if (isBeforeConfirm) {
+      isBeforeConfirm = false
+      emit(UPDATE_MODEL_EVENT, value)
+    }
   }
 
   // 重置指定位置的数据
@@ -351,6 +369,13 @@ export const usePicker = (props: PickerProps) => {
 
   // 点击确认按钮
   const confirmEvent = () => {
+    if (isPickerScrolling.value) {
+      if (props.allowConfirmBeforeScrollEnd) {
+        isBeforeConfirm = true
+      } else {
+        return
+      }
+    }
     const value = _getCurrentPickerValue()
     const originData = _getCurrentPickerOriginData()
     isInnerUpdate = true
@@ -374,7 +399,10 @@ export const usePicker = (props: PickerProps) => {
     showPicker,
     pickerData,
     currentPickerIndex,
+    isPickerScrolling,
     closePopupEvent,
+    pickerViewPickStartEvent,
+    pickerViewPickerEndEvent,
     pickerViewChangeEvent,
     confirmEvent,
     cancelEvent,

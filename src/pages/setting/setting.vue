@@ -44,7 +44,9 @@
         <up-icon name="arrow-right" color="#969799" size="28"></up-icon>
       </view>
     </view>
-
+	<view class="u-m-l-10 u-p-10">
+	  <up-icon name="arrow-right" color="#969799" size="28"></up-icon>
+	</view>
     <view class="u-m-t-20">
       <up-cell-group>
         <up-cell icon="rmb-circle" title="成为会员" @click="showPay=true"></up-cell>

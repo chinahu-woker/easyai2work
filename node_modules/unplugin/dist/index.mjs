@@ -1028,7 +1028,7 @@ function getEsbuildPlugin(factory) {
             loader.options || (loader.options = _options);
             loader.onTransformCb = callback;
           }
-        });
+        }, build2);
         if (loader.onLoadCb || loader.onTransformCb)
           loaders.push(loader);
       }
@@ -1080,9 +1080,9 @@ function getEsbuildPlugin(factory) {
 }
 function buildSetup(meta) {
   return (plugin) => {
-    return (_build) => {
+    return (build2, rawBuild) => {
       var _a, _b, _c, _d, _e;
-      const build2 = meta.build = _build;
+      meta.build = build2;
       const context = createBuildContext(build2);
       const { onStart, onEnd, onResolve, onLoad, onTransform, initialOptions } = build2;
       const onResolveFilter = ((_a = plugin.esbuild) == null ? void 0 : _a.onResolveFilter) ?? /.*/;
@@ -1209,7 +1209,7 @@ function buildSetup(meta) {
         });
       }
       if ((_e = plugin.esbuild) == null ? void 0 : _e.setup)
-        return plugin.esbuild.setup(meta.build);
+        return plugin.esbuild.setup(rawBuild);
     };
   };
 }

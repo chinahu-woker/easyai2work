@@ -174,7 +174,7 @@
   width: 100%;
   border-radius: 15rpx;
 }
-.tn-graphic-card__images--item.is-three .image-wrapper-right .image-container + .image-container.data-v-1bacfa93 {
+.tn-graphic-card__images--item.is-three .image-wrapper-right .image-container+.image-container.data-v-1bacfa93 {
   margin-top: 28rpx;
 }
 .tn-graphic-card__images--item.is-four.data-v-1bacfa93 {

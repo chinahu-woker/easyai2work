@@ -50,6 +50,9 @@
 .tn-picker__operation-btn.data-v-33c7c90b {
   padding: 0rpx 30rpx;
 }
+.tn-picker__operation-btn--disabled.data-v-33c7c90b {
+  color: var(--tn-color-gray) !important;
+}
 .tn-picker__content.data-v-33c7c90b {
   position: relative;
   width: 100%;

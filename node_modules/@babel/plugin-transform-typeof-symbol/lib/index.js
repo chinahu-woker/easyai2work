@@ -32,18 +32,20 @@ var _default = exports.default = (0, _helperPluginUtils.declare)(api => {
           }
         }
         let isUnderHelper = path.findParent(path => {
-          if (path.isFunction()) {
+          if (path.isFunctionDeclaration()) {
             var _path$get;
             return ((_path$get = path.get("body.directives.0")) == null ? void 0 : _path$get.node.value.value) === "@babel/helpers - typeof";
           }
         });
         if (isUnderHelper) return;
         const helper = this.addHelper("typeof");
-        isUnderHelper = path.findParent(path => {
-          return path.isVariableDeclarator() && path.node.id === helper || path.isFunctionDeclaration() && path.node.id && path.node.id.name === helper.name;
-        });
-        if (isUnderHelper) {
-          return;
+        {
+          isUnderHelper = path.findParent(path => {
+            return path.isVariableDeclarator() && path.node.id === helper || path.isFunctionDeclaration() && path.node.id && path.node.id.name === helper.name;
+          });
+          if (isUnderHelper) {
+            return;
+          }
         }
         const call = _core.types.callExpression(helper, [node.argument]);
         const arg = path.get("argument");

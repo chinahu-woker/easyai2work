@@ -41,7 +41,9 @@ export default {
       <!-- 图标 -->
       <template v-if="bulge">
         <view :class="[bulgeClass]" :style="bulgeStyle(itemRectInfo)">
-          <TnIcon :name="isActive ? activeIcon : icon" :size="iconSize" />
+          <slot name="content">
+            <TnIcon :name="isActive ? activeIcon : icon" :size="iconSize" />
+          </slot>
         </view>
       </template>
       <template v-else>
@@ -50,15 +52,17 @@ export default {
           :class="[ns.e('icon')]"
           :style="tabbarItemElementStyle('icon')"
         >
-          <TnIcon :name="isActive ? activeIcon : icon" :size="iconSize" />
-          <!-- 角标 -->
-          <TnBadge
-            v-if="hasBadge"
-            :value="badge"
-            :dot="badgeConfig.dot"
-            :size="badgeConfig.dot ? '16' : ''"
-            type="danger"
-          />
+          <slot name="content">
+            <TnIcon :name="isActive ? activeIcon : icon" :size="iconSize" />
+            <!-- 角标 -->
+            <TnBadge
+              v-if="hasBadge"
+              :value="badge"
+              :dot="badgeConfig.dot"
+              :size="badgeConfig.dot ? '16' : ''"
+              type="danger"
+            />
+          </slot>
         </view>
       </template>
       <!-- 文字 -->
@@ -67,7 +71,9 @@ export default {
         :class="[ns.e('text')]"
         :style="tabbarItemElementStyle('text')"
       >
-        {{ text }}
+        <slot name="content">
+          {{ text }}
+        </slot>
       </view>
     </slot>
   </view>

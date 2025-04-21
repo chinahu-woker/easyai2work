@@ -74,7 +74,7 @@ export const useTabbarItem = (
       itemRectInfo.value.left = rectInfo.left || 0
 
       if (itemRectInfo.value.width > 80) {
-        itemRectInfo.value.maxWidth = 80
+        itemRectInfo.value.maxWidth = tabbarContext?.bulgeMaxSize || 80
       }
 
       tabbarContext?.setBulgeCircle(itemRectInfo.value)

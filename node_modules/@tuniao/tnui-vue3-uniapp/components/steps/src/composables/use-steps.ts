@@ -7,6 +7,14 @@ import { debugWarn } from '../../../../utils'
 import type { StepsProps } from '../steps'
 import type { StepContext } from '../../../../tokens'
 
+interface StepsLineRectInfo {
+  left: number
+  top: number
+  width: number
+  color: string
+  activeColor: string
+}
+
 export const useSteps = (props: StepsProps) => {
   const instance = getCurrentInstance()
 
@@ -24,6 +32,8 @@ export const useSteps = (props: StepsProps) => {
 
   // 当前已激活的Uid列表
   const activeUidList = ref<number[]>([])
+  // 步进器横线位置信息
+  const stepsLineRectInfoList = ref<StepsLineRectInfo[]>([])
 
   let innerUpdate = false
   // 更新当前激活的Uid列表
@@ -72,6 +82,31 @@ export const useSteps = (props: StepsProps) => {
   // 添加item到items
   const addItem = (item: StepContext) => {
     addChild(item)
+
+    // 计算横线信息
+    const lineRectInfoLength = stepsLineRectInfoList.value.length
+    const stepsItemLeft = item?.left || 0
+    const stepsItemRight = item?.right || 0
+    const stepsItemWidth = item?.width || 0
+    const stepsItemHeight = item?.height || 0
+    stepsLineRectInfoList.value.push({
+      left: stepsItemRight - stepsItemWidth / 2 + 3,
+      top: stepsItemHeight / 2,
+      width: 0,
+      color: '',
+      activeColor: '',
+    })
+    if (lineRectInfoLength > 0) {
+      const prevStepsLineInfo =
+        stepsLineRectInfoList.value[lineRectInfoLength - 1]
+      stepsLineRectInfoList.value[lineRectInfoLength - 1].width =
+        stepsItemLeft - prevStepsLineInfo.left - stepsItemWidth * (3 / 4)
+      stepsLineRectInfoList.value[lineRectInfoLength - 1].color =
+        item?.normalColor || ''
+      stepsLineRectInfoList.value[lineRectInfoLength - 1].activeColor =
+        item?.activeColor || ''
+    }
+
     if (
       !activeUidList.value.length &&
       props.modelValue !== undefined &&
@@ -93,4 +128,8 @@ export const useSteps = (props: StepsProps) => {
       setActiveItem,
     })
   )
+
+  return {
+    stepsLineRectInfoList,
+  }
 }

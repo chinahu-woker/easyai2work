@@ -120,6 +120,7 @@ function normalizeCoreJSOption(corejs, useBuiltIns) {
   };
 }
 function normalizeOptions(opts) {
+  ;
   v.validateTopLevelOptions(opts, _options.TopLevelOptions);
   const useBuiltIns = validateUseBuiltInsOption(opts.useBuiltIns);
   const corejs = normalizeCoreJSOption(opts.corejs, useBuiltIns);
@@ -129,9 +130,9 @@ function normalizeOptions(opts) {
   {
     v.validateBooleanOption("loose", opts.loose);
     v.validateBooleanOption("spec", opts.spec);
+    v.validateBooleanOption("bugfixes", opts.bugfixes);
   }
   return {
-    bugfixes: v.validateBooleanOption(_options.TopLevelOptions.bugfixes, opts.bugfixes, false),
     configPath: v.validateStringOption(_options.TopLevelOptions.configPath, opts.configPath, process.cwd()),
     corejs,
     debug: v.validateBooleanOption(_options.TopLevelOptions.debug, opts.debug, false),

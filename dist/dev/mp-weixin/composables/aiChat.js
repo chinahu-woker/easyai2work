@@ -21,7 +21,7 @@ const getUserToken = () => {
       // 请求成功回调
       fail: (err) => {
         reject(err);
-        console.log("请求失败", err);
+        common_vendor.index.__f__("log", "at composables/aiChat.ts:30", "请求失败", err);
       }
       // 请求失败回调
     });
@@ -46,7 +46,7 @@ const getModelList = (data) => {
       // 请求成功回调
       fail: (err) => {
         reject(err);
-        console.log("请求失败", err);
+        common_vendor.index.__f__("log", "at composables/aiChat.ts:65", "请求失败", err);
       }
       // 请求失败回调
     });
@@ -77,7 +77,7 @@ const getUserKey = (data, Rtoken_value) => {
       // 请求成功回调
       fail: (err) => {
         reject(err);
-        console.log("请求失败", err);
+        common_vendor.index.__f__("log", "at composables/aiChat.ts:103", "请求失败", err);
       }
       // 请求失败回调
     });
@@ -102,7 +102,7 @@ const getUserInfo = (data) => {
       // 请求成功回调
       fail: (err) => {
         reject(err);
-        console.log("请求失败", err);
+        common_vendor.index.__f__("log", "at composables/aiChat.ts:135", "请求失败", err);
       }
       // 请求失败回调
     });
@@ -113,3 +113,4 @@ exports.getModelList = getModelList;
 exports.getUserInfo = getUserInfo;
 exports.getUserKey = getUserKey;
 exports.getUserToken = getUserToken;
+//# sourceMappingURL=../../.sourcemap/mp-weixin/composables/aiChat.js.map

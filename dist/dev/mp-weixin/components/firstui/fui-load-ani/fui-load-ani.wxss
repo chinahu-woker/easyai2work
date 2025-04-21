@@ -42,9 +42,7 @@
 		animation-delay: -0.15s;
 }
 @keyframes ani_1-ffc2d581 {
-0%,
-		80%,
-		100% {
+0%,80%,100% {
 			-webkit-transform: scale(0)
 }
 40% {
@@ -124,8 +122,7 @@
 		border-radius: 50%;
 		animation: ani_4 1s infinite linear;
 }
-.fui-load__ani-g.data-v-ffc2d581,
-	.fui-load__ani-h.data-v-ffc2d581 {
+.fui-load__ani-g.data-v-ffc2d581,.fui-load__ani-h.data-v-ffc2d581 {
 		display: inline-block;
 		position: absolute;
 		top: 0;

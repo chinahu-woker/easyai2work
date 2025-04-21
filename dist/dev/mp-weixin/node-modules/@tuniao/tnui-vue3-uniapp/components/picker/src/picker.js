@@ -15,7 +15,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       showPicker,
       pickerData,
       currentPickerIndex,
+      isPickerScrolling,
       closePopupEvent,
+      pickerViewPickStartEvent,
+      pickerViewPickerEndEvent,
       pickerViewChangeEvent,
       confirmEvent,
       cancelEvent,
@@ -41,7 +44,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         a: _ctx.showCancel
       }, _ctx.showCancel ? {
         b: common_vendor.t(props.cancelText),
-        c: common_vendor.n(common_vendor.unref(operationBtnClass)("cancel")),
+        c: common_vendor.n(common_vendor.unref(operationBtnClass)("cancel", false)),
         d: common_vendor.s(common_vendor.unref(operationBtnStyle)("cancel")),
         e: common_vendor.o(
           //@ts-ignore
@@ -49,7 +52,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         )
       } : {}, {
         f: common_vendor.t(props.confirmText),
-        g: common_vendor.n(common_vendor.unref(operationBtnClass)("confirm")),
+        g: common_vendor.n(common_vendor.unref(operationBtnClass)("confirm", common_vendor.unref(isPickerScrolling))),
         h: common_vendor.s(common_vendor.unref(operationBtnStyle)("confirm")),
         i: common_vendor.o(
           //@ts-ignore
@@ -75,16 +78,26 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         p: common_vendor.n(common_vendor.unref(ns).e("picker-view-column")),
         q: common_vendor.n(common_vendor.unref(ns).e("picker-view")),
         r: common_vendor.unref(currentPickerIndex),
-        s: common_vendor.o(
+        s: `height: ${props.indicatorHeight || 44}px;`,
+        t: _ctx.immediateChange,
+        v: common_vendor.o(
           //@ts-ignore
           (...args) => common_vendor.unref(pickerViewChangeEvent) && common_vendor.unref(pickerViewChangeEvent)(...args)
+        ),
+        w: common_vendor.o(
+          //@ts-ignore
+          (...args) => common_vendor.unref(pickerViewPickStartEvent) && common_vendor.unref(pickerViewPickStartEvent)(...args)
+        ),
+        x: common_vendor.o(
+          //@ts-ignore
+          (...args) => common_vendor.unref(pickerViewPickerEndEvent) && common_vendor.unref(pickerViewPickerEndEvent)(...args)
         )
       } : {}, {
-        t: common_vendor.n(common_vendor.unref(ns).e("content")),
-        v: common_vendor.n(common_vendor.unref(ns).b()),
-        w: common_vendor.o(common_vendor.unref(closePopupEvent)),
-        x: common_vendor.o(($event) => common_vendor.isRef(openPopup) ? openPopup.value = $event : null),
-        y: common_vendor.p({
+        y: common_vendor.n(common_vendor.unref(ns).e("content")),
+        z: common_vendor.n(common_vendor.unref(ns).b()),
+        A: common_vendor.o(common_vendor.unref(closePopupEvent)),
+        B: common_vendor.o(($event) => common_vendor.isRef(openPopup) ? openPopup.value = $event : null),
+        C: common_vendor.p({
           ["open-direction"]: "bottom",
           overlay: true,
           ["overlay-opacity"]: common_vendor.unref(overlayOpacity),
@@ -99,3 +112,4 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
 });
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-33c7c90b"]]);
 wx.createComponent(Component);
+//# sourceMappingURL=../../../../../../../.sourcemap/mp-weixin/node-modules/@tuniao/tnui-vue3-uniapp/components/picker/src/picker.js.map

@@ -4,17 +4,9 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.buildDecoratedClass = buildDecoratedClass;
-exports.hasDecorators = hasDecorators;
-exports.hasOwnDecorators = hasOwnDecorators;
 var _core = require("@babel/core");
 var _helperReplaceSupers = require("@babel/helper-replace-supers");
-function hasOwnDecorators(node) {
-  var _node$decorators;
-  return !!((_node$decorators = node.decorators) != null && _node$decorators.length);
-}
-function hasDecorators(node) {
-  return hasOwnDecorators(node) || node.body.body.some(hasOwnDecorators);
-}
+;
 function prop(key, value) {
   if (!value) return null;
   return _core.types.objectProperty(_core.types.identifier(key), value);

@@ -34,22 +34,11 @@ function filterStageFromList(list, stageList) {
     return result;
   }, {});
 }
-const pluginLists = {
-  withProposals: {
-    withoutBugfixes: _pluginsCompatData.plugins,
-    withBugfixes: Object.assign({}, _pluginsCompatData.plugins, _pluginsCompatData.pluginsBugfixes)
-  },
-  withoutProposals: {
-    withoutBugfixes: filterStageFromList(_pluginsCompatData.plugins, _shippedProposals.proposalPlugins),
-    withBugfixes: filterStageFromList(Object.assign({}, _pluginsCompatData.plugins, _pluginsCompatData.pluginsBugfixes), _shippedProposals.proposalPlugins)
-  }
-};
-function getPluginList(proposals, bugfixes) {
-  if (proposals) {
-    if (bugfixes) return pluginLists.withProposals.withBugfixes;else return pluginLists.withProposals.withoutBugfixes;
-  } else {
-    if (bugfixes) return pluginLists.withoutProposals.withBugfixes;else return pluginLists.withoutProposals.withoutBugfixes;
-  }
+const pluginsListWithProposals = Object.assign({}, _pluginsCompatData.plugins, _pluginsCompatData.pluginsBugfixes);
+const pluginsListWithuotProposals = filterStageFromList(pluginsListWithProposals, _shippedProposals.proposalPlugins);
+{
+  var pluginsListNoBugfixesWithProposals = _pluginsCompatData.plugins;
+  var pluginsListNoBugfixesWithoutProposals = filterStageFromList(_pluginsCompatData.plugins, _shippedProposals.proposalPlugins);
 }
 const getPlugin = pluginName => {
   const plugin = _availablePlugins.default[pluginName]();
@@ -209,7 +198,6 @@ var _default = exports.default = (0, _helperPluginUtils.declarePreset)((api, opt
   const babelTargets = api.targets();
   ;
   const {
-    bugfixes,
     configPath,
     debug,
     exclude: optionsExclude,
@@ -229,7 +217,8 @@ var _default = exports.default = (0, _helperPluginUtils.declarePreset)((api, opt
   {
     var {
       loose,
-      spec = false
+      spec = false,
+      bugfixes = false
     } = opts;
   }
   let targets = babelTargets;
@@ -250,7 +239,7 @@ option \`forceAllTransforms: true\` instead.
   const transformTargets = forceAllTransforms || hasUglifyTarget ? {} : targets;
   const include = transformIncludesAndExcludes(optionsInclude);
   const exclude = transformIncludesAndExcludes(optionsExclude);
-  const compatData = getPluginList(shippedProposals, bugfixes);
+  const compatData = bugfixes ? shippedProposals ? pluginsListWithProposals : pluginsListWithuotProposals : shippedProposals ? pluginsListNoBugfixesWithProposals : pluginsListNoBugfixesWithoutProposals;
   const modules = optionsModules === "auto" ? api.caller(supportsStaticESM) ? false : "commonjs" : optionsModules;
   const shouldTransformDynamicImport = optionsModules === "auto" ? !api.caller(supportsDynamicImport) : !!modules;
   if (!exclude.plugins.has("transform-export-namespace-from") && (optionsModules === "auto" ? !api.caller(supportsExportNamespaceFrom) : !!modules)) {

@@ -38,9 +38,8 @@ function buildPrivateNamesMap(className, privateFieldsAsSymbolsOrProperties, pro
         let initAdded = false;
         let id;
         if (!privateFieldsAsSymbolsOrProperties && newHelpers(file) && isMethod && !isStatic) {
-          var _classBrandId;
           initAdded = !!classBrandId;
-          (_classBrandId = classBrandId) != null ? _classBrandId : classBrandId = prop.scope.generateUidIdentifier(`${className}_brand`);
+          classBrandId != null ? classBrandId : classBrandId = prop.scope.generateUidIdentifier(`${className}_brand`);
           id = classBrandId;
         } else {
           id = prop.scope.generateUidIdentifier(name);
@@ -897,7 +896,6 @@ function inheritLoc(node, original) {
   return node;
 }
 function buildFieldsInitNodes(ref, superRef, props, privateNamesMap, file, setPublicClassFields, privateFieldsAsSymbolsOrProperties, noUninitializedPrivateFieldAccess, constantSuper, innerBindingRef) {
-  var _ref, _ref2;
   let classRefFlags = 0;
   let injectSuperRef;
   const staticNodes = [];
@@ -906,12 +904,11 @@ function buildFieldsInitNodes(ref, superRef, props, privateNamesMap, file, setPu
   const pureStaticNodes = [];
   let classBindingNode = null;
   const getSuperRef = _core.types.isIdentifier(superRef) ? () => superRef : () => {
-    var _injectSuperRef;
-    (_injectSuperRef = injectSuperRef) != null ? _injectSuperRef : injectSuperRef = props[0].scope.generateUidIdentifierBasedOnNode(superRef);
+    injectSuperRef != null ? injectSuperRef : injectSuperRef = props[0].scope.generateUidIdentifierBasedOnNode(superRef);
     return injectSuperRef;
   };
-  const classRefForInnerBinding = (_ref = ref) != null ? _ref : props[0].scope.generateUidIdentifier((innerBindingRef == null ? void 0 : innerBindingRef.name) || "Class");
-  (_ref2 = ref) != null ? _ref2 : ref = _core.types.cloneNode(innerBindingRef);
+  const classRefForInnerBinding = ref != null ? ref : props[0].scope.generateUidIdentifier((innerBindingRef == null ? void 0 : innerBindingRef.name) || "Class");
+  ref != null ? ref : ref = _core.types.cloneNode(innerBindingRef);
   for (const prop of props) {
     if (prop.isClassProperty()) {
       ts.assertFieldTransformed(prop);

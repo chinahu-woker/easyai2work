@@ -43,7 +43,10 @@ function handleClassTDZ(path, state) {
   }
 }
 const classFieldDefinitionEvaluationTDZVisitor = {
-  ReferencedIdentifier: handleClassTDZ
+  ReferencedIdentifier: handleClassTDZ,
+  "TSTypeAnnotation|TypeAnnotation"(path) {
+    path.skip();
+  }
 };
 function injectInitialization(path, constructor, nodes, renamer, lastReturnsThis) {
   if (!nodes.length) return;

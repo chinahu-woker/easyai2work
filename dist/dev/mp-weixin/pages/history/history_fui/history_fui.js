@@ -56,26 +56,26 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const getHistoryData = async (pageNumber) => {
       const { items } = await utils_request.request(`/draw/history/${pageNumber}`);
       historyData.value = items;
-      console.log("pageNumber", pageNumber);
-      console.log("historyData", historyData.value);
+      common_vendor.index.__f__("log", "at pages/history/history_fui/history_fui.vue:60", "pageNumber", pageNumber);
+      common_vendor.index.__f__("log", "at pages/history/history_fui/history_fui.vue:61", "historyData", historyData.value);
     };
     const removeHistoryRecord = async (id) => {
       try {
-        console.log("Attempting to remove history record with id:", id);
+        common_vendor.index.__f__("log", "at pages/history/history_fui/history_fui.vue:66", "Attempting to remove history record with id:", id);
         const response = await utils_request.request(`/draw/history/${id}`, {
           method: "DELETE"
         });
-        console.log("Response status:", response.status);
-        console.log("History record removed:", id);
+        common_vendor.index.__f__("log", "at pages/history/history_fui/history_fui.vue:71", "Response status:", response.status);
+        common_vendor.index.__f__("log", "at pages/history/history_fui/history_fui.vue:81", "History record removed:", id);
         historyData.value = historyData.value.filter((item) => item._id !== id);
-        console.log("Updated historyData:", historyData.value);
+        common_vendor.index.__f__("log", "at pages/history/history_fui/history_fui.vue:83", "Updated historyData:", historyData.value);
         common_vendor.index.showToast({
           title: "删除成功",
           icon: "success",
           duration: 2e3
         });
       } catch (err) {
-        console.error("Failed to remove history record:", err);
+        common_vendor.index.__f__("error", "at pages/history/history_fui/history_fui.vue:90", "Failed to remove history record:", err);
       }
     };
     common_vendor.computed(() => {
@@ -93,7 +93,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           });
         }
       });
-      console.log("tempTimeLineData:", tempTimeLineData);
+      common_vendor.index.__f__("log", "at pages/history/history_fui/history_fui.vue:113", "tempTimeLineData:", tempTimeLineData);
       return tempTimeLineData.sort((a, b) => {
         return new Date(b.day).getTime() - new Date(a.day).getTime();
       });
@@ -111,7 +111,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const currentTabIndex = common_vendor.ref(0);
     const tabs = common_vendor.ref(["时间轴模式", "相册模式"]);
     function QieHuan(e) {
-      console.log("-----------------------------------", e);
+      common_vendor.index.__f__("log", "at pages/history/history_fui/history_fui.vue:137", "-----------------------------------", e);
       currentTabIndex.value = e.index;
     }
     const show = common_vendor.ref(false);
@@ -120,7 +120,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     function showGallery(data) {
       show.value = true;
       GalleryPic.value = data;
-      console.log(GalleryPic.value);
+      common_vendor.index.__f__("log", "at pages/history/history_fui/history_fui.vue:148", GalleryPic.value);
     }
     function hideGallery() {
       show.value = false;
@@ -143,10 +143,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         showToast: true,
         // 是否显示提示，默认为true
         success: function() {
-          console.log("复制成功");
+          common_vendor.index.__f__("log", "at pages/history/history_fui/history_fui.vue:182", "复制成功");
         },
         fail: function(err) {
-          console.error("复制失败", err);
+          common_vendor.index.__f__("error", "at pages/history/history_fui/history_fui.vue:185", "复制失败", err);
         }
       });
     }
@@ -166,14 +166,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             icon: "success"
           });
         } else {
-          console.error("下载失败，状态码:", downloadResult.statusCode);
+          common_vendor.index.__f__("error", "at pages/history/history_fui/history_fui.vue:215", "下载失败，状态码:", downloadResult.statusCode);
           common_vendor.index.showToast({
             title: "下载失败",
             icon: "none"
           });
         }
       } catch (error) {
-        console.error("下载失败:", error);
+        common_vendor.index.__f__("error", "at pages/history/history_fui/history_fui.vue:222", "下载失败:", error);
         common_vendor.index.showToast({
           title: "下载失败",
           icon: "none"
@@ -247,7 +247,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               };
             }),
             n: common_vendor.o(($event) => showGallery(historyData.value[index].output)),
-            o: common_vendor.o(($event) => removeHistoryRecord(item.id), index),
+            o: common_vendor.o(($event) => removeHistoryRecord(item._id), index),
             p: "56f14cc7-11-" + i0 + "," + ("56f14cc7-6-" + i0),
             q: common_vendor.p({
               color: "#ff0000",
@@ -327,3 +327,4 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
 });
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-56f14cc7"]]);
 wx.createPage(MiniProgramPage);
+//# sourceMappingURL=../../../../.sourcemap/mp-weixin/pages/history/history_fui/history_fui.js.map

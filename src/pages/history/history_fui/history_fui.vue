@@ -273,7 +273,8 @@
 
 						<fui-icon
 							style="margin-top:-11%; background-color:rgba(255, 255, 255, 0.5);; border-radius: 100px;  position: absolute ; margin-left: 480rpx;"
-							color="#ff0000" name="delete" @click="removeHistoryRecord(item.id)"></fui-icon>
+							color="#ff0000" name="delete" @click="removeHistoryRecord(item._id)"></fui-icon>
+						
 
 					</view>
 					<!-- 如果是视频的话 -->

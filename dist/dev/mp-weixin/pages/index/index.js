@@ -1,6 +1,7 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const composables_useCommon = require("../../composables/useCommon.js");
+const cofigs_data_globalAppData = require("../../cofigs/data/globalAppData.js");
 const composables_useWorkFlow = require("../../composables/useWorkFlow.js");
 const utils_request = require("../../utils/request.js");
 const utils_common = require("../../utils/common.js");
@@ -43,8 +44,8 @@ const _easycom_up_cell_group = () => "../../node-modules/uview-plus/components/u
 if (!Math) {
   (_easycom_fui_tabs + _easycom_fui_nav_bar + fuiBackgroundImage + AppSwiper + _easycom_up_gap + AppTags + AppWaterFall + _easycom_up_status_bar + MyGraphicCard + BaseLayout + _easycom_fui_footer + _easycom_fui_avatar + _easycom_fui_load_ani + _easycom_fui_icon + _easycom_fui_picker + _easycom_fui_safe_area + _easycom_up_avatar + UserMemberInfo + GetUserInfoPopup + _easycom_up_icon + _easycom_up_cell + _easycom_up_cell_group)();
 }
-const BaseLayout = () => "../../layouts/BaseLayout.js";
 const GetUserInfoPopup = () => "../../components/GetUserInfoPopup.js";
+const BaseLayout = () => "../../layouts/BaseLayout.js";
 const UserMemberInfo = () => "../../components/home/UserMemberInfo.js";
 const MyGraphicCard = () => "../../components/custom/MyGraphicCard/MyGraphicCard.js";
 const AppSwiper = () => "../../components/home/AppSwiper.js";
@@ -52,11 +53,25 @@ const AppTags = () => "../../components/home/AppTags.js";
 const AppWaterFall = () => "../../components/home/AppWaterFall.js";
 const fuiBackgroundImage = () => "../../components/firstui/fui-background-image/fui-background-image.js";
 const backGroundImage = "https://chinahu-ai-server.oss-cn-chengdu.aliyuncs.com/aidraw/image/temps/67873d6c232a3c5d52240dd6/Home2.jpg";
-const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
+const _sfc_defineComponent = common_vendor.defineComponent({
   __name: "index",
   setup(__props) {
     global.TextEncoder = common_vendor.TextEncoder;
     global.TextDecoder = common_vendor.TextDecoder;
+    common_vendor.onShareAppMessage(() => {
+      const inviteCode = stores_appStore.useAppStore().user.my_invite_code;
+      return {
+        title: cofigs_data_globalAppData.globalAppData.share.appInfo,
+        path: `/pages/index/index?inviteCode=${inviteCode}`
+      };
+    });
+    common_vendor.onShareTimeline(() => {
+      const inviteCode = stores_appStore.useAppStore().user.my_invite_code;
+      return {
+        title: cofigs_data_globalAppData.globalAppData.share.appInfo,
+        path: `/pages/index/index?inviteCode=${inviteCode}`
+      };
+    });
     function ToConsole() {
       common_vendor.index.navigateTo({
         url: "/pages/console/console"
@@ -69,7 +84,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         return 0;
       }
       const UserInfor = common_vendor.index.getStorageSync("userInfo");
-      console.log("-----------userInfo---------------", UserInfor);
+      common_vendor.index.__f__("log", "at pages/index/index.vue:361", "-----------userInfo---------------", UserInfor);
       const roltList = ["operator", "manager", "admin"];
       if (roltList.includes(UserInfor.role[0])) {
         role.value = true;
@@ -80,14 +95,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       common_vendor.index.setClipboardData({
         data: text,
         success: () => {
-          console.log("复制成功");
+          common_vendor.index.__f__("log", "at pages/index/index.vue:378", "复制成功");
           common_vendor.index.showToast({
             title: "复制成功",
             icon: "none"
           });
         },
         fail: (err) => {
-          console.error("复制失败", err);
+          common_vendor.index.__f__("error", "at pages/index/index.vue:386", "复制失败", err);
           common_vendor.index.showToast({
             title: "复制失败，请稍后再试",
             icon: "none"
@@ -101,29 +116,29 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       await composables_aiChat.getUserToken().then((res) => {
         requestTask.value = res.data;
       }).catch((err) => {
-        console.error("获取getUserToken失败:", err);
+        common_vendor.index.__f__("error", "at pages/index/index.vue:405", "获取getUserToken失败:", err);
       });
-      console.log("getUserToken执行完毕");
+      common_vendor.index.__f__("log", "at pages/index/index.vue:407", "getUserToken执行完毕");
       await composables_aiChat.getUserInfo(requestTask.value).then((res) => {
         userInfo.value = res.data;
       }).catch((err) => {
-        console.error("获取getUserInfo失败:", err);
+        common_vendor.index.__f__("error", "at pages/index/index.vue:413", "获取getUserInfo失败:", err);
       });
-      console.log("getUserInfo执行完毕");
+      common_vendor.index.__f__("log", "at pages/index/index.vue:415", "getUserInfo执行完毕");
       await composables_aiChat.getModelList(requestTask.value.token).then((res) => {
         modelList.value = res.data;
         chooseModel.value = res.data[0];
       }).catch((err) => {
-        console.error("获取getModelList失败:", err);
+        common_vendor.index.__f__("error", "at pages/index/index.vue:421", "获取getModelList失败:", err);
       });
-      console.log("getModelList执行完毕");
+      common_vendor.index.__f__("log", "at pages/index/index.vue:423", "getModelList执行完毕");
       await composables_aiChat.getUserKey(userInfo.value, requestTask.value.refresh_token).then((res) => {
-        console.log("获取到的getUserKey信息:", res.data);
+        common_vendor.index.__f__("log", "at pages/index/index.vue:425", "获取到的getUserKey信息:", res.data);
         userkey.value = res.data.key;
       }).catch((err) => {
-        console.error("获取getUserKey失败:", err);
+        common_vendor.index.__f__("error", "at pages/index/index.vue:428", "获取getUserKey失败:", err);
       });
-      console.log("getUserKey执行完毕");
+      common_vendor.index.__f__("log", "at pages/index/index.vue:430", "getUserKey执行完毕");
     }
     const popup = common_vendor.ref(false);
     const modelList = common_vendor.ref([]);
@@ -186,7 +201,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               title: "请求失败",
               duration: 2e3
             });
-            console.log("请求失败", err);
+            common_vendor.index.__f__("log", "at pages/index/index.vue:526", "请求失败", err);
           }
           // 请求失败回调
         });
@@ -197,11 +212,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             const text = new common_vendor.TextDecoder().decode(arrayBuffer, { stream: true });
             handleStreamData(text);
           } catch (error) {
-            console.error("处理数据块失败", error);
+            common_vendor.index.__f__("error", "at pages/index/index.vue:544", "处理数据块失败", error);
           }
         });
         requestTask.onHeadersReceived(() => {
-          console.log("请求完成");
+          common_vendor.index.__f__("log", "at pages/index/index.vue:548", "请求完成");
         });
       });
     };
@@ -219,7 +234,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             msg.value += data.choices[0].delta.content;
           }
         } catch (error) {
-          console.log("解析错误:", error);
+          common_vendor.index.__f__("log", "at pages/index/index.vue:568", "解析错误:", error);
         }
       }
       const index = msgList.value.length - 1;
@@ -266,7 +281,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         "role": "system"
       });
       msg.value = "";
-      console.log(msgList.value);
+      common_vendor.index.__f__("log", "at pages/index/index.vue:619", msgList.value);
     }
     common_vendor.onReady(() => {
       socketInit();
@@ -403,7 +418,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           const result = await composables_useCommon.loginByWechatCode(code);
           composables_useCommon.saveLoginInfo(result);
           common_vendor.index.hideLoading();
-          console.log("------------result--------", result);
+          common_vendor.index.__f__("log", "at pages/index/index.vue:820", "------------result--------", result);
           common_vendor.index.setStorageSync("refreshToken", result.refresh_token);
           role.value = true;
         },
@@ -419,7 +434,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const { socketInit } = composables_useWorkFlow.useWorkFlow();
     const handlePayMessage = async (order_id) => {
-      console.log("收到支付成功消息", order_id);
+      common_vendor.index.__f__("log", "at pages/index/index.vue:839", "收到支付成功消息", order_id);
       const order = await composables_useCommon.getOrderInfoById(order_id);
       if (order[0] && order[0].order_status === 1) {
         common_vendor.index.showToast({
@@ -634,5 +649,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
   }
 });
-const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-83a5a03c"]]);
+_sfc_defineComponent.__runtimeHooks = 6;
+const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_defineComponent, [["__scopeId", "data-v-83a5a03c"]]);
 wx.createPage(MiniProgramPage);
+//# sourceMappingURL=../../../.sourcemap/mp-weixin/pages/index/index.js.map

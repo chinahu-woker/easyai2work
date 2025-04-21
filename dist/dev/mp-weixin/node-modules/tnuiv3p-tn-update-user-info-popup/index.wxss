@@ -29,9 +29,9 @@
 .tn-update-user-info-popup .btn-reset.data-v-fd9bc11c {
   background-color: transparent;
   border-radius: 0rpx;
-  color: unset;
-  font-size: unset;
-  line-height: unset;
+  color: inherit;
+  font-size: inherit;
+  line-height: inherit;
   overflow: visible;
   padding: 0rpx;
 }

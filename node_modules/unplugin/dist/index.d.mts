@@ -116,7 +116,7 @@ interface UnpluginOptions {
     esbuild?: {
         onResolveFilter?: RegExp;
         onLoadFilter?: RegExp;
-        setup?: (build: EsbuildPluginBuild) => void | Promise<void>;
+        setup?: (build: PluginBuild) => void | Promise<void>;
         loader?: Loader | ((code: string, id: string) => Loader);
         config?: (options: BuildOptions) => void;
     };

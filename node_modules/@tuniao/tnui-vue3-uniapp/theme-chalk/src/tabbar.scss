@@ -76,6 +76,13 @@
     position: fixed;
     left: 0;
     bottom: 0;
+    transition-property: transform;
+    transition-duration: 0.25s;
+    transition-timing-function: linear;
+    transform: translateY(0);
+  }
+  @include m(fixed-hidden) {
+    transform: translateY(120%);
   }
   /* 固定在底部 end */
 }

@@ -14,7 +14,7 @@ const request = (apiUrl, options = {}, retry = true) => {
         if (res.statusCode === 401 && retry) {
           const { token } = await refreshToken(getRefreshToken());
           composables_useCommon.saveLoginInfo({ token });
-          console.log("刷新后获取的token", token);
+          common_vendor.index.__f__("log", "at utils/request.ts:20", "刷新后获取的token", token);
           if (token) {
             options.header = {
               Authorization: `Bearer ${token}`
@@ -36,10 +36,10 @@ const request = (apiUrl, options = {}, retry = true) => {
         }
       },
       fail: async (err) => {
-        console.log(233333333);
+        common_vendor.index.__f__("log", "at utils/request.ts:45", 233333333);
       },
       complete: async (err) => {
-        console.log("请求完成", err);
+        common_vendor.index.__f__("log", "at utils/request.ts:48", "请求完成", err);
       }
     });
   });
@@ -49,7 +49,7 @@ const refreshToken = async (refreshToken2, apiUrl = "/auth/refreshTokens", maxRe
   let attempt = 0;
   while (attempt < maxRetries) {
     attempt++;
-    console.log(`尝试第 ${attempt} 次刷新Token, refreshToken:`, refreshToken2);
+    common_vendor.index.__f__("log", "at utils/request.ts:68", `尝试第 ${attempt} 次刷新Token, refreshToken:`, refreshToken2);
     try {
       return await new Promise((resolve, reject) => {
         common_vendor.index.request({
@@ -62,32 +62,32 @@ const refreshToken = async (refreshToken2, apiUrl = "/auth/refreshTokens", maxRe
           timeout,
           success: (res) => {
             if (res.statusCode >= 400) {
-              console.log("refreshToken", res);
+              common_vendor.index.__f__("log", "at utils/request.ts:85", "refreshToken", res);
               reject(res);
             } else {
-              console.log("refreshToken", res);
+              common_vendor.index.__f__("log", "at utils/request.ts:89", "refreshToken", res);
               resolve(res.data);
             }
           },
           fail: (err) => {
-            console.error("刷新Token失败", err);
+            common_vendor.index.__f__("error", "at utils/request.ts:94", "刷新Token失败", err);
             reject(err);
           }
         });
       });
     } catch (err) {
       if (err.name === "AbortError") {
-        console.error(`第 ${attempt} 次刷新Token超时`);
+        common_vendor.index.__f__("error", "at utils/request.ts:102", `第 ${attempt} 次刷新Token超时`);
       } else {
-        console.error(`第 ${attempt} 次刷新Token失败`, err);
+        common_vendor.index.__f__("error", "at utils/request.ts:104", `第 ${attempt} 次刷新Token失败`, err);
       }
     }
     if (attempt < maxRetries) {
-      console.log(`等待 ${retryInterval} 毫秒后重试...`);
+      common_vendor.index.__f__("log", "at utils/request.ts:109", `等待 ${retryInterval} 毫秒后重试...`);
       await new Promise((resolve) => setTimeout(resolve, retryInterval));
     }
   }
-  console.log("刷新Token失败，已达到最大重试次数");
+  common_vendor.index.__f__("log", "at utils/request.ts:115", "刷新Token失败，已达到最大重试次数");
   return null;
 };
 const uploadFile = (filePath, options = {}, apiUrl = "/file/upload") => {
@@ -109,7 +109,7 @@ const uploadFile = (filePath, options = {}, apiUrl = "/file/upload") => {
           }
           const { token } = await refreshToken(_refreshToken);
           composables_useCommon.saveLoginInfo({ token });
-          console.log("刷新后获取的token", token);
+          common_vendor.index.__f__("log", "at utils/request.ts:142", "刷新后获取的token", token);
           if (token) {
             options.header = {
               Authorization: `Bearer ${token}`
@@ -123,7 +123,7 @@ const uploadFile = (filePath, options = {}, apiUrl = "/file/upload") => {
             reject(res);
           }
         } else {
-          console.log("success", res);
+          common_vendor.index.__f__("log", "at utils/request.ts:156", "success", res);
           const data = JSON.parse(res.data);
           if (data.data) {
             resolve(data.data);
@@ -133,7 +133,7 @@ const uploadFile = (filePath, options = {}, apiUrl = "/file/upload") => {
         }
       },
       fail: async (err) => {
-        console.log("fail", err);
+        common_vendor.index.__f__("log", "at utils/request.ts:167", "fail", err);
         if (err) {
           const _refreshToken = getRefreshToken();
           if (!_refreshToken) {
@@ -141,7 +141,7 @@ const uploadFile = (filePath, options = {}, apiUrl = "/file/upload") => {
           }
           const { token } = await refreshToken(_refreshToken);
           composables_useCommon.saveLoginInfo({ token });
-          console.log("刷新后获取的token", token);
+          common_vendor.index.__f__("log", "at utils/request.ts:177", "刷新后获取的token", token);
           if (token) {
             options.header = {
               Authorization: `Bearer ${token}`
@@ -168,3 +168,4 @@ const getRefreshToken = () => composables_useCommon.getLoginInfo().refresh_token
 exports.getBaseWsURL = getBaseWsURL;
 exports.request = request;
 exports.uploadFile = uploadFile;
+//# sourceMappingURL=../../.sourcemap/mp-weixin/utils/request.js.map

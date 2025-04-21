@@ -1,5 +1,5 @@
 import type { SocketInitOptions } from '@/composables/useWorkFlow.ts';
-
+export * from './event.types.ts'
 /**
  * 绘图历史
  * @property _id 历史id
@@ -70,7 +70,7 @@ export interface IComfyUIOptions {
     task_id?: string
     source?: 'web' | 'wechat';  //默认web,web端调用不需要传值
     apisource?: 'sd3' | 'default';    //,默认default,使用sd3官方API绘图时传sd3
-    lifo?: boolean;    //优先
+    lifo?: boolean;    //优先	
     servername?: string; //服务器名称
     workflow_id?: string; //工作流Id，必须参数
     workflow_name?: string; //工作流名称,使用自定义工作流必须

@@ -151,41 +151,11 @@ export const useStepCustomStyle = (
     }
   })
 
-  // step-line对应的类
-  const lineClass = computed<string>(() => {
-    const cls: string[] = [ns.e('line'), ns.is('no-title', !props.title)]
-
-    if (isActive.value) {
-      if (bgActiveColorClass.value) cls.push(bgActiveColorClass.value)
-    } else {
-      if (bgColorClass.value) cls.push(bgColorClass.value)
-    }
-
-    return cls.join(' ')
-  })
-  // step-line对应的样式
-  const lineStyle = computed<CSSProperties>(() => {
-    const style: CSSProperties = {}
-
-    if (isActive.value) {
-      if (!bgActiveColorClass.value)
-        style.backgroundColor =
-          bgActiveColorStyle.value || 'var(--tn-color-primary)'
-    } else {
-      if (!bgColorClass.value)
-        style.backgroundColor = bgColorStyle.value || 'var(--tn-color-gray)'
-    }
-
-    return style
-  })
-
   return {
     ns,
     stepClass,
     stepStyle,
     modeClass,
     modeStyle,
-    lineClass,
-    lineStyle,
   }
 }

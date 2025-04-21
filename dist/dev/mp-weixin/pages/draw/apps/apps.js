@@ -1,7 +1,6 @@
 "use strict";
 const common_vendor = require("../../../common/vendor.js");
 const composables_useWorkFlow = require("../../../composables/useWorkFlow.js");
-const types_index = require("../../../types/index.js");
 const stores_appStore = require("../../../stores/appStore.js");
 const utils_common = require("../../../utils/common.js");
 if (!Array) {
@@ -46,40 +45,38 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       handleFindComponentName,
       handleSubmitTaskTask
     } = composables_useWorkFlow.useWorkFlow();
-    console.log("-------------bindParam----------------", bindParam.value);
     const workflowId = common_vendor.ref("");
     common_vendor.onLoad(async () => {
       const currentPage = getCurrentPages().pop();
       const query = currentPage == null ? void 0 : currentPage.options;
       workflowId.value = query.id;
-      handleGetWorkFlwById(query.id).then(() => console.log(workflow.value));
-      socketInit({
-        params: {
-          type: types_index.IWebsocketSceneType.drawProcessPush
-        }
-      });
+      handleGetWorkFlwById(query.id).then(() => common_vendor.index.__f__("log", "at pages/draw/apps/apps.vue:79", workflow.value));
+      socketInit();
     });
     const showPopup = common_vendor.ref(false);
     const FlotButton = common_vendor.ref("空闲");
     const { localTasks } = common_vendor.storeToRefs(stores_appStore.useAppStore());
     const currentProgress = common_vendor.computed(() => {
-      const excuTask = localTasks.value.find((item) => item.status === 4);
+      common_vendor.index.__f__("log", "at pages/draw/apps/apps.vue:101", "进度条1：", localTasks.value);
+      const excuTask = localTasks.value.find((item) => item.status === 0);
+      common_vendor.index.__f__("log", "at pages/draw/apps/apps.vue:103", "进度条：", excuTask);
       if (!excuTask) {
         return FlotButton.value;
+      } else {
+        return excuTask.power === void 0 ? "0%" : excuTask.power + "%" || "返回";
       }
-      return excuTask.progress + "%";
     });
     const endPos = common_vendor.ref({ x: 0, y: 0 });
     const anims = common_vendor.ref([]);
     const startAnimation = async () => {
-      console.log("seedRef.value", seedRef.value);
+      common_vendor.index.__f__("log", "at pages/draw/apps/apps.vue:134", "seedRef.value", seedRef.value);
       if (seedRef.value && seedRef.value.length > 0) {
         for (const item of seedRef.value) {
           item.getSeed();
         }
       }
       handleSubmitTaskTask();
-      console.log("handleSubmitTaskTask", handleSubmitTaskTask);
+      common_vendor.index.__f__("log", "at pages/draw/apps/apps.vue:143", "handleSubmitTaskTask", handleSubmitTaskTask);
       const key = utils_common.randomId(5);
       anims.value.push({
         key,
@@ -138,24 +135,25 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const imageRegex = /\.(jpg|jpeg|png|gif|bmp)$/i;
       const videoRegex = /\.(mp3|wav|ogg)$/i;
       if (!input) {
-        console.log("==============", "是空值");
+        common_vendor.index.__f__("log", "at pages/draw/apps/apps.vue:244", "==============", "是空值");
         return 0;
       } else if (imageRegex.test(input)) {
-        console.log("==============", "是图片");
+        common_vendor.index.__f__("log", "at pages/draw/apps/apps.vue:249", "==============", "是图片");
         return 1;
       } else if (videoRegex.test(input)) {
-        console.log("==============", "是音频");
+        common_vendor.index.__f__("log", "at pages/draw/apps/apps.vue:254", "==============", "是音频");
         return 2;
       }
     }
     return (_ctx, _cache) => {
+      var _a;
       return common_vendor.e({
         a: common_vendor.p({
           name: "arrowleft"
         }),
         b: common_vendor.o(leftClick),
         c: common_vendor.p({
-          title: common_vendor.unref(workflow).title
+          title: (_a = common_vendor.unref(workflow)) == null ? void 0 : _a.title
         }),
         d: showPopup.value
       }, showPopup.value ? {
@@ -306,3 +304,4 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
 });
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-6cf62e12"]]);
 wx.createPage(MiniProgramPage);
+//# sourceMappingURL=../../../../.sourcemap/mp-weixin/pages/draw/apps/apps.js.map

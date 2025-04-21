@@ -22,6 +22,13 @@ export const keyboardProps = buildProps({
     default: false,
   },
   /**
+   * @description 静态键盘
+   */
+  static: {
+    type: Boolean,
+    default: false,
+  },
+  /**
    * @description 键盘类型
    */
   mode: {

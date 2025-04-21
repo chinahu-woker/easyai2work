@@ -29,7 +29,7 @@ const randomId = (length = 8) => {
 const parseJSONToObject = (json) => {
   let msgObj;
   try {
-    let parsedString = JSON.parse(json);
+    const parsedString = JSON.parse(json);
     if (typeof parsedString === "string") {
       msgObj = JSON.parse(parsedString);
     } else {
@@ -48,3 +48,4 @@ exports.generateRandomNumber = generateRandomNumber;
 exports.isVideo = isVideo;
 exports.parseJSONToObject = parseJSONToObject;
 exports.randomId = randomId;
+//# sourceMappingURL=../../.sourcemap/mp-weixin/utils/common.js.map

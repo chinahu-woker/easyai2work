@@ -140,9 +140,6 @@
 				</fui-bottom-popup> -->
 				<fui-safe-area background="#f8f8f8"></fui-safe-area>
 			</view>
-
-
-
 		</view>
 
 
@@ -275,7 +272,7 @@
 
 <script setup lang="ts">
 	import MyNavbar from "@/components/common/MyNavbar.vue";
-	import BaseLayout from "@/layouts/BaseLayout.vue";
+	
 	import GetUserInfoPopup from "@/components/GetUserInfoPopup.vue";
 	import {
 		creatOrder,
@@ -290,9 +287,18 @@
 		refreshUserInfo,
 		saveLoginInfo
 	} from "@/composables/useCommon.ts";
+	import BaseLayout from '@/layouts/BaseLayout.vue'
+	
+	import { onShareAppMessage, onShareTimeline } from '@dcloudio/uni-app'
+	import { globalAppData } from '@/cofigs'
+	
+	
 	import TnIcon from '@tuniao/tnui-vue3-uniapp/components/icon/src/icon.vue'
 	import { onLoad, onReady ,includes} from "@dcloudio/uni-app";
-	import useWorkFlow from "@/composables/useWorkFlow.ts";
+	
+	// import useWorkFlow from "@/composables/useWorkFlow.ts";
+	import useWorkFlow from "@/composables/useWorkFlow";
+	
 	import UserMemberInfo from "@/components/home/UserMemberInfo.vue";
 	import { ref, onMounted, onUnmounted, computed, watch, nextTick } from 'vue'
 	import TnWaterFall from '@tuniao/tnui-vue3-uniapp/components/water-fall/src/water-fall.vue'
@@ -322,6 +328,23 @@
 	global.TextEncoder = TextEncoder
 	global.TextDecoder = TextDecoder
 	
+	// 分享
+	onShareAppMessage(() => {
+	  const inviteCode = useAppStore().user.my_invite_code
+	  // 在页面中定义分享方法
+	  return {
+	    title: globalAppData.share.appInfo,
+	    path: `/pages/index/index?inviteCode=${inviteCode}`,
+	  }
+	})
+	// 朋友圈
+	onShareTimeline(() => {
+	  const inviteCode = useAppStore().user.my_invite_code
+	  return {
+	    title: globalAppData.share.appInfo,
+	    path: `/pages/index/index?inviteCode=${inviteCode}`,
+	  }
+	})
 	function ToConsole(){
 		uni.navigateTo({
 			url: '/pages/console/console'

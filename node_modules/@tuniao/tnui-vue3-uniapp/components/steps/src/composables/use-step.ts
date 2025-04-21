@@ -7,7 +7,8 @@ import {
   onUnmounted,
 } from 'vue'
 import { stepsContextKey } from '../../../../tokens'
-import { debugWarn } from '../../../../utils'
+import { useSelectorQuery } from '../../../../hooks'
+import { debugWarn, generateId } from '../../../../utils'
 
 import type { StepProps } from '../steps-item'
 import type { StepsMode } from '../steps'
@@ -21,6 +22,9 @@ export const useStep = (props: StepProps) => {
   const { emit, uid } = instance!
 
   const stepsContext = inject(stepsContextKey)
+
+  const { getSelectorNodeInfo } = useSelectorQuery(instance)
+  const itemComponentId = `tsii-${generateId()}`
 
   // 判断当前是否被激活
   const isActive = computed<boolean>(
@@ -39,9 +43,40 @@ export const useStep = (props: StepProps) => {
     emit('click')
   }
 
+  // 获取标签的位置信息
+  let initGetRectInfoCount = 0
+  const getStepItemComponentRectInfo = async () => {
+    try {
+      const rectInfo = await getSelectorNodeInfo(`#${itemComponentId}`)
+
+      initGetRectInfoCount = 0
+      stepsContext?.addItem({
+        uid,
+        normalColor: props.color,
+        activeColor: props.activeColor,
+        left: rectInfo.left,
+        right: rectInfo.right,
+        top: rectInfo.top,
+        bottom: rectInfo.bottom,
+        width: rectInfo.width,
+        height: rectInfo.height,
+      })
+    } catch (err) {
+      if (initGetRectInfoCount > 10) {
+        initGetRectInfoCount = 0
+        debugWarn('TnStepsItem', `获取step标签位置失败: ${err}`)
+        return
+      }
+      initGetRectInfoCount++
+      setTimeout(() => {
+        getStepItemComponentRectInfo()
+      }, 150)
+    }
+  }
+
   onMounted(() => {
     nextTick(() => {
-      stepsContext?.addItem({ uid })
+      getStepItemComponentRectInfo()
     })
   })
 
@@ -52,6 +87,7 @@ export const useStep = (props: StepProps) => {
   return {
     isActive,
     stepMode,
+    itemComponentId,
     itemClickEvent,
   }
 }

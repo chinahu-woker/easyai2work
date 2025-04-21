@@ -39,7 +39,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return tagsTemp;
     });
     const handleTabClick = (item) => {
-      console.log(item);
+      common_vendor.index.__f__("log", "at components/home/AppTags.vue:35", item);
       home_tagActiveIndex.value = item.index;
     };
     return (_ctx, _cache) => {
@@ -53,3 +53,4 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   }
 });
 wx.createComponent(_sfc_main);
+//# sourceMappingURL=../../../.sourcemap/mp-weixin/components/home/AppTags.js.map

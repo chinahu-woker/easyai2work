@@ -11,7 +11,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   setup(__props) {
     const { showExecuting } = common_vendor.storeToRefs(stores_appStore.useAppStore());
     common_vendor.watch(showExecuting, () => {
-      console.log("showExcuting", showExecuting);
+      common_vendor.index.__f__("log", "at components/common/TaskExcuting.vue:10", "showExcuting", showExecuting);
     });
     const progressPercent = common_vendor.ref(30);
     return (_ctx, _cache) => {
@@ -35,3 +35,4 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   }
 });
 wx.createComponent(_sfc_main);
+//# sourceMappingURL=../../../.sourcemap/mp-weixin/components/common/TaskExcuting.js.map

@@ -9,7 +9,7 @@ var _core = require("@babel/core");
 var _default = exports.default = (0, _helperPluginUtils.declare)(api => {
   api.assertVersion(7);
   function transformStatementList(parentPath, paths) {
-    const isInStrictMode = parentPath.isInStrictMode();
+    ;
     for (const path of paths) {
       if (!path.isFunctionDeclaration()) continue;
       ;

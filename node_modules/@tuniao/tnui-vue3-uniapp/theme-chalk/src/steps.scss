@@ -7,4 +7,18 @@
 
   display: flex;
   flex-wrap: nowrap;
+  justify-content: space-between;
+
+  @include e(line) {
+    position: absolute;
+    height: 4rpx;
+    z-index: 1;
+    border-radius: 100rpx;
+    transform: translateY(-50%);
+    transition: background-color 0.3s ease;
+
+    &:last-of-type {
+      display: none;
+    }
+  }
 }

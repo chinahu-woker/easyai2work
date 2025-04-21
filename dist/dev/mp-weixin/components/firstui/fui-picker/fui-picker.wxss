@@ -83,8 +83,7 @@
 .fui-picker__header-dark.data-v-debed8cc::after {
 		border-bottom-color: #333;
 }
-.fui-picker__btn-cancel.data-v-debed8cc,
-	.fui-picker__btn-sure.data-v-debed8cc {
+.fui-picker__btn-cancel.data-v-debed8cc,.fui-picker__btn-sure.data-v-debed8cc {
 		font-weight: normal;
 		height: 88rpx;
 		padding: 0 24rpx;

@@ -30,7 +30,7 @@
 	import { useAppStore } from "@/stores/appStore.ts";
 	import { randomId } from "@/utils/common.ts";
 	import DragButton2 from "@/components/common/DragButton2.vue";
-	
+
 
 	/** 所有的组件 */
 	const components = {
@@ -67,33 +67,48 @@
 		handleSubmitTaskTask
 	} = useWorkFlow()
 
-	// console.log('-------------useWorkFlow()----------------', useWorkFlow())
-	console.log('-------------bindParam----------------',bindParam.value)
-	// console.log('-------------useWorkFlow()----------------',useWorkFlow())
+	// // console.log('-------------useWorkFlow()----------------', useWorkFlow())
+	// console.log('-------------bindParam----------------', bindParam.value)
+	// // console.log('-------------useWorkFlow()----------------',useWorkFlow())
 
 	const workflowId = ref('')
-onLoad(async () => {
-  const currentPage = getCurrentPages().pop(); // 获取当前页面栈中的最后一个页面
-  const query = currentPage?.options; // 获取 query 参数
-  workflowId.value = query.id
-  handleGetWorkFlwById(query.id).then(() => console.log(workflow.value))
-  socketInit({
-    params:{
-      type:IWebsocketSceneType.drawProcessPush
-    }
-  })
-})
+	onLoad(async () => {
+		const currentPage = getCurrentPages().pop(); // 获取当前页面栈中的最后一个页面
+		const query = currentPage?.options; // 获取 query 参数
+		workflowId.value = query.id
+		handleGetWorkFlwById(query.id).then(() => console.log(workflow.value))
+		socketInit()
+		// socketInit({
+		//   params:{
+		//     type:IWebsocketSceneType.drawProcessPush
+		//   }
+		// })
+	})
 
 	const showPopup = ref(false)
 	const FlotButton = ref("空闲")
 
 	const { localTasks } = storeToRefs(useAppStore())
+	// const currentProgress = computed(() => {
+	// 	const excuTask = localTasks.value.find(item => item.status === 4)
+	// 	console.log('进度条：', excuTask?.progress)
+	// 	if (!excuTask) {
+	// 		return '空闲'
+	// 	}
+	// 	return excuTask.progress === undefined ? '0%' : excuTask.progress + '%'
+	// })
 	const currentProgress = computed(() => {
-		const excuTask = localTasks.value.find(item => item.status === 4)
+		console.log('进度条1：',localTasks.value)
+		const excuTask = localTasks.value.find(item => item.status === 0)
+		console.log('进度条：',excuTask)
 		if (!excuTask) {
 			return FlotButton.value
 		}
-		return excuTask.progress + '%'
+		else{
+			return excuTask.power === undefined ? '0%' : excuTask.power + '%' ||'返回'
+		}
+		
+		// return excuTask.progress === undefined ? '0%' : excuTask.progress + '%'
 	})
 
 
@@ -117,9 +132,9 @@ onLoad(async () => {
 	const anims = ref<any[]>([]);
 	const startAnimation = async () => {
 		console.log('seedRef.value', seedRef.value)
-		
+
 		if (seedRef.value && seedRef.value.length > 0) {
-			
+
 			for (const item of seedRef.value) {
 				item.getSeed()
 			}
@@ -140,7 +155,7 @@ onLoad(async () => {
 		await nextTick(); // 确保 DOM 完全渲染后再执行
 		const submitBtn = uni.createSelectorQuery().select('#submit-btn');
 		const cartBtn = uni.createSelectorQuery().select('#cartBtn');
-		
+
 		submitBtn.boundingClientRect().exec((rect) => {
 			// console.log('rect',rect)
 			// submitBtnCenter.value={x:rect[0].left+rect[0].width/2,y:rect[0].top}
@@ -184,7 +199,11 @@ onLoad(async () => {
 
 	const handToggelePregress = () => {
 		showPopup.value = !showPopup.value
-		if (showPopup.value == true) { FlotButton.value = '返回' }
+		if (showPopup.value == true) { 
+			
+			FlotButton.value = '返回'
+			 
+			 }
 
 		else { FlotButton.value = '空闲' }
 
@@ -219,13 +238,13 @@ onLoad(async () => {
 		const imageRegex = /\.(jpg|jpeg|png|gif|bmp)$/i;
 		// 定义视频链接的正则表达式
 		const videoRegex = /\.(mp3|wav|ogg)$/i;
-	
+
 		// 检查内容是否为空
 		if (!input) {
 			console.log('==============', '是空值')
 			return 0; // 内容为空
 		}
-		
+
 		else if (imageRegex.test(input)) {
 			console.log('==============', '是图片')
 			return 1; // 是图片链接
@@ -235,13 +254,12 @@ onLoad(async () => {
 			console.log('==============', '是音频')
 			return 2; // 是音频链接
 		}
-		
+
 	}
-	
 </script>
 
 <template>
-	<fui-nav-bar :title="workflow.title " @leftClick="leftClick">
+	<fui-nav-bar :title="workflow?.title " @leftClick="leftClick">
 		<fui-icon name="arrowleft"></fui-icon>
 		<!-- <template v-slot:right>
 			<fui-icon name="plus"></fui-icon>
@@ -275,15 +293,15 @@ onLoad(async () => {
 								:options="item.attributes" />
 						</template>
 						<template v-else-if="handleFindComponentName(item.name)==='ImageUpload'">
-							
+
 							<view v-if="checkFileType(item.param) == 2">
 								<AudioUpload :title="item.title" v-model="bindParam[item.name]"
-								:options="item.attributes" />
+									:options="item.attributes" />
 							</view>
 
 							<view v-else>
 								<ImageUpload :title="item.title" v-model="bindParam[item.name]"
-								:options="item.attributes" />
+									:options="item.attributes" />
 							</view>
 						</template>
 						<template v-else-if="handleFindComponentName(item.name)==='Width'">
@@ -311,14 +329,14 @@ onLoad(async () => {
 								:options="item.attributes" />
 						</template>
 						<template v-else>
-						
-							
+
+
 							<view v-if="item.name =='custom_batch_image_path_origin'">
 								<!-- 自定义节点多任务上传 -->
 								<MoreImageUpload :title="item.title" v-model="bindParam[item.name]"
-								:options="item.attributes" />
-								
-								
+									:options="item.attributes" />
+
+
 							</view>
 						</template>
 
@@ -360,7 +378,7 @@ onLoad(async () => {
 			</view>
 			<!-- AllList -->
 			<DragButton2 v-model="endPos">
-				
+
 				<view class="content-default" id="cartBtn" @click="handToggelePregress">
 					{{currentProgress }}
 				</view>
@@ -395,18 +413,19 @@ onLoad(async () => {
 		position: relative;
 		padding-top: 80rpx;
 		/* 顶部导航栏的高度 + 小间距 */
-		padding-bottom: 120px;
+		padding-bottom: 120rpx;
 		/* 底部导航栏的高度 + 小间距 */
 	}
 
 	/* 居中按钮样式 */
 	.floating-button {
 		width: 80%;
-		position: fixed;
-		bottom: 70px;
+		position: fixed !important;
+		// position: fixed;
+		bottom: 70rpx;
 		/* 底部导航栏的高度 + 小间距 */
-		left: 50%;
-		transform: translateX(-50%);
+		left: 50% !important;
+		transform: translateX(-50%) !important;
 		z-index: 10;
 		/* 确保按钮在底部导航栏上方 */
 	}
@@ -420,10 +439,10 @@ onLoad(async () => {
 
 	.cart {
 		position: absolute;
-		top: 50px;
-		right: 30px;
+		top: 50rpx;
+		right: 30rpx;
 		background-color: #f0f0f0;
-		padding: 10px;
+		padding: 10rpx;
 	}
 
 	.add-icon {
@@ -438,19 +457,33 @@ onLoad(async () => {
 		animation: moveAnimation 1s ease-in-out forwards;
 	}
 
+	// .content-default {
+	// 	z-index: 996;
+	// 	width: 100rpx;
+	// 	height: 100rpx;
+	// 	background: linear-gradient(360deg, $u-primary-lighten 0%, $u-primary 100%);
+	// 	box-shadow: 0 4rpx 12rpx 0 #ADC3F8;
+	// 	border-radius: 50rpx;
+	// 	color: #FFFFFF;
+	// 	display: flex;
+	// 	align-items: center;
+	// 	justify-content: center;
+	// 	animation: verticalMove 2s ease-in-out infinite;
+	// 	position: relative !important; /* 避免绝对定位影响 */
+	// }
 	.content-default {
-		z-index: 996;
-		width: 100rpx;
-		height: 100rpx;
-		background: linear-gradient(360deg, $u-primary-lighten 0%, $u-primary 100%);
-		box-shadow: 0 4rpx 12rpx 0 #ADC3F8;
-		border-radius: 50rpx;
-		color: #FFFFFF;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		animation: verticalMove 2s ease-in-out infinite;
-	}
+  position: relative !important; /* 避免绝对定位影响 */
+  width: 100rpx;
+  height: 100rpx;
+  background: linear-gradient(360deg, $u-primary-lighten 0%, $u-primary 100%);
+  box-shadow: 0 4rpx 12rpx 0 #ADC3F8;
+  border-radius: 50rpx;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: verticalMove 2s ease-in-out infinite;
+}
 
 	/* 上下移动动画 */
 	@keyframes verticalMove {

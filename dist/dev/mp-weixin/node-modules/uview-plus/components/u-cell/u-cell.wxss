@@ -23,22 +23,7 @@
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
-.u-empty.data-v-b4243719,
-.u-empty__wrap.data-v-b4243719,
-.u-tabs.data-v-b4243719,
-.u-tabs__wrapper.data-v-b4243719,
-.u-tabs__wrapper__scroll-view-wrapper.data-v-b4243719,
-.u-tabs__wrapper__scroll-view.data-v-b4243719,
-.u-tabs__wrapper__nav.data-v-b4243719,
-.u-tabs__wrapper__nav__line.data-v-b4243719,
-.up-empty.data-v-b4243719,
-.up-empty__wrap.data-v-b4243719,
-.up-tabs.data-v-b4243719,
-.up-tabs__wrapper.data-v-b4243719,
-.up-tabs__wrapper__scroll-view-wrapper.data-v-b4243719,
-.up-tabs__wrapper__scroll-view.data-v-b4243719,
-.up-tabs__wrapper__nav.data-v-b4243719,
-.up-tabs__wrapper__nav__line.data-v-b4243719 {
+.u-empty.data-v-b4243719,.u-empty__wrap.data-v-b4243719,.u-tabs.data-v-b4243719,.u-tabs__wrapper.data-v-b4243719,.u-tabs__wrapper__scroll-view-wrapper.data-v-b4243719,.u-tabs__wrapper__scroll-view.data-v-b4243719,.u-tabs__wrapper__nav.data-v-b4243719,.u-tabs__wrapper__nav__line.data-v-b4243719,.up-empty.data-v-b4243719,.up-empty__wrap.data-v-b4243719,.up-tabs.data-v-b4243719,.up-tabs__wrapper.data-v-b4243719,.up-tabs__wrapper__scroll-view-wrapper.data-v-b4243719,.up-tabs__wrapper__scroll-view.data-v-b4243719,.up-tabs__wrapper__nav.data-v-b4243719,.up-tabs__wrapper__nav__line.data-v-b4243719 {
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
@@ -66,7 +51,7 @@
   padding-top: 13px;
   padding-bottom: 13px;
 }
-.u-cell__left-icon-wrap.data-v-b4243719, .u-cell__right-icon-wrap.data-v-b4243719 {
+.u-cell__left-icon-wrap.data-v-b4243719,.u-cell__right-icon-wrap.data-v-b4243719 {
   display: flex;
   flex-direction: row;
   align-items: center;

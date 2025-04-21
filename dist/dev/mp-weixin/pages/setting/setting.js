@@ -49,7 +49,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (uniPlatform !== "web") {
         handleLoginByWechat();
       } else {
-        console.log("dev");
+        common_vendor.index.__f__("log", "at pages/setting/setting.vue:132", "dev");
         const user2 = await composables_useCommon.loginByUsername({
           username: "test456",
           password: "123456"
@@ -79,7 +79,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       utils_emitter.on(types_event_types.EventType.PAY_SUCCESS, ({ order_id }) => handlePayMessage(order_id));
     });
     const handlePayMessage = async (order_id) => {
-      console.log("收到支付成功消息", order_id);
+      common_vendor.index.__f__("log", "at pages/setting/setting.vue:171", "收到支付成功消息", order_id);
       const order = await composables_useCommon.getOrderInfoById(order_id);
       if (order[0] && order[0].order_status === 1) {
         common_vendor.index.showToast({
@@ -129,21 +129,26 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           color: "#969799",
           size: "28"
         }),
-        j: common_vendor.o(($event) => showPay.value = true),
-        k: common_vendor.p({
+        j: common_vendor.p({
+          name: "arrow-right",
+          color: "#969799",
+          size: "28"
+        }),
+        k: common_vendor.o(($event) => showPay.value = true),
+        l: common_vendor.p({
           icon: "rmb-circle",
           title: "成为会员"
         }),
-        l: common_vendor.o(handleGotoHistory),
-        m: common_vendor.p({
+        m: common_vendor.o(handleGotoHistory),
+        n: common_vendor.p({
           icon: "photo",
           title: "绘图历史"
         }),
-        n: common_vendor.p({
+        o: common_vendor.p({
           name: "logout"
         }),
-        o: common_vendor.o(handleLoginOut),
-        p: common_vendor.p({
+        p: common_vendor.o(handleLoginOut),
+        q: common_vendor.p({
           icon: "setting",
           title: "退出登录"
         })
@@ -152,3 +157,4 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   }
 });
 wx.createPage(_sfc_main);
+//# sourceMappingURL=../../../.sourcemap/mp-weixin/pages/setting/setting.js.map

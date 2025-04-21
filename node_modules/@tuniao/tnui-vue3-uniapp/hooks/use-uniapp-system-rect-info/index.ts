@@ -60,9 +60,23 @@ export const useUniAppSystemRectInfo = () => {
 
   const getSystemRectInfo = () => {
     try {
+      let statusBarHeight = 0
+      let windowWidth = 0
+      let windowHeight = 0
+      let titleBarHeight = 0
+      // #ifndef MP-WEIXIN
       const uniSystemInfo = uni.getSystemInfoSync()
-      const { statusBarHeight, windowWidth, windowHeight, titleBarHeight } =
-        uniSystemInfo
+      statusBarHeight = uniSystemInfo.statusBarHeight || 0
+      windowWidth = uniSystemInfo.windowWidth || 0
+      windowHeight = uniSystemInfo.windowHeight || 0
+      titleBarHeight = uniSystemInfo.titleBarHeight || 0
+      // #endif
+      // #ifdef MP-WEIXIN
+      const windowInfo = wx.getWindowInfo()
+      statusBarHeight = windowInfo.statusBarHeight || 0
+      windowWidth = windowInfo.windowWidth || 0
+      windowHeight = windowInfo.windowHeight || 0
+      // #endif
 
       let height = 0
       // #ifndef MP
@@ -94,6 +108,10 @@ export const useUniAppSystemRectInfo = () => {
       navBarBoundingInfo.top = menuButtonTop
       navBarBoundingInfo.left = menuButtonLeft
       navBarBoundingInfo.right = menuButtonRight
+      const boundingMaxWidth = navBarBoundingInfo.height * 2.56
+      if (navBarBoundingInfo.width > boundingMaxWidth) {
+        navBarBoundingInfo.width = Math.floor(boundingMaxWidth)
+      }
       // #ifdef MP-ALIPAY
       navBarBoundingInfo.right = menuButtonLeft + menuButtonWidth
       // #endif

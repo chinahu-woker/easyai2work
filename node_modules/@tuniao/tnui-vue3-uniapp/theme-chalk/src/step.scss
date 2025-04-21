@@ -3,9 +3,8 @@
 $mode-item-size: 50rpx;
 
 @include b(step) {
-  flex: 1;
   position: relative;
-  width: 100%;
+  width: fit-content;
 
   display: flex;
   justify-content: flex-end;
@@ -135,24 +134,6 @@ $mode-item-size: 50rpx;
   }
   /* 图标模式 end */
 
-  /* 横线 start */
-  @include e(line) {
-    position: absolute;
-    right: calc(#{$mode-item-size} * 1.35);
-    top: calc(#{$mode-item-size} / 2 - 2rpx);
-    width: calc(100% - #{$mode-item-size});
-    height: 4rpx;
-
-    z-index: 1;
-
-    transition: background-color 0.3s ease;
-
-    @include when(no-title) {
-      right: calc(#{$mode-item-size});
-    }
-  }
-  /* 横线 end */
-
   /* 激活状态 start */
   @include when(active) {
     // 数字模式
@@ -204,10 +185,6 @@ $mode-item-size: 50rpx;
     flex-shrink: 0;
     width: fit-content;
     max-width: fit-content;
-
-    @include e(line) {
-      display: none;
-    }
   }
   /* 最后一个元素 end */
 }

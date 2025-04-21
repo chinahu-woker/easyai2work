@@ -35,7 +35,7 @@
   left: calc(50rpx / 2);
   top: 50rpx;
   width: 2rpx;
-  height: calc(100% - (50rpx / 2));
+  height: calc(100% - 50rpx / 2);
   background-color: var(--tn-color-gray-disabled);
   transform: translateX(-50%);
 }
