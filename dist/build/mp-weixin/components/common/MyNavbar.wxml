@@ -1,0 +1,1 @@
+<up-navbar-mini wx:if="{{a}}" u-i="33bfbb72-0" bind:__l="__l" u-p="{{a}}" class="{{[virtualHostClass]}}" virtualHostClass="{{[virtualHostClass]}}" style="{{virtualHostStyle}}" virtualHostStyle="{{virtualHostStyle}}" hidden="{{virtualHostHidden}}" virtualHostHidden="{{virtualHostHidden}}" id="{{virtualHostId}}" virtualHostId="{{virtualHostId}}"></up-navbar-mini>

@@ -1,0 +1,7 @@
+{
+  "component": true,
+  "usingComponents": {
+    "tn-popup": "../../node-modules/@tuniao/tnui-vue3-uniapp/components/popup/src/popup",
+    "tn-circle-progress": "../../node-modules/@tuniao/tnui-vue3-uniapp/components/circle-progress/src/circle-progress"
+  }
+}

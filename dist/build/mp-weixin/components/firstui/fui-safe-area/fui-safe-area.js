@@ -1,0 +1,1 @@
+"use strict";const e=require("../../../common/vendor.js"),n={name:"fui-safe-area",props:{background:{type:String,default:"#FFFFFF"}},created(){},data:()=>({iphonex:!1}),methods:{}};const o=e._export_sfc(n,[["render",function(e,n,o,r,t,a){return{a:t.iphonex?1:"",b:o.background}}],["__scopeId","data-v-f4213fd4"]]);wx.createComponent(o);

@@ -78,16 +78,15 @@ const _sfc_defineComponent = common_vendor.defineComponent({
       });
     }
     const role = common_vendor.ref(false);
+    const roltList = ["manager", "admin"];
     function Kongzhitai() {
       if (!composables_useCommon.isLogin.value) {
         role.value = false;
         return 0;
-      }
-      const UserInfor = common_vendor.index.getStorageSync("userInfo");
-      common_vendor.index.__f__("log", "at pages/index/index.vue:361", "-----------userInfo---------------", UserInfor);
-      const roltList = ["operator", "manager", "admin"];
-      if (roltList.includes(UserInfor.role[0])) {
-        role.value = true;
+      } else {
+        const UserInfor = common_vendor.index.getStorageSync("userInfo");
+        common_vendor.index.__f__("log", "at pages/index/index.vue:365", "361---userInfo---------------", roltList.includes(UserInfor.role[0]));
+        role.value = roltList.includes(UserInfor.role[0]);
       }
     }
     let items = common_vendor.ref("");
@@ -95,14 +94,14 @@ const _sfc_defineComponent = common_vendor.defineComponent({
       common_vendor.index.setClipboardData({
         data: text,
         success: () => {
-          common_vendor.index.__f__("log", "at pages/index/index.vue:378", "复制成功");
+          common_vendor.index.__f__("log", "at pages/index/index.vue:382", "复制成功");
           common_vendor.index.showToast({
             title: "复制成功",
             icon: "none"
           });
         },
         fail: (err) => {
-          common_vendor.index.__f__("error", "at pages/index/index.vue:386", "复制失败", err);
+          common_vendor.index.__f__("error", "at pages/index/index.vue:390", "复制失败", err);
           common_vendor.index.showToast({
             title: "复制失败，请稍后再试",
             icon: "none"
@@ -116,29 +115,29 @@ const _sfc_defineComponent = common_vendor.defineComponent({
       await composables_aiChat.getUserToken().then((res) => {
         requestTask.value = res.data;
       }).catch((err) => {
-        common_vendor.index.__f__("error", "at pages/index/index.vue:405", "获取getUserToken失败:", err);
+        common_vendor.index.__f__("error", "at pages/index/index.vue:409", "获取getUserToken失败:", err);
       });
-      common_vendor.index.__f__("log", "at pages/index/index.vue:407", "getUserToken执行完毕");
+      common_vendor.index.__f__("log", "at pages/index/index.vue:411", "getUserToken执行完毕");
       await composables_aiChat.getUserInfo(requestTask.value).then((res) => {
         userInfo.value = res.data;
       }).catch((err) => {
-        common_vendor.index.__f__("error", "at pages/index/index.vue:413", "获取getUserInfo失败:", err);
+        common_vendor.index.__f__("error", "at pages/index/index.vue:417", "获取getUserInfo失败:", err);
       });
-      common_vendor.index.__f__("log", "at pages/index/index.vue:415", "getUserInfo执行完毕");
+      common_vendor.index.__f__("log", "at pages/index/index.vue:419", "getUserInfo执行完毕");
       await composables_aiChat.getModelList(requestTask.value.token).then((res) => {
         modelList.value = res.data;
         chooseModel.value = res.data[0];
       }).catch((err) => {
-        common_vendor.index.__f__("error", "at pages/index/index.vue:421", "获取getModelList失败:", err);
+        common_vendor.index.__f__("error", "at pages/index/index.vue:425", "获取getModelList失败:", err);
       });
-      common_vendor.index.__f__("log", "at pages/index/index.vue:423", "getModelList执行完毕");
+      common_vendor.index.__f__("log", "at pages/index/index.vue:427", "getModelList执行完毕");
       await composables_aiChat.getUserKey(userInfo.value, requestTask.value.refresh_token).then((res) => {
-        common_vendor.index.__f__("log", "at pages/index/index.vue:425", "获取到的getUserKey信息:", res.data);
+        common_vendor.index.__f__("log", "at pages/index/index.vue:429", "获取到的getUserKey信息:", res.data);
         userkey.value = res.data.key;
       }).catch((err) => {
-        common_vendor.index.__f__("error", "at pages/index/index.vue:428", "获取getUserKey失败:", err);
+        common_vendor.index.__f__("error", "at pages/index/index.vue:432", "获取getUserKey失败:", err);
       });
-      common_vendor.index.__f__("log", "at pages/index/index.vue:430", "getUserKey执行完毕");
+      common_vendor.index.__f__("log", "at pages/index/index.vue:434", "getUserKey执行完毕");
     }
     const popup = common_vendor.ref(false);
     const modelList = common_vendor.ref([]);
@@ -201,7 +200,7 @@ const _sfc_defineComponent = common_vendor.defineComponent({
               title: "请求失败",
               duration: 2e3
             });
-            common_vendor.index.__f__("log", "at pages/index/index.vue:526", "请求失败", err);
+            common_vendor.index.__f__("log", "at pages/index/index.vue:530", "请求失败", err);
           }
           // 请求失败回调
         });
@@ -212,11 +211,11 @@ const _sfc_defineComponent = common_vendor.defineComponent({
             const text = new common_vendor.TextDecoder().decode(arrayBuffer, { stream: true });
             handleStreamData(text);
           } catch (error) {
-            common_vendor.index.__f__("error", "at pages/index/index.vue:544", "处理数据块失败", error);
+            common_vendor.index.__f__("error", "at pages/index/index.vue:548", "处理数据块失败", error);
           }
         });
         requestTask.onHeadersReceived(() => {
-          common_vendor.index.__f__("log", "at pages/index/index.vue:548", "请求完成");
+          common_vendor.index.__f__("log", "at pages/index/index.vue:552", "请求完成");
         });
       });
     };
@@ -234,7 +233,7 @@ const _sfc_defineComponent = common_vendor.defineComponent({
             msg.value += data.choices[0].delta.content;
           }
         } catch (error) {
-          common_vendor.index.__f__("log", "at pages/index/index.vue:568", "解析错误:", error);
+          common_vendor.index.__f__("log", "at pages/index/index.vue:572", "解析错误:", error);
         }
       }
       const index = msgList.value.length - 1;
@@ -281,7 +280,7 @@ const _sfc_defineComponent = common_vendor.defineComponent({
         "role": "system"
       });
       msg.value = "";
-      common_vendor.index.__f__("log", "at pages/index/index.vue:619", msgList.value);
+      common_vendor.index.__f__("log", "at pages/index/index.vue:623", msgList.value);
     }
     common_vendor.onReady(() => {
       socketInit();
@@ -411,6 +410,11 @@ const _sfc_defineComponent = common_vendor.defineComponent({
       }
       chatAiGetToken();
       name_value.value = "我的";
+      Kongzhitai();
+      common_vendor.index.reLaunch({ url: "/pages/index/index" });
+      common_vendor.index.showLoading({
+        title: "加载中"
+      });
     };
     const handleLoginByWechat = () => {
       common_vendor.index.login({
@@ -418,9 +422,8 @@ const _sfc_defineComponent = common_vendor.defineComponent({
           const result = await composables_useCommon.loginByWechatCode(code);
           composables_useCommon.saveLoginInfo(result);
           common_vendor.index.hideLoading();
-          common_vendor.index.__f__("log", "at pages/index/index.vue:820", "------------result--------", result);
+          common_vendor.index.__f__("log", "at pages/index/index.vue:830", "------------result--------", result);
           common_vendor.index.setStorageSync("refreshToken", result.refresh_token);
-          role.value = true;
         },
         fail: function(err) {
           common_vendor.index.showToast({
@@ -430,11 +433,10 @@ const _sfc_defineComponent = common_vendor.defineComponent({
         }
       });
       chatAiGetToken();
-      Kongzhitai();
     };
     const { socketInit } = composables_useWorkFlow.useWorkFlow();
     const handlePayMessage = async (order_id) => {
-      common_vendor.index.__f__("log", "at pages/index/index.vue:839", "收到支付成功消息", order_id);
+      common_vendor.index.__f__("log", "at pages/index/index.vue:849", "收到支付成功消息", order_id);
       const order = await composables_useCommon.getOrderInfoById(order_id);
       if (order[0] && order[0].order_status === 1) {
         common_vendor.index.showToast({

@@ -1,0 +1,6 @@
+{
+  "component": true,
+  "usingComponents": {
+    "up-navbar-mini": "../../node-modules/uview-plus/components/u-navbar-mini/u-navbar-mini"
+  }
+}

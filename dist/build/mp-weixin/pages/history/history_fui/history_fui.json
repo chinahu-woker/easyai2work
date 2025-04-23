@@ -1,0 +1,17 @@
+{
+  "navigationBarTitleText": "",
+  "usingComponents": {
+    "fui-background-image": "../../../components/firstui/fui-background-image/fui-background-image",
+    "fui-tabs": "../../../components/firstui/fui-tabs/fui-tabs",
+    "fui-sticky": "../../../components/firstui/fui-sticky/fui-sticky",
+    "fui-section": "../../../components/firstui/fui-section/fui-section",
+    "fui-gallery": "../../../components/firstui/fui-gallery/fui-gallery",
+    "fui-icon": "../../../components/firstui/fui-icon/fui-icon",
+    "fui-load-ani": "../../../components/firstui/fui-load-ani/fui-load-ani",
+    "fui-collapse-item": "../../../components/firstui/fui-collapse-item/fui-collapse-item",
+    "fui-timeaxis-node": "../../../components/firstui/fui-timeaxis-node/fui-timeaxis-node",
+    "fui-timeaxis": "../../../components/firstui/fui-timeaxis/fui-timeaxis",
+    "fui-waterfall-item": "../../../components/firstui/fui-waterfall-item/fui-waterfall-item",
+    "fui-waterfall": "../../../components/firstui/fui-waterfall/fui-waterfall"
+  }
+}

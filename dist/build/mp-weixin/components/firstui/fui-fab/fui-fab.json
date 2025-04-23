@@ -1,0 +1,6 @@
+{
+  "component": true,
+  "usingComponents": {
+    "fui-icon": "../fui-icon/fui-icon"
+  }
+}

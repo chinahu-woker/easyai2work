@@ -1,0 +1,6 @@
+{
+  "component": true,
+  "usingComponents": {
+    "up-gap": "../../node-modules/uview-plus/components/u-gap/u-gap"
+  }
+}

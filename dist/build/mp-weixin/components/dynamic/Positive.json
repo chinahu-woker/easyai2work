@@ -1,0 +1,8 @@
+{
+  "component": true,
+  "usingComponents": {
+    "param-card": "../common/ParamCard",
+    "my-title": "../common/MyTitle",
+    "tn-input": "../../node-modules/@tuniao/tnui-vue3-uniapp/components/input/src/input"
+  }
+}

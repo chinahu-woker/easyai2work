@@ -1,0 +1,20 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/creative/creative",
+    "pages/home/home",
+    "pages/setting/setting",
+    "pages/history/history",
+    "pages/draw/apps/apps",
+    "pages/Empty/Empty",
+    "pages/history/history_fui/history_fui",
+    "pages/draw/draw_info/draw_info",
+    "pages/console/console"
+  ],
+  "window": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "Fuzi-AI",
+    "navigationStyle": "custom"
+  },
+  "usingComponents": {}
+}

@@ -1,0 +1,1 @@
+"use strict";const e=require("../../common/vendor.js");Math||t();const t=()=>"../../node-modules/@tuniao/tnui-vue3-uniapp/components/title/src/title.js",n=e.defineComponent({__name:"MyTitle",props:{title:{default:"默认标题"}},setup:t=>(t,n)=>({a:e.p({title:t.title,mode:"vLine"})})});wx.createComponent(n);

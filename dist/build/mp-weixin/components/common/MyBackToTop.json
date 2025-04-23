@@ -1,0 +1,6 @@
+{
+  "component": true,
+  "usingComponents": {
+    "up-back-top": "../../node-modules/uview-plus/components/u-back-top/u-back-top"
+  }
+}

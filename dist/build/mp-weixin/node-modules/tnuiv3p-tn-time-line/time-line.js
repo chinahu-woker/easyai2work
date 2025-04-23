@@ -1,0 +1,1 @@
+"use strict";const e=require("../../common/vendor.js"),n=e.defineComponent({__name:"time-line",props:e.timeLineProps,setup(n){const o=n,i=e.useNamespace("time-line");return e.provide(e.timeLineKey,{showLine:e.toRef(o,"showLine")}),(n,o)=>({a:e.n(e.unref(i).b())})}});wx.createComponent(n);

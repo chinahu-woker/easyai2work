@@ -1,0 +1,1 @@
+<view class="{{['hljs', virtualHostClass]}}" style="{{virtualHostStyle}}" hidden="{{virtualHostHidden}}" id="{{virtualHostId}}"><rich-text nodes="{{a}}" space="nbsp"></rich-text></view>

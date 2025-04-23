@@ -78,8 +78,7 @@
 				<view class="fui-chat__box" ref="chatBox">
 					<view v-for="(item,index) in msgList" :key="index">
 						<view :id="`items-${index}`" class="fui-chat__item"
-							:class="[item.role=='user'?'fui-chat__right':'fui-chat__left']"
-							>
+							:class="[item.role=='user'?'fui-chat__right':'fui-chat__left']">
 							<!-- @tap="getCopyMsg(1,item?.msg,$event)" @longpress="getCopyMsg(2,item.content,$event)" -->
 							<fui-avatar background="#f9f9f9"
 								:src="item.role=='system'?'https://wangbo0808.oss-cn-shanghai.aliyuncs.com/assets/gpt4.png':user.avatar_url">
@@ -259,7 +258,7 @@
 							<!--        <up-cell icon="coupon" title="卡券(暂未开放)"></up-cell>-->
 							<!--        <up-cell icon="heart" title="关注(暂未开放)"></up-cell>-->
 						</up-cell-group>
-					<!-- 	<button open-type="share">分享到微信</button> -->
+						<!-- 	<button open-type="share">分享到微信</button> -->
 					</view>
 
 
@@ -272,7 +271,7 @@
 
 <script setup lang="ts">
 	import MyNavbar from "@/components/common/MyNavbar.vue";
-	
+
 	import GetUserInfoPopup from "@/components/GetUserInfoPopup.vue";
 	import {
 		creatOrder,
@@ -288,17 +287,17 @@
 		saveLoginInfo
 	} from "@/composables/useCommon.ts";
 	import BaseLayout from '@/layouts/BaseLayout.vue'
-	
+
 	import { onShareAppMessage, onShareTimeline } from '@dcloudio/uni-app'
 	import { globalAppData } from '@/cofigs'
-	
-	
+
+
 	import TnIcon from '@tuniao/tnui-vue3-uniapp/components/icon/src/icon.vue'
-	import { onLoad, onReady ,includes} from "@dcloudio/uni-app";
-	
+	import { onLoad, onReady, includes, onShow } from "@dcloudio/uni-app";
+
 	// import useWorkFlow from "@/composables/useWorkFlow.ts";
 	import useWorkFlow from "@/composables/useWorkFlow";
-	
+
 	import UserMemberInfo from "@/components/home/UserMemberInfo.vue";
 	import { ref, onMounted, onUnmounted, computed, watch, nextTick } from 'vue'
 	import TnWaterFall from '@tuniao/tnui-vue3-uniapp/components/water-fall/src/water-fall.vue'
@@ -323,46 +322,51 @@
 	import PaymentPopup from "@/components/home/PaymentPopup.vue";
 	import fuiBackgroundImage from "@/components/firstui/fui-background-image/fui-background-image.vue";
 	import { getModelList, getUserKey, getUserToken, getUserInfo, ChatAPiUrl } from "@/composables/aiChat.ts";
- 
+
 	import { TextEncoder, TextDecoder } from 'text-decoding'
 	global.TextEncoder = TextEncoder
 	global.TextDecoder = TextDecoder
-	
+
 	// 分享
 	onShareAppMessage(() => {
-	  const inviteCode = useAppStore().user.my_invite_code
-	  // 在页面中定义分享方法
-	  return {
-	    title: globalAppData.share.appInfo,
-	    path: `/pages/index/index?inviteCode=${inviteCode}`,
-	  }
+		const inviteCode = useAppStore().user.my_invite_code
+		// 在页面中定义分享方法
+		return {
+			title: globalAppData.share.appInfo,
+			path: `/pages/index/index?inviteCode=${inviteCode}`,
+		}
 	})
 	// 朋友圈
 	onShareTimeline(() => {
-	  const inviteCode = useAppStore().user.my_invite_code
-	  return {
-	    title: globalAppData.share.appInfo,
-	    path: `/pages/index/index?inviteCode=${inviteCode}`,
-	  }
+		const inviteCode = useAppStore().user.my_invite_code
+		return {
+			title: globalAppData.share.appInfo,
+			path: `/pages/index/index?inviteCode=${inviteCode}`,
+		}
 	})
-	function ToConsole(){
+	function ToConsole() {
 		uni.navigateTo({
 			url: '/pages/console/console'
 		})
-		
+
 	}
+
+
 	const role = ref(false)
+	const roltList = ['manager', 'admin']
 	function Kongzhitai() {
 		if (!isLogin.value) {
 			role.value = false
 			return 0
 		}
-		const UserInfor = uni.getStorageSync('userInfo')
-		console.log("-----------userInfo---------------",UserInfor)
-		const roltList = ['operator', 'manager', 'admin']
-		if (roltList.includes(UserInfor.role[0])) {
-			role.value = true
+		else {
+			const UserInfor = uni.getStorageSync('userInfo')
+			
+			console.log("361---userInfo---------------", roltList.includes(UserInfor.role[0]))
+			role.value = roltList.includes(UserInfor.role[0]);
 		}
+
+
 	}
 	// ---------------------------AIChat  Page------------------------------
 
@@ -789,15 +793,14 @@
 		})
 		//获取平台信息
 		const { uniPlatform } = uni.getSystemInfoSync()
-	
+
 		if (uniPlatform !== 'web') {
 			// 非开发者工具环境，执行登录操作
 			handleLoginByWechat()
-			
+
 		} else {
 			// console.log('dev')
 			// 开发者工具环境，模拟登录 todo
-
 			const user = await loginByUsername({
 				username: 'test456',
 				password: '123456'
@@ -807,7 +810,14 @@
 		}
 		chatAiGetToken()
 		name_value.value = '我的'
-		
+		Kongzhitai()
+		 uni.reLaunch({ url: '/pages/index/index' });
+		 uni.showLoading({
+		 title: '加载中'
+		 });
+		// uni.reLaunch({
+		//   url: '/' + getCurrentPages()[getCurrentPages().length - 1].route
+		// });
 
 	}
 	/** 通过微信登录 */
@@ -819,7 +829,7 @@
 				uni.hideLoading()
 				console.log("------------result--------", result)
 				uni.setStorageSync('refreshToken', result.refresh_token)
-				role.value = true
+
 
 			},
 			fail: function (err) {
@@ -830,7 +840,7 @@
 			}
 		})
 		chatAiGetToken()
-		Kongzhitai()
+
 	}
 	const { socketInit } = useWorkFlow()
 
@@ -852,9 +862,9 @@
 			title: '正在退出登录...',
 			mask: true
 		})
-		
+
 		loginOut()
-		
+
 		uni.hideLoading()
 		role.value = false
 		uni.showToast({

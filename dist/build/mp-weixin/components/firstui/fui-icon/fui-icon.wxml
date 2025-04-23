@@ -1,0 +1,1 @@
+<text style="{{'color:' + b + ';' + ('font-size:' + c) + ';' + ('font-weight:' + d) + ';' + virtualHostStyle}}" class="{{['fui-icon', 'data-v-1fa01a47', e, f, g, h, i, virtualHostClass]}}" bindtap="{{j}}" hidden="{{virtualHostHidden}}" id="{{virtualHostId}}">{{a}}</text>

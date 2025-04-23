@@ -1,0 +1,7 @@
+{
+  "component": true,
+  "usingComponents": {
+    "tn-popup": "../@tuniao/tnui-vue3-uniapp/components/popup/src/popup",
+    "tn-icon": "../@tuniao/tnui-vue3-uniapp/components/icon/src/icon"
+  }
+}
