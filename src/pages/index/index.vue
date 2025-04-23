@@ -47,7 +47,7 @@
 			<view>
 				<up-status-bar />
 
-				<template v-for="graphicData in graphicDatas">
+				<template v-for="(graphicData,KeyIndex) in graphicDatas" :key="KeyIndex">
 
 					<view>
 						<MyGraphicCard :avatar="graphicData.avatar" :title="graphicData.title"
@@ -201,7 +201,7 @@
 
 
 
-							<view
+							<view v-if="isLogin"
 								style=" margin-top:5% ; color: #000000; height: 100%; background: radial-gradient(circle, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.1)); border-radius: 10px 10px 10px 10px; height: 120rpx; ">
 								<up-cell :border='false' @click="handleGotoHistory">
 									<template #icon>
@@ -230,7 +230,7 @@
 									</up-cell>
 								</button>
 							</view>
-							<view
+							<view v-if="isLogin"
 								style=" margin-top:5% ; color: #000000; height: 100%;  background: radial-gradient(circle, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.1)); border-radius: 10px 10px 10px 10px; height: 120rpx; ">
 								<up-cell :border='false' @click="handleLoginOut">
 									<template #icon>

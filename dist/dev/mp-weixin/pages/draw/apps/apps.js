@@ -50,16 +50,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const currentPage = getCurrentPages().pop();
       const query = currentPage == null ? void 0 : currentPage.options;
       workflowId.value = query.id;
-      handleGetWorkFlwById(query.id).then(() => common_vendor.index.__f__("log", "at pages/draw/apps/apps.vue:79", workflow.value));
+      handleGetWorkFlwById(query.id).then(() => common_vendor.index.__f__("log", "at pages/draw/apps/apps.vue:80", workflow.value));
       socketInit();
     });
     const showPopup = common_vendor.ref(false);
     const FlotButton = common_vendor.ref("空闲");
     const { localTasks } = common_vendor.storeToRefs(stores_appStore.useAppStore());
     const currentProgress = common_vendor.computed(() => {
-      common_vendor.index.__f__("log", "at pages/draw/apps/apps.vue:101", "进度条1：", localTasks.value);
       const excuTask = localTasks.value.find((item) => item.status === 0);
-      common_vendor.index.__f__("log", "at pages/draw/apps/apps.vue:103", "进度条：", excuTask);
+      common_vendor.index.__f__("log", "at pages/draw/apps/apps.vue:124", "进度条：", excuTask);
       if (!excuTask) {
         return FlotButton.value;
       } else {
@@ -69,14 +68,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const endPos = common_vendor.ref({ x: 0, y: 0 });
     const anims = common_vendor.ref([]);
     const startAnimation = async () => {
-      common_vendor.index.__f__("log", "at pages/draw/apps/apps.vue:134", "seedRef.value", seedRef.value);
+      common_vendor.index.__f__("log", "at pages/draw/apps/apps.vue:155", "seedRef.value", seedRef.value);
       if (seedRef.value && seedRef.value.length > 0) {
         for (const item of seedRef.value) {
           item.getSeed();
         }
       }
       handleSubmitTaskTask();
-      common_vendor.index.__f__("log", "at pages/draw/apps/apps.vue:143", "handleSubmitTaskTask", handleSubmitTaskTask);
+      common_vendor.index.__f__("log", "at pages/draw/apps/apps.vue:164", "handleSubmitTaskTask", handleSubmitTaskTask);
       const key = utils_common.randomId(5);
       anims.value.push({
         key,
@@ -135,13 +134,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const imageRegex = /\.(jpg|jpeg|png|gif|bmp)$/i;
       const videoRegex = /\.(mp3|wav|ogg)$/i;
       if (!input) {
-        common_vendor.index.__f__("log", "at pages/draw/apps/apps.vue:244", "==============", "是空值");
+        common_vendor.index.__f__("log", "at pages/draw/apps/apps.vue:265", "==============", "是空值");
         return 0;
       } else if (imageRegex.test(input)) {
-        common_vendor.index.__f__("log", "at pages/draw/apps/apps.vue:249", "==============", "是图片");
+        common_vendor.index.__f__("log", "at pages/draw/apps/apps.vue:270", "==============", "是图片");
         return 1;
       } else if (videoRegex.test(input)) {
-        common_vendor.index.__f__("log", "at pages/draw/apps/apps.vue:254", "==============", "是音频");
+        common_vendor.index.__f__("log", "at pages/draw/apps/apps.vue:275", "==============", "是音频");
         return 2;
       }
     }

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-	import { computed, inject, onMounted, ref, nextTick } from "vue";
+	import { computed, inject, onMounted, ref, nextTick ,watch} from "vue";
+
 
 
 	import BaseLayout from "@/layouts/BaseLayout.vue";
@@ -97,8 +98,28 @@
 	// 	}
 	// 	return excuTask.progress === undefined ? '0%' : excuTask.progress + '%'
 	// })
+	
+	// const currentSwiperIndex = ref(0)
+	// watch(currentSwiperIndex, () => {
+	// 	console.log('currentSwiperIndex', currentSwiperIndex.value)
+	// })
+	
+	// const currentProgress = computed(() => {
+	// 	if (localTasks.value.length === 0) {
+	// 		return '暂无任务'
+	// 	}
+	// 	// 进度更新
+	// 	const currentTask = localTasks.value[currentSwiperIndex.value]
+	// 	if (currentTask && currentTask.status === 4) {
+	// 		return currentTask.progress + '%'
+	// 	} else if (currentTask && currentTask.status === 0 && currentTask.queue) {
+	// 		return `对列:${currentTask.queue},预计:${currentTask.time_remained}s`
+	// 	}
+	// 	return ''
+	// })
+	
 	const currentProgress = computed(() => {
-		console.log('进度条1：',localTasks.value)
+		
 		const excuTask = localTasks.value.find(item => item.status === 0)
 		console.log('进度条：',excuTask)
 		if (!excuTask) {
@@ -108,7 +129,7 @@
 			return excuTask.power === undefined ? '0%' : excuTask.power + '%' ||'返回'
 		}
 		
-		// return excuTask.progress === undefined ? '0%' : excuTask.progress + '%'
+	// 	// return excuTask.progress === undefined ? '0%' : excuTask.progress + '%'
 	})
 
 

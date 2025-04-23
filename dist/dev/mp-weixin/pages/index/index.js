@@ -495,7 +495,7 @@ const _sfc_defineComponent = common_vendor.defineComponent({
         h: common_vendor.p({
           src: backGroundImage
         }),
-        i: common_vendor.f(graphicDatas.value, (graphicData, k0, i0) => {
+        i: common_vendor.f(graphicDatas.value, (graphicData, KeyIndex, i0) => {
           return {
             a: "83a5a03c-11-" + i0 + ",83a5a03c-9",
             b: common_vendor.p({
@@ -510,7 +510,8 @@ const _sfc_defineComponent = common_vendor.defineComponent({
               ["comment-count"]: graphicData.commentCount,
               ["like-count"]: graphicData.likeCount,
               ["view-user-avatars"]: graphicData.viewUserAvatars
-            })
+            }),
+            c: KeyIndex
           };
         }),
         j: common_vendor.p({
@@ -606,45 +607,51 @@ const _sfc_defineComponent = common_vendor.defineComponent({
         O: common_vendor.o(toEmpty),
         P: common_vendor.o(handleLogin),
         Q: common_vendor.o(img2pay),
-        R: common_vendor.p({
+        R: common_vendor.unref(composables_useCommon.isLogin)
+      }, common_vendor.unref(composables_useCommon.isLogin) ? {
+        S: common_vendor.p({
           size: "30",
           name: "https://chinahu-ai-server.oss-cn-chengdu.aliyuncs.com/Iconly_Glass_Gallery.png"
         }),
-        S: common_vendor.o(handleGotoHistory),
-        T: common_vendor.p({
-          border: false
-        }),
+        T: common_vendor.o(handleGotoHistory),
         U: common_vendor.p({
-          size: "30",
-          name: "https://chinahu-ai-server.oss-cn-chengdu.aliyuncs.com/Iconly_Glass_Chat.png"
-        }),
-        V: common_vendor.p({
-          border: false
-        }),
-        W: common_vendor.p({
-          size: "30",
-          name: "https://chinahu-ai-server.oss-cn-chengdu.aliyuncs.com/Iconly_Glass_Home.png"
-        }),
-        X: common_vendor.o(handleLoginOut),
-        Y: common_vendor.p({
-          border: false
-        }),
-        Z: role.value
-      }, role.value ? {
-        aa: common_vendor.p({
-          size: "30",
-          name: "https://chinahu-ai-server.oss-cn-chengdu.aliyuncs.com/Iconly_Glass_Setting.png"
-        }),
-        ab: common_vendor.o(ToConsole),
-        ac: common_vendor.p({
           border: false
         })
       } : {}, {
-        ad: common_vendor.p({
+        V: common_vendor.p({
+          size: "30",
+          name: "https://chinahu-ai-server.oss-cn-chengdu.aliyuncs.com/Iconly_Glass_Chat.png"
+        }),
+        W: common_vendor.p({
+          border: false
+        }),
+        X: common_vendor.unref(composables_useCommon.isLogin)
+      }, common_vendor.unref(composables_useCommon.isLogin) ? {
+        Y: common_vendor.p({
+          size: "30",
+          name: "https://chinahu-ai-server.oss-cn-chengdu.aliyuncs.com/Iconly_Glass_Home.png"
+        }),
+        Z: common_vendor.o(handleLoginOut),
+        aa: common_vendor.p({
+          border: false
+        })
+      } : {}, {
+        ab: role.value
+      }, role.value ? {
+        ac: common_vendor.p({
+          size: "30",
+          name: "https://chinahu-ai-server.oss-cn-chengdu.aliyuncs.com/Iconly_Glass_Setting.png"
+        }),
+        ad: common_vendor.o(ToConsole),
+        ae: common_vendor.p({
+          border: false
+        })
+      } : {}, {
+        af: common_vendor.p({
           color: "#fff",
           border: false
         }),
-        ae: pageindex.value == 3
+        ag: pageindex.value == 3
       });
     };
   }

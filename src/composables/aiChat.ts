@@ -50,7 +50,7 @@ export const getModelList = (data) => {
 			method: "GET",
 			header: {
 				'Authorization': 'Bearer ' + token,
-				'Host': 'scschool.cc',
+				// 'Host': 'scschool.cc',
 			},
 			enableChunked: false, // 开启流传输
 			success: (res) => {

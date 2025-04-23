@@ -35,8 +35,8 @@ const getModelList = (data) => {
       // 请求地址
       method: "GET",
       header: {
-        "Authorization": "Bearer " + token,
-        "Host": "scschool.cc"
+        "Authorization": "Bearer " + token
+        // 'Host': 'scschool.cc',
       },
       enableChunked: false,
       // 开启流传输
