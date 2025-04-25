@@ -23,6 +23,7 @@
     "app-swiper": "../../components/home/AppSwiper",
     "app-tags": "../../components/home/AppTags",
     "app-water-fall": "../../components/home/AppWaterFall",
+    "payment-popup": "../../components/home/PaymentPopup",
     "fui-background-image": "../../components/firstui/fui-background-image/fui-background-image"
   }
 }

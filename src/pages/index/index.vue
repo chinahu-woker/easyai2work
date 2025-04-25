@@ -266,7 +266,7 @@
 			</BaseLayout>
 		</template>
 	</view>
-
+<PaymentPopup/>
 </template>
 
 <script setup lang="ts">
@@ -650,7 +650,8 @@
 		imageData.value = []
 	})
 	function img2pay() {
-		pageindex.value = 3
+		// pageindex.value = 3
+		console.log('点击支付')
 		showPay.value = true
 	}
 

@@ -42,7 +42,7 @@ const _easycom_up_icon = () => "../../node-modules/uview-plus/components/u-icon/
 const _easycom_up_cell = () => "../../node-modules/uview-plus/components/u-cell/u-cell.js";
 const _easycom_up_cell_group = () => "../../node-modules/uview-plus/components/u-cell-group/u-cell-group.js";
 if (!Math) {
-  (_easycom_fui_tabs + _easycom_fui_nav_bar + fuiBackgroundImage + AppSwiper + _easycom_up_gap + AppTags + AppWaterFall + _easycom_up_status_bar + MyGraphicCard + BaseLayout + _easycom_fui_footer + _easycom_fui_avatar + _easycom_fui_load_ani + _easycom_fui_icon + _easycom_fui_picker + _easycom_fui_safe_area + _easycom_up_avatar + UserMemberInfo + GetUserInfoPopup + _easycom_up_icon + _easycom_up_cell + _easycom_up_cell_group)();
+  (_easycom_fui_tabs + _easycom_fui_nav_bar + fuiBackgroundImage + AppSwiper + _easycom_up_gap + AppTags + AppWaterFall + _easycom_up_status_bar + MyGraphicCard + BaseLayout + _easycom_fui_footer + _easycom_fui_avatar + _easycom_fui_load_ani + _easycom_fui_icon + _easycom_fui_picker + _easycom_fui_safe_area + _easycom_up_avatar + UserMemberInfo + GetUserInfoPopup + _easycom_up_icon + _easycom_up_cell + _easycom_up_cell_group + PaymentPopup)();
 }
 const GetUserInfoPopup = () => "../../components/GetUserInfoPopup.js";
 const BaseLayout = () => "../../layouts/BaseLayout.js";
@@ -51,6 +51,7 @@ const MyGraphicCard = () => "../../components/custom/MyGraphicCard/MyGraphicCard
 const AppSwiper = () => "../../components/home/AppSwiper.js";
 const AppTags = () => "../../components/home/AppTags.js";
 const AppWaterFall = () => "../../components/home/AppWaterFall.js";
+const PaymentPopup = () => "../../components/home/PaymentPopup.js";
 const fuiBackgroundImage = () => "../../components/firstui/fui-background-image/fui-background-image.js";
 const backGroundImage = "https://chinahu-ai-server.oss-cn-chengdu.aliyuncs.com/aidraw/image/temps/67873d6c232a3c5d52240dd6/Home2.jpg";
 const _sfc_defineComponent = common_vendor.defineComponent({
@@ -296,7 +297,7 @@ const _sfc_defineComponent = common_vendor.defineComponent({
       imageData.value = [];
     });
     function img2pay() {
-      pageindex.value = 3;
+      common_vendor.index.__f__("log", "at pages/index/index.vue:654", "点击支付");
       showPay.value = true;
     }
     common_vendor.ref("fuiNavBar");
@@ -422,7 +423,7 @@ const _sfc_defineComponent = common_vendor.defineComponent({
           const result = await composables_useCommon.loginByWechatCode(code);
           composables_useCommon.saveLoginInfo(result);
           common_vendor.index.hideLoading();
-          common_vendor.index.__f__("log", "at pages/index/index.vue:830", "------------result--------", result);
+          common_vendor.index.__f__("log", "at pages/index/index.vue:831", "------------result--------", result);
           common_vendor.index.setStorageSync("refreshToken", result.refresh_token);
         },
         fail: function(err) {
@@ -436,7 +437,7 @@ const _sfc_defineComponent = common_vendor.defineComponent({
     };
     const { socketInit } = composables_useWorkFlow.useWorkFlow();
     const handlePayMessage = async (order_id) => {
-      common_vendor.index.__f__("log", "at pages/index/index.vue:849", "收到支付成功消息", order_id);
+      common_vendor.index.__f__("log", "at pages/index/index.vue:850", "收到支付成功消息", order_id);
       const order = await composables_useCommon.getOrderInfoById(order_id);
       if (order[0] && order[0].order_status === 1) {
         common_vendor.index.showToast({
