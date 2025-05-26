@@ -48,8 +48,8 @@ graph TD
 ### 部署步骤
 1. **初始化项目**
    ```bash
-   git clone https://github.com/yourname/yourrepo.git
-   cd yourrepo
+   git clone https://github.com/chinahu-woker/easyai2work.git
+   cd easyai2work
    npm install
    ```
 
