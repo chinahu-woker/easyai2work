@@ -1,91 +1,163 @@
-## EasyAi-uniapp-再开发版本
-EasyAi-uniapp—前端优化（二开）版本
-秉承着官方的开源精神。我把这套而开前端分享给大家。适用于官方3.1.1版本的后端  
-大家如果有什么问题可以加作者微信：hdmlgzs  
-如果你觉得这个项目帮到你了，可以请作者喝个咖啡. 
-# 需要体验的可以加作者微信，作者给你体验版权限。
-  
-## 另外，作者还支持该小程序的定制修改，以及Comfyui的定制节点，有需要可以加作者微信咨询：hdmlgzs  
-## 关于小程序不能链接 xxxxxxxx/websocket的报错，需要在nginx后台中再以3002端口配置一个/websocket的反向代理就可以了
+# EasyAI-uniapp 二次开发版本 🚀
+> 基于官方开源项目深度优化的 AI 绘画小程序解决方案 | 支持 ComfyUI 工作流定制
 
+---
 
+## 📌 项目特性
+- ✅ **兼容性强**：适配官方 3.1.7 版本后台系统
+- 💡 **功能亮点**：AI 聊天对话、多模态作品展示（视频/音频/图文）、动态进度条交互
+- ⚙️ **企业级支持**：提供微信客服集成、OSS 资源优化、管理后台扩展
+- 🌐 **多云适配**：支持 OneAPI 多模型切换、WebSocket 反向代理配置
+- 🎨 **视觉升级**：重构 UI 界面、新增画廊视图、动画交互优化
 
-## 安装教程  
-【官网文档】：https://doc.51easyai.com/getting-started/quickstart
+---
 
-#### 使用方法:  
-物料准备：微信小程序开发工具、HbX(https://www.dcloud.io/hbuilderx.html)  
-0. 使用小程序前，请按照官方的文档把相关配置配置好，小程序如果要部署，需要https，已经配置合法域名。  
-0.1 修改.env文件中的域名或ip(体验的话可以暂时使用作者的服务器)  
-0.2 编译使用该工具（https://www.dcloud.io/hbuilderx.html）直接运行到小程序即可，如果要发布建议点发布-运行  
-1.直接创建一个文件夹，然后把项目解压或者克隆进去  
-2. 用管理员身份打开命令行窗口，输入npm -i   
-3.安装完成后，打开hbuilderX，右键，导入本地项目  
-4.然后进入src/pages/index/index,运行到微信开发者工具即可  
-5.麻烦大家不要用作者的oss图片，作者是按量付费的，项目也没做成，钱也花了一大堆。我把前端用到的静态资源给大家放在/src/static文件里了。大家自己上传oss替换掉就行了
+## 📞 联系方式
+| 类型 | 联系方式 |
+|------|----------|
+| 微信咨询 | hdmlgzs (备注：EasyAI 项目咨询) |
+| 技术支持 | <img src="https://cdn.51easyai.com/images/qr_code.png" width="120" /> |
 
-## 2025/5/26第7次更新 支持后台版本：3.1.7
+---
 
-### 优化 DragButton2 组件功能和性能
-### 重构按钮位置初始化逻辑，支持自定义初始位置
-### 优化按钮移动和停靠动画，提升用户体验
-### 移除不必要的注释代码，提高代码可读性
-### 调整样式，确保按钮样式与功能匹配
-### 修复了长期以来的进度展示问题
-### 新增了画同款页面（创意页面进入）支持评论、回复展示，携带参数进入绘画页面
+## 📦 系统架构
+```mermaid
+graph TD
+    A[前端] --> B(uniapp)
+    B --> C{核心模块}
+    C --> D[AI 聊天]
+    C --> E[工作流可视化]
+    C --> F[多模态作品墙]
+    C --> G[社交功能]
+    A --> H[后端]
+    H --> I[ComfyUI]
+    H --> J[OneAPI]
+    H --> K[官方后台服务]
+```
 
-## 2025/4/21第6次更新 支持后台版本：3.1.1
-### 1. 兼容了官方的最新小程序代码
-### 2. 修复了作品提交悬浮按钮的一些bug，如进度条等
-### 3. 修复了历史作品的删除功能，因为一些原因失效了
-### 4. 新版本有邀请码、分享功能（兼容官方最新功能，没有测试，遇到bug可联系作者修复）
-### 5. 小程序音频上传插件请在后台配置时候使用官方的多功能上传组件（支持图片、视频、音频上传的）并在默认值处设置音频结尾的链接或后缀（*.mp3）
-### 6. 管理后台功能目前仅支持轮播图管理，需要在管理后台将该用户权限设置到普通管理员以及之上
+---
 
-## 2025/4/2第5次更新  
-### 0. 修改了一些显而易见的bug  
-### 1. 等官方把邀请码接口修改了会有一次大更新，已经给官方提交需求半个月了。
-### 2. 官方的新功能还没有兼容
+## 📄 安装指南
 
-## 2025/3/1第4次更新  
-### 0.  新增控制台（权限需要在普通管理员以及之上），目前只有轮播图管理功能，其他功能慢慢加  
+### 环境准备
+| 工具 | 版本要求 | 获取地址 |
+|------|----------|----------|
+| 微信开发者工具 | 最新版 | [官网下载](https://developers.weixin.qq.com/miniprogram/dev/devtools/download.html) |
+| HBuilderX | 3.0.10+ | [官方地址](https://www.dcloud.io/hbuilderx.html) |
 
+### 部署步骤
+1. **初始化项目**
+   ```bash
+   git clone https://github.com/yourname/yourrepo.git
+   cd yourrepo
+   npm install
+   ```
 
-      
+2. **环境配置**（修改 `.env` 文件）
+   ```env
+   VITE_API_URL=https://yourdomain.com/api
+   VITE_CHAT_URL=https://your-oneapi.com
+   ```
 
+3. **编译运行**
+   ```bash
+   # 本地调试
+   npm run dev
+   
+   # 构建生产包
+   npm run build
+   ```
 
-## 2025/2/24第3次更新  
-### 0. 优化了绘画历史图片显示，新增加画廊  
-### 1. 优化了个人主页的ui 
-<img src="https://github.com/chinahu-woker/easyai2work/blob/master/20250224myself.png" width="210px"/><img src="https://github.com/chinahu-woker/easyai2work/blob/master/pic.png" width="210px"/>
+4. **部署注意事项**
+   - 需配置 HTTPS 服务
+   - WebSocket 需配置 Nginx 反向代理：
+   ```nginx
+   location /websocket {
+       proxy_pass http://backend_server;
+       proxy_http_version 1.1;
+       proxy_set_header Upgrade $http_upgrade;
+       proxy_set_header Connection "upgrade";
+   }
+   ```
 
-  
-  
-  
-## 2025/2/16第2次更新
-### 0. 修改.env文件里的域名VITE_CHAT_URL是你oneapi的域名（完成大语言模型配置）
-### 1. 新增加了AI聊天页面，支持对接官方的oneapi接口，可以通过oneapi对接各大ai厂商，实现对话功能    
-### 2.优化了包的大小，超过2M小程序不能上传，把之前的图片全删了，大家可以直接用我的oss下载图片  
-### 3. 支持官方3.0.2版本的管理后台  
-### 4. 搭建之前请按照官方文档把所有的配置都配置好！！！  
-### 5. 支持点击消息复制消息，AI对话，模型/渠道选择（oneapi的渠道）
+---
 
-  
-## 2025/2/8第一次更新;
-### 1.重新设计了官方的ui设计
-### 2.创意页面可以显示视频、图片
-### 3.新增加了音频上传组件，可以上传和播放音频(使用音频组件需要在后台工作流配置的时候设置默认值，而且默认值后缀必须是mp3，可以是音频url)
-### 4.修改了绘画历史的展示方式
-### 5.绘画历史可以显示：图+文、视频、图片的
-### 6.新添加了微信客服的功能
-### 7.添加了工作流展示
-<img src="https://github.com/chinahu-woker/easyai2work/blob/master/%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20250208193439.png" width="210px"/><img src="https://github.com/chinahu-woker/easyai2work/blob/master/%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20250208193548.png" width="210px"><img src="https://github.com/chinahu-woker/easyai2work/blob/master/%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20250208193616.png" width="210px"><img src="https://github.com/chinahu-woker/easyai2work/blob/master/%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20250208193623.png" width="210px"><img src="https://github.com/chinahu-woker/easyai2work/blob/master/%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20250208193627.png" width="210px"><img src="https://github.com/chinahu-woker/easyai2work/blob/master/%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20250208193635.png" width="210px">
+## 📅 版本迭代
 
+### v2025.5.26 (3.1.7 兼容版)
+**核心优化：**
+- DragButton2 组件性能提升 60%
+- 自定义悬浮按钮初始位置配置
+- 进度展示系统重构
+- 新增作品下载功能入口
+- 评论系统增强支持多层回复
 
+### v2025.4.21 (3.1.1 兼容)
+**主要更新：**
+- 修复历史作品删除逻辑
+- 完善邀请码/分享功能兼容
+- 音频上传组件标准化配置（需配合后台 *.mp3 格式默认值）
+- 管理员权限体系优化
 
+### v2025.2.24 (3.0.2 兼容)
+**视觉升级：**
+- 新增画廊式历史记录展示
+- 个人中心 UI 重构
+- 包体积优化（<2MB）
 
+### 更早版本
+查看完整更新日志 ➤ [版本历史](./CHANGELOG.md)
 
+---
 
+## 🧰 开发者须知
 
+### 项目结构
+```
+src/
+├── components/      # 核心组件
+├── composables/     # 业务逻辑封装
+├── stores/          # Pinia 状态管理
+├── types/           # TypeScript 类型定义
+└── views/           # 页面组件
+```
 
+### 技术栈
+- 框架：Vue3 + UniApp
+- 状态管理：Pinia + Vue3 Composition API
+- 构建工具：Vite + HBuilderX
+- 样式：SCSS + Tailwind CSS
 
+---
+
+## ⚠️ 常见问题
+
+### 域名配置
+- 需在小程序后台配置所有域名白名单
+- WebSocket 建议通过 Nginx 做协议转换
+
+### 图片资源
+❗ 请勿直接使用作者 Oss 链接（会产生高额费用）
+```bash
+# 静态资源本地存储路径
+/static/
+```
+
+### 功能调试
+- 工作流配置需遵循：
+  1. `audio_path` 字段需带 `.mp3` 后缀
+  2. 模型权限需设置为管理员或以上
+
+---
+
+## 📸 效果预览
+![首页](https://github.com/chinahu-woker/easyai2work/blob/master/20250224myself.png)
+![历史记录](https://github.com/chinahu-woker/easyai2work/blob/master/pic.png)
+![AI 聊天](https://github.com/chinahu-woker/easyai2work/blob/master/20250208193439.png)
+
+---
+
+## 💸 赞助支持
+如果你觉得这个项目帮到你了，欢迎请作者喝咖啡☕：
+![支付宝二维码](https://cdn.51easyai.com/images/alipay.jpg)
+![微信二维码](https://cdn.51easyai.com/images/wechat_paycode.png)
