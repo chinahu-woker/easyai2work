@@ -9,7 +9,8 @@
     "pages/Empty/Empty",
     "pages/history/history_fui/history_fui",
     "pages/draw/draw_info/draw_info",
-    "pages/console/console"
+    "pages/console/console",
+    "pages/drawLike/alike"
   ],
   "window": {
     "navigationBarTextStyle": "black",

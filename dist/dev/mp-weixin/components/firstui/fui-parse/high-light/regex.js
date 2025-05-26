@@ -14,4 +14,3 @@ function concat(...args) {
   return joined;
 }
 exports.optional = optional;
-//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/components/firstui/fui-parse/high-light/regex.js.map

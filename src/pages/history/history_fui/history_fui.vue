@@ -1,236 +1,247 @@
 <script setup lang="ts">
-	import TnTimeLine from 'tnuiv3p-tn-time-line/time-line.vue'
-	import TnTimeLineItem from 'tnuiv3p-tn-time-line/time-line-item.vue'
-	import TnTimeLineData from 'tnuiv3p-tn-time-line/time-line-data.vue'
-	import TnPhotoAlbum from '@tuniao/tnui-vue3-uniapp/components/photo-album/src/photo-album.vue'
-	import TnSwitchTab from '@tuniao/tnui-vue3-uniapp/components/switch-tab/src/switch-tab.vue'
-	import TnLazyLoad from '@tuniao/tnui-vue3-uniapp/components/lazy-load/src/lazy-load.vue'
-	import { computed, ref } from 'vue'
-	import { request } from '@/utils/request.ts'
-	import { formatDateTime } from "@/utils/common.ts";
-	import type { IDrawHistoryItem } from "@/types";
-	import BaseLayout from "@/layouts/BaseLayout.vue";
-	import MyNavbar from "@/components/common/MyNavbar.vue";
-	import { onLoad, onReady } from "@dcloudio/uni-app";
-	import TnTag from '@tuniao/tnui-vue3-uniapp/components/tag/src/tag.vue'
-	import {
+import TnTimeLine from 'tnuiv3p-tn-time-line/time-line.vue'
+import TnTimeLineItem from 'tnuiv3p-tn-time-line/time-line-item.vue'
+import TnTimeLineData from 'tnuiv3p-tn-time-line/time-line-data.vue'
+import TnPhotoAlbum from '@tuniao/tnui-vue3-uniapp/components/photo-album/src/photo-album.vue'
+import TnSwitchTab from '@tuniao/tnui-vue3-uniapp/components/switch-tab/src/switch-tab.vue'
+import TnLazyLoad from '@tuniao/tnui-vue3-uniapp/components/lazy-load/src/lazy-load.vue'
+import { computed, ref } from 'vue'
+import { request } from '@/utils/request.ts'
+import { formatDateTime } from "@/utils/common.ts";
+import type { IDrawHistoryItem } from "@/types";
+import BaseLayout from "@/layouts/BaseLayout.vue";
+import MyNavbar from "@/components/common/MyNavbar.vue";
 
-		isLogin
-
-	} from "@/composables/useCommon.ts";
+import { onLoad, onReady } from "@dcloudio/uni-app";
+import TnTag from '@tuniao/tnui-vue3-uniapp/components/tag/src/tag.vue'
+import { isLogin } from "@/composables/useCommon.ts";
 
 
 
 
-	interface TimeLineData {
-		day : string
-		icon ?: string
-		data : IDrawHistoryItem[]
-	}
+interface TimeLineData {
+	day: string
+	icon?: string
+	data: IDrawHistoryItem[]
+}
 
-	interface IHistoryResponse {
-		total : number,
-		items : IDrawHistoryItem[]
-	}
+interface IHistoryResponse {
+	total: number,
+	items: IDrawHistoryItem[]
+}
 
-	onLoad(() => {
-		if (!isLogin.value) {
-			uni.showToast({
-				icon: 'error',
-				title: '您还没有登录',
-				duration: 2000,
-				complete() {
-					setTimeout(() => {
-						uni.navigateBack()
-					}, 2000)
-				}
-
-			})
-		}
-		getHistoryData()
-	})
-
-	
-	const historyData = ref<IDrawHistoryItem[]>([])
-
-	// 根据用户获取绘图历史数据
-	const getHistoryData = async (pageNumber ?: number) => {
-		const { items } = await request<IHistoryResponse>(`/draw/history/${pageNumber}`)
-		historyData.value = items
-		console.log('pageNumber', pageNumber)
-		console.log('historyData', historyData.value)
-	}
-	// 删除历史记录
-	const removeHistoryRecord = async (id : number) => {
-		try {
-			console.log('Attempting to remove history record with id:', id);
-			const response = await request<IHistoryResponse>(`/draw/history/${id}`, {
-				method: 'DELETE',
-			});
-
-			console.log('Response status:', response.status);
-			// if (response.status === 1) {
-			//   throw new Error(`Custom error! Status: ${response.status} - ${response.statusText}`);
-			// }
-
-			// if (!response.ok) {
-			//   throw new Error(`HTTP error! Status: ${response.status}`);
-			// }
-
-			// 从本地数据中移除已删除的记录
-			console.log('History record removed:', id);
-			historyData.value = historyData.value.filter(item => item._id !== id);
-			console.log('Updated historyData:', historyData.value);
-			uni.showToast({
-				title: '删除成功',
-				icon: 'success',
-				duration: 2000
-			})
-		} catch (err) {
-			console.error('Failed to remove history record:', err);
-			// 可以在这里显示错误信息给用户
-		}
-	}
-
-	//将获取的数据转换为时间轴数据computed
-	const timeLineDataComptRef = computed(() => {
-		const tempTimeLineData : TimeLineData[] = []
-		historyData.value.forEach(item => {
-			//   从历史数据中去除日期并格式化为2023-07-22
-			const date = formatDateTime(new Date(item.created_at as number), 'YYYY-MM-DD')
-			// 获取日期对应的数据
-			const data = tempTimeLineData.find(i => i.day === date)
-			if (data) {
-				data.data = [...data.data, item]
-			} else {
-				tempTimeLineData.push({
-					day: date,
-					icon: "creative",
-					data: [item]
-				})
+onLoad(() => {
+	if (!isLogin.value) {
+		uni.showToast({
+			icon: 'error',
+			title: '您还没有登录',
+			duration: 2000,
+			complete() {
+				setTimeout(() => {
+					uni.navigateBack()
+				}, 2000)
 			}
+
 		})
-		console.log('tempTimeLineData:', tempTimeLineData)
-		return tempTimeLineData.sort((a, b) => {
-			return new Date(b.day).getTime() - new Date(a.day).getTime()
-		})
-	})
-
-	const PhotoAlbumImages = computed<string[]>(() => {
-		let _imageList = [] as string[]
-		historyData.value.forEach(item => {
-			if (item.output) {
-				_imageList = [..._imageList, ...item.output]
-			}
-		})
-		return _imageList
-	})
-
-	const testData = ["https://chinahu-ai-server.oss-cn-chengdu.aliyuncs.com/aidraw/image/temps/6787db82dd3d12610cbb21bd/ComfyUI_0001.png"]
-
-	const currentTabIndex = ref(0)
-	const tabs = ref(['时间轴模式', '相册模式'])
-	const option = {
-		path: 'https://chinahu-ai-server.oss-cn-chengdu.aliyuncs.com/aidraw/image/temps/67873d6c232a3c5d52240dd6/empty.json'
 	}
-	function QieHuan(e) {
-		console.log('-----------------------------------', e)
-		currentTabIndex.value = e.index
-
-	}
-	const show = ref(false);
-	const picArry = ref()
-	const GalleryPic = ref()
-	
-	function showGallery(data) {
-		show.value = true;
-		GalleryPic.value = data;
-		console.log(GalleryPic.value)
-	}
+	getHistoryData()
+})
 
 
-	function hideGallery() {
-		show.value = false;
+const historyData = ref<IDrawHistoryItem[]>([])
 
-	}
-
-
-
-
-	function linkType(url) {
-		// 如果输入不是字符串，返回 2（未知类型）
-		if (typeof url !== 'string') return 2;
-
-		// 图片扩展名正则表达式
-		const imageExtensions = /\.(jpg|jpeg|png|gif|bmp|webp)$/i;
-		// 视频扩展名正则表达式
-		const videoExtensions = /\.(mp4|avi|mov|mkv|flv|wmv)$/i;
-
-		// 判断是否为图片
-		if (imageExtensions.test(url)) return 0; // 返回 0 表示图片
-		// 判断是否为视频
-		if (videoExtensions.test(url)) return 1; // 返回 1 表示视频
-
-		// 都不是，返回 2（未知类型）
-		return 2;
-	}
-	function handleClick(StringTxt) {
-		uni.setClipboardData({
-			data: StringTxt, // 需要设置到剪切板的内容
-			showToast: true, // 是否显示提示，默认为true
-			success: function () {
-				console.log('复制成功');
-			},
-			fail: function (err) {
-				console.error('复制失败', err);
-			}
+// 根据用户获取绘图历史数据
+const getHistoryData = async (pageNumber?: number) => {
+	const { items } = await request<IHistoryResponse>(`/draw/history/${pageNumber}`)
+	historyData.value = items
+	console.log('pageNumber', pageNumber)
+	console.log('historyData', historyData.value)
+}
+// 删除历史记录
+const removeHistoryRecord = async (id: number) => {
+	try {
+		console.log('Attempting to remove history record with id:', id);
+		const response = await request<IHistoryResponse>(`/draw/history/${id}`, {
+			method: 'DELETE',
 		});
 
-	}
-	// 定义 dowonVideo 函数，并指定 url 参数的类型为 string
-	async function dowonVideo(url : string) {
-		// 替换为你的视频地址
-		const videoUrl = url;
+		console.log('Response status:', response.status);
+		// if (response.status === 1) {
+		//   throw new Error(`Custom error! Status: ${response.status} - ${response.statusText}`);
+		// }
 
-		try {
-			// 下载视频到临时路径，使用 await 等待 Promise 解析
-			const downloadResult = await uni.downloadFile({
-				url: videoUrl,
+		// if (!response.ok) {
+		//   throw new Error(`HTTP error! Status: ${response.status}`);
+		// }
+
+		// 从本地数据中移除已删除的记录
+		console.log('History record removed:', id);
+		historyData.value = historyData.value.filter(item => item._id !== id);
+		console.log('Updated historyData:', historyData.value);
+		uni.showToast({
+			title: '删除成功',
+			icon: 'success',
+			duration: 2000
+		})
+	} catch (err) {
+		console.error('Failed to remove history record:', err);
+		// 可以在这里显示错误信息给用户
+	}
+}
+
+//将获取的数据转换为时间轴数据computed
+const timeLineDataComptRef = computed(() => {
+	const tempTimeLineData: TimeLineData[] = []
+	historyData.value.forEach(item => {
+		//   从历史数据中去除日期并格式化为2023-07-22
+		const date = formatDateTime(new Date(item.created_at as number), 'YYYY-MM-DD')
+		// 获取日期对应的数据
+		const data = tempTimeLineData.find(i => i.day === date)
+		if (data) {
+			data.data = [...data.data, item]
+		} else {
+			tempTimeLineData.push({
+				day: date,
+				icon: "creative",
+				data: [item]
+			})
+		}
+	})
+	console.log('tempTimeLineData:', tempTimeLineData)
+	return tempTimeLineData.sort((a, b) => {
+		return new Date(b.day).getTime() - new Date(a.day).getTime()
+	})
+})
+
+const PhotoAlbumImages = computed<string[]>(() => {
+	let _imageList = [] as string[]
+	historyData.value.forEach(item => {
+		if (item.output) {
+			_imageList = [..._imageList, ...item.output]
+		}
+	})
+	return _imageList
+})
+
+const testData = ["https://chinahu-ai-server.oss-cn-chengdu.aliyuncs.com/aidraw/image/temps/6787db82dd3d12610cbb21bd/ComfyUI_0001.png"]
+
+const currentTabIndex = ref(0)
+const tabs = ref(['时间轴模式', '相册模式'])
+const option = {
+	path: 'https://chinahu-ai-server.oss-cn-chengdu.aliyuncs.com/aidraw/image/temps/67873d6c232a3c5d52240dd6/empty.json'
+}
+function QieHuan(e) {
+	console.log('-----------------------------------', e)
+	currentTabIndex.value = e.index
+
+}
+const show = ref(false);
+const picArry = ref()
+const GalleryPic = ref()
+
+function showGallery(data) {
+	show.value = true;
+	GalleryPic.value = data;
+	console.log(GalleryPic.value)
+}
+
+
+function hideGallery() {
+	show.value = false;
+
+}
+
+
+
+
+function linkType(url) {
+	// 如果输入不是字符串，返回 2（未知类型）
+	if (typeof url !== 'string') return 2;
+
+	// 图片扩展名正则表达式
+	const imageExtensions = /\.(jpg|jpeg|png|gif|bmp|webp)$/i;
+	// 视频扩展名正则表达式
+	const videoExtensions = /\.(mp4|avi|mov|mkv|flv|wmv)$/i;
+
+	// 判断是否为图片
+	if (imageExtensions.test(url)) return 0; // 返回 0 表示图片
+	// 判断是否为视频
+	if (videoExtensions.test(url)) return 1; // 返回 1 表示视频
+
+	// 都不是，返回 2（未知类型）
+	return 2;
+}
+function handleClick(StringTxt) {
+	uni.setClipboardData({
+		data: StringTxt, // 需要设置到剪切板的内容
+		showToast: true, // 是否显示提示，默认为true
+		success: function () {
+			console.log('复制成功');
+		},
+		fail: function (err) {
+			console.error('复制失败', err);
+		}
+	});
+
+}
+// 定义 dowonVideo 函数，并指定 url 参数的类型为 string
+async function dowonVideo(url: string) {
+	// 替换为你的视频地址
+	const videoUrl = url;
+
+	try {
+		// 下载视频到临时路径，使用 await 等待 Promise 解析
+		const downloadResult = await uni.downloadFile({
+			url: videoUrl,
+		});
+
+		// 检查下载是否成功
+		if (downloadResult.statusCode === 200) {
+			const { tempFilePath } = downloadResult;
+
+			// 保存到相册
+			await uni.saveVideoToPhotosAlbum({
+				filePath: tempFilePath,
 			});
 
-			// 检查下载是否成功
-			if (downloadResult.statusCode === 200) {
-				const { tempFilePath } = downloadResult;
-
-				// 保存到相册
-				await uni.saveVideoToPhotosAlbum({
-					filePath: tempFilePath,
-				});
-
-				uni.showToast({
-					title: '下载成功',
-					icon: 'success',
-				});
-			} else {
-				console.error('下载失败，状态码:', downloadResult.statusCode);
-				uni.showToast({
-					title: '下载失败',
-					icon: 'none',
-				});
-			}
-		} catch (error) {
-			console.error('下载失败:', error);
+			uni.showToast({
+				title: '下载成功',
+				icon: 'success',
+			});
+		} else {
+			console.error('下载失败，状态码:', downloadResult.statusCode);
 			uni.showToast({
 				title: '下载失败',
 				icon: 'none',
 			});
 		}
+	} catch (error) {
+		console.error('下载失败:', error);
+		uni.showToast({
+			title: '下载失败',
+			icon: 'none',
+		});
 	}
+}
+
+const isDeleting = ref(false)
+const handleDeleteTouchStart = () => {
+	isDeleting.value = true
+}
+const handleDeleteTouchEnd = () => {
+	setTimeout(() => {
+		isDeleting.value = false
+	}, 500)
+}
+
+
 </script>
 
 <template>
+	<MyNavbar />
 	<fui-background-image src="@/src/static/Home2 (1).jpgHome2(1).jpg">
 	</fui-background-image>
+
 	<fui-sticky>
 		<fui-tabs style="margin-top: 15%; background-color: transparent;" :tabs="tabs" @change="QieHuan"></fui-tabs>
 	</fui-sticky>
@@ -245,8 +256,8 @@
 	</view>
 	<view v-if="currentTabIndex == 0">
 		<fui-gallery :urls="GalleryPic" :show="show" @hide="hideGallery"></fui-gallery>
-		<fui-timeaxis :padding="['32rpx','16rpx']">
-			<fui-timeaxis-node v-for="(item,index ) in historyData" :key="index">
+		<fui-timeaxis :padding="['32rpx', '16rpx']">
+			<fui-timeaxis-node v-for="(item, index) in historyData" :key="index">
 
 				<view class="fui-node__box" style="background: #FF2B2B;" v-if="item.status == 2">
 					<fui-icon name="clear-fill" :size="28" color="#fff"></fui-icon>
@@ -262,8 +273,8 @@
 					<view class="fui-custom__wrap" v-if="linkType(item.output[0]) == 0">
 						<fui-section title="提示词" :descr="item.params?.positive" descrSize='32'
 							descrColor='#000000'></fui-section>
-						<view class="section__ctn" style="margin-top: 6%;" >
-							<view v-for="(pic,picIndex) in item.output">
+						<view class="section__ctn" style="margin-top: 6%;">
+							<view v-for="(pic, picIndex) in item.output">
 								<image @click="showGallery(historyData[index].output)"
 									style="width: 300px;  background-color:transparent;" mode="widthFix" :src="pic"
 									:show-menu-by-longpress='true'>
@@ -271,20 +282,26 @@
 							</view>
 						</view>
 
-						<fui-icon
+						<!-- <fui-icon
 							style="margin-top:-11%; background-color:rgba(255, 255, 255, 0.5);; border-radius: 100px;  position: absolute ; margin-left: 480rpx;"
-							color="#ff0000" name="delete" @click="removeHistoryRecord(item._id)"></fui-icon>
-						
+							color="#ff0000" name="delete" @click="removeHistoryRecord(item._id)"></fui-icon> -->
+						<view class="delete-button" @click="removeHistoryRecord(item._id)"
+							@touchstart="handleDeleteTouchStart" @touchend="handleDeleteTouchEnd">
+							<tn-icon name="delete" size="36"
+								:class="['delete-icon', isDeleting ? 'icon-shake' : '']"></tn-icon>
+						</view>
+
 
 					</view>
 					<!-- 如果是视频的话 -->
 					<view class="fui-custom__wrap" v-else-if="linkType(item.output[0]) == 1">
-						<fui-section title="提示词" :descr="item.params?.positive"></fui-section>
+						<fui-section title="提示词" :descr="item.params?.positive" descrSize='32'
+							descrColor='#000000'></fui-section>
 						<view style="margin-top: 6%;">
 							<video style="width: 100%; height: 390px; background-color:transparent;" id="myVideo"
 								:src="item.output[0]" controls></video>
 						</view>
-						<view>
+						<!-- <view>
 							<fui-icon
 								style="margin-top:-95%; background-color:rgba(255, 255, 255, 0.5);; border-radius: 100px;  position: absolute ; margin-left: 600rpx;"
 								color="#ff0000" name="delete" @click="removeHistoryRecord(item._id)"></fui-icon>
@@ -292,6 +309,15 @@
 								style="margin-top:-85%; background-color:rgba(255, 255, 255, 0.5);; border-radius: 100px;  position: absolute ; margin-left: 600rpx;"
 								color="#e0e0e0" name="pulldown" @click="dowonVideo(item.output[0])"></fui-icon>
 
+						</view> -->
+
+						<view class="video-controls">
+							<view class="control-button download-btn" @click="dowonVideo(item.output[0])">
+								<tn-icon name="download-simple" size="36"></tn-icon>
+							</view>
+							<view class="control-button delete-btn" @click="removeHistoryRecord(item._id)">
+								<tn-icon name="delete" size="36"></tn-icon>
+							</view>
 						</view>
 
 					</view>
@@ -306,21 +332,32 @@
 							<view class="fui-item__box">
 
 								<image mode="widthFix"
-									:src="item.params?.image_path_mask  || item.params?.image_path_origin || testData "
+									:src="item.params?.image_path_mask || item.params?.image_path_origin || testData"
 									class="fui-logo" :show-menu-by-longpress='true'></image>
 
+
+
 							</view>
-							<fui-icon
-								style="margin-top:-12%; background-color:rgba(255, 255, 255, 0.5);; border-radius: 100px;  position: absolute ; margin-left: 280rpx;"
-								color="#ff0000" name="delete" @click="removeHistoryRecord(item.id)"></fui-icon>
-							<view style="margin-top: -5%;">
+
+
+							<view>
 								<fui-collapse-item background="transparent ">
 
 									<template v-slot:content>
 										<!-- <fui-copy-text  text="长按复制文本" :value="item.output[0]"></fui-copy-text> -->
-										<view style='margin-left: 5%; margin-top: 5%;'
-											@click="handleClick(item.output[0])">复制</view>
-										<view class="fui-descr">{{item.output[0]}}</view>
+										<view style='margin-left: 5%; margin-top: 5%;   display: flex;'
+											@click="handleClick(item.output[0])">
+											<text>复制</text>
+											
+
+											<view style='margin-left: 10%;    display: flex;'  @click="removeHistoryRecord(item._id)">
+												<text  >删除</text>
+												<tn-icon name="delete" size="36"></tn-icon>
+											</view>
+										</view>
+
+
+										<view class="fui-descr">{{ item.output[0] }}</view>
 									</template>
 								</fui-collapse-item>
 							</view>
@@ -342,7 +379,7 @@
 		<view class="content">
 			<view class="photo-album">
 				<fui-waterfall>
-					<fui-waterfall-item v-for="(item,index) in historyData" :key="index">
+					<fui-waterfall-item v-for="(item, index) in historyData" :key="index">
 
 						<view v-if="linkType(item.output[0]) == 0">
 							<view>
@@ -362,8 +399,7 @@
 						<view v-else>
 
 							<view class="fui-item__box">
-								<image
-									:src="item.params?.image_path_mask  || item.params?.image_path_origin || testData "
+								<image :src="item.params?.image_path_mask || item.params?.image_path_origin || testData"
 									class="fui-logo"></image>
 
 							</view>
@@ -400,115 +436,231 @@
 
 
 <style lang="scss" scoped>
-	.fui-item__box {
-		margin-top: 5%;
-		width: 100%;
-		padding: 26rpx 32rpx;
-		box-sizing: border-box;
-		display: flex;
-		align-items: center;
+.video-container {
+	position: relative;
+	width: 100%;
+}
+
+.video-controls {
+	position: absolute;
+	right: 20rpx;
+	bottom: 20rpx;
+	display: flex;
+	gap: 20rpx;
+	z-index: 10;
+}
+
+.control-button {
+	width: 60rpx;
+	height: 60rpx;
+	background: rgba(255, 255, 255, 0.95);
+	border-radius: 40rpx;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.15);
+	transition: all 0.3s ease;
+
+	&:active {
+		transform: scale(0.9);
+		background: rgba(255, 255, 255, 0.8);
+	}
+}
+
+.delete-btn {
+	background: rgba(255, 255, 255, 0.95);
+	color: #ff4949;
+}
+
+.download-btn {
+	background: rgba(255, 255, 255, 0.95);
+	color: #000000;
+}
+
+// ============================================
+.delete-button2 {
+	position: absolute;
+	right: 100rpx;
+	bottom: -10rpx;
+	width: 60rpx;
+	height: 60rpx;
+	background: rgba(255, 255, 255, 0.95);
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.15);
+	transition: all 0.3s ease;
+	z-index: 999;
+
+	&:active {
+		transform: scale(0.9);
+		background: rgba(255, 255, 255, 0.8);
+	}
+}
+
+.delete-button {
+	position: absolute;
+	right: 20rpx;
+	bottom: 20rpx;
+	width: 60rpx;
+	height: 60rpx;
+	background: rgba(255, 255, 255, 0.95);
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.15);
+	transition: all 0.3s ease;
+	z-index: 999;
+
+	&:active {
+		transform: scale(0.9);
+		background: rgba(255, 255, 255, 0.8);
+	}
+}
+
+.delete-icon {
+	color: #ff4949;
+	transition: all 0.3s ease;
+}
+
+.icon-shake {
+	animation: shake 0.5s;
+}
+
+@keyframes shake {
+	0% {
+		transform: rotate(0deg);
 	}
 
-	.fui-logo {
-		width: 300rpx;
-		// height: 400rpx;
-		margin-right: 24rpx;
-		display: flex;
-		text-align: center;
-
+	25% {
+		transform: rotate(-15deg);
 	}
 
-	.fui-descr {
-		width: 100%;
-		padding: 32rpx;
-		font-size: 28rpx;
-		line-height: 52rpx;
-		color: #7F7F7F;
-		word-break: break-all;
-		box-sizing: border-box;
+	50% {
+		transform: rotate(15deg);
 	}
 
-	.fui-vip__icon {
-		width: 48rpx;
-		height: 48rpx;
-		margin-left: 16rpx;
-
+	75% {
+		transform: rotate(-15deg);
 	}
 
-	.fui-header {
-		width: 100%;
-		padding: 24rpx;
-		box-sizing: border-box;
-		display: flex;
-		justify-content: center;
-		background: #F8F8F8;
-		color: #465CFF;
-		font-weight: bold;
+	100% {
+		transform: rotate(0deg);
 	}
+}
 
-	.fui-animation {
-		width: 600rpx;
-		height: 400rpx;
-	}
+// =======================================
+.fui-item__box {
+	margin-top: 5%;
+	width: 100%;
+	padding: 26rpx 32rpx;
+	box-sizing: border-box;
+	display: flex;
+	align-items: center;
+}
 
-	.main-container {
-		padding: 0 10rpx;
-	}
+.fui-logo {
+	width: 300rpx;
+	// height: 400rpx;
+	margin-right: 24rpx;
+	display: flex;
+	text-align: center;
 
-	.content {
-		position: relative;
-		width: 100%;
+}
 
-		.time-line {
-			&__title {
-				font-size: 32rpx;
-				margin-bottom: 20rpx;
-			}
+.fui-descr {
+	width: 100%;
+	padding: 32rpx;
+	font-size: 28rpx;
+	line-height: 52rpx;
+	color: #7F7F7F;
+	word-break: break-all;
+	box-sizing: border-box;
+}
+
+.fui-vip__icon {
+	width: 48rpx;
+	height: 48rpx;
+	margin-left: 16rpx;
+
+}
+
+.fui-header {
+	width: 100%;
+	padding: 24rpx;
+	box-sizing: border-box;
+	display: flex;
+	justify-content: center;
+	background: #F8F8F8;
+	color: #465CFF;
+	font-weight: bold;
+}
+
+.fui-animation {
+	width: 600rpx;
+	height: 400rpx;
+}
+
+.main-container {
+	padding: 0 10rpx;
+}
+
+.content {
+	position: relative;
+	width: 100%;
+
+	.time-line {
+		&__title {
+			font-size: 32rpx;
+			margin-bottom: 20rpx;
 		}
 	}
+}
 
-	.photo-album {
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(200rpx, 1fr));
-		grid-gap: 15rpx;
-	}
-
-
-
+.photo-album {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(200rpx, 1fr));
+	grid-gap: 15rpx;
+}
 
 
 
 
-	.fui-custom__wrap {
-		margin-bottom: 5%;
-		padding: 0rpx;
-		box-sizing: border-box;
-	}
 
-	.child {
-		width: 300rpx;
-		display: inline-block;
-		margin: 0 10px;
-		/* 添加间距 */
-	}
 
-	.fui-custom__innder {
-		height: 100%;
-		border-radius: 0 16rpx 16rpx;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		background: transparent;
-		color: #FFB703;
-	}
 
-	.fui-node__box {
-		width: 36rpx;
-		height: 36rpx;
-		background: #ccc;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		border-radius: 50%;
-	}
+.fui-custom__wrap {
+	margin-bottom: 5%;
+	padding: 0rpx;
+	box-sizing: border-box;
+}
+
+.child {
+	width: 300rpx;
+	display: inline-block;
+	margin: 0 10px;
+	/* 添加间距 */
+}
+
+.fui-custom__innder {
+	height: 100%;
+	border-radius: 0 16rpx 16rpx;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: transparent;
+	color: #FFB703;
+}
+
+.fui-node__box {
+	width: 36rpx;
+	height: 36rpx;
+	background: #ccc;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 50%;
+}
 </style>

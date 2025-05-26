@@ -16,7 +16,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const waterfallElement = common_vendor.ref();
     const showApps = common_vendor.ref();
     const getshowApps = () => {
-      common_vendor.index.__f__("log", "at components/home/AppWaterFall.vue:25", "home_tagActiveIndex", home_tagActiveIndex.value);
+      console.log("home_tagActiveIndex", home_tagActiveIndex.value);
       if (home_tagActiveIndex.value === 0) {
         showApps.value = [...workflows_all.value];
         return;
@@ -25,7 +25,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         var _a;
         return (_a = item.tags) == null ? void 0 : _a.includes(home_tagsList.value[home_tagActiveIndex.value].name);
       });
-      common_vendor.index.__f__("log", "at components/home/AppWaterFall.vue:32", "result", result);
+      console.log("result", result);
       showApps.value = [...result];
     };
     common_vendor.watch(home_tagActiveIndex, () => {
@@ -91,4 +91,3 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
 });
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-f26ed2f2"]]);
 wx.createComponent(Component);
-//# sourceMappingURL=../../../.sourcemap/mp-weixin/components/home/AppWaterFall.js.map

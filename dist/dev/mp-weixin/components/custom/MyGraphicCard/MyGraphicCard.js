@@ -188,7 +188,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         ak: _ctx.showHot
       }, _ctx.showHot ? {
         al: common_vendor.p({
-          name: _ctx.activeHot ? _ctx.activeHotIcon : _ctx.hotIcon
+          name: _ctx.activeHot ? _ctx.activeHotIcon : _ctx.hotIcon,
+          size: "20px"
         }),
         am: common_vendor.t(_ctx.hotCount),
         an: common_vendor.n(common_vendor.unref(hotClass)),
@@ -201,7 +202,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         aq: _ctx.showComment
       }, _ctx.showComment ? {
         ar: common_vendor.p({
-          name: _ctx.activeComment ? _ctx.activeCommentIcon : _ctx.commentIcon
+          name: _ctx.activeComment ? _ctx.activeCommentIcon : _ctx.commentIcon,
+          size: "20px"
         }),
         as: common_vendor.t(_ctx.commentCount),
         at: common_vendor.n(common_vendor.unref(commentClass)),
@@ -214,7 +216,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         ax: _ctx.showLike
       }, _ctx.showLike ? {
         ay: common_vendor.p({
-          name: _ctx.activeLike ? _ctx.activeLikeIcon : _ctx.likeIcon
+          name: _ctx.activeLike ? _ctx.activeLikeIcon : _ctx.likeIcon,
+          size: "20px"
         }),
         az: common_vendor.t(_ctx.likeCount),
         aA: common_vendor.n(common_vendor.unref(likeClass)),
@@ -258,4 +261,3 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
 });
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-1bacfa93"]]);
 wx.createComponent(Component);
-//# sourceMappingURL=../../../../.sourcemap/mp-weixin/components/custom/MyGraphicCard/MyGraphicCard.js.map

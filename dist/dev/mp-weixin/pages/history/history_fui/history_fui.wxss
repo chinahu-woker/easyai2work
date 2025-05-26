@@ -23,6 +23,103 @@
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
+.video-container.data-v-56f14cc7 {
+  position: relative;
+  width: 100%;
+}
+.video-controls.data-v-56f14cc7 {
+  position: absolute;
+  right: 20rpx;
+  bottom: 20rpx;
+  display: flex;
+  gap: 20rpx;
+  z-index: 10;
+}
+.control-button.data-v-56f14cc7 {
+  width: 60rpx;
+  height: 60rpx;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 40rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+.control-button.data-v-56f14cc7:active {
+  transform: scale(0.9);
+  background: rgba(255, 255, 255, 0.8);
+}
+.delete-btn.data-v-56f14cc7 {
+  background: rgba(255, 255, 255, 0.95);
+  color: #ff4949;
+}
+.download-btn.data-v-56f14cc7 {
+  background: rgba(255, 255, 255, 0.95);
+  color: #000000;
+}
+.delete-button2.data-v-56f14cc7 {
+  position: absolute;
+  right: 100rpx;
+  bottom: -10rpx;
+  width: 60rpx;
+  height: 60rpx;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+  z-index: 999;
+}
+.delete-button2.data-v-56f14cc7:active {
+  transform: scale(0.9);
+  background: rgba(255, 255, 255, 0.8);
+}
+.delete-button.data-v-56f14cc7 {
+  position: absolute;
+  right: 20rpx;
+  bottom: 20rpx;
+  width: 60rpx;
+  height: 60rpx;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+  z-index: 999;
+}
+.delete-button.data-v-56f14cc7:active {
+  transform: scale(0.9);
+  background: rgba(255, 255, 255, 0.8);
+}
+.delete-icon.data-v-56f14cc7 {
+  color: #ff4949;
+  transition: all 0.3s ease;
+}
+.icon-shake.data-v-56f14cc7 {
+  animation: shake-56f14cc7 0.5s;
+}
+@keyframes shake-56f14cc7 {
+0% {
+    transform: rotate(0deg);
+}
+25% {
+    transform: rotate(-15deg);
+}
+50% {
+    transform: rotate(15deg);
+}
+75% {
+    transform: rotate(-15deg);
+}
+100% {
+    transform: rotate(0deg);
+}
+}
 .fui-item__box.data-v-56f14cc7 {
   margin-top: 5%;
   width: 100%;

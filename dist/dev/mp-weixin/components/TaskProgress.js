@@ -15,7 +15,7 @@ const _easycom_fui_parse = () => "./firstui/fui-parse/fui-parse.js";
 const _easycom_fui_parse_group = () => "./firstui/fui-parse-group/fui-parse-group.js";
 const _easycom_fui_fab = () => "./firstui/fui-fab/fui-fab.js";
 if (!Math) {
-  (_easycom_fui_background_image + _easycom_up_swiper + TnIcon + _easycom_fui_parse + _easycom_fui_parse_group + _easycom_fui_fab + MyPopup)();
+  (_easycom_fui_background_image + _easycom_up_swiper + TnIcon + _easycom_fui_parse + _easycom_fui_parse_group + _easycom_fui_fab + TnIcon + MyPopup)();
 }
 const MyPopup = () => "./common/MyPopup.js";
 const TnIcon = () => "../node-modules/@tuniao/tnui-vue3-uniapp/components/icon/src/icon.js";
@@ -32,7 +32,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   setup(__props) {
     const currentSwiperIndex = common_vendor.ref(0);
     common_vendor.watch(currentSwiperIndex, () => {
-      common_vendor.index.__f__("log", "at components/TaskProgress.vue:14", "currentSwiperIndex", currentSwiperIndex.value);
+      console.log("currentSwiperIndex", currentSwiperIndex.value);
     });
     const { localTasks } = common_vendor.storeToRefs(stores_appStore.useAppStore());
     const AllList = common_vendor.computed(() => {
@@ -103,7 +103,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     common_vendor.onShow(() => {
       const excIndex = handleFindExecutingTaskIndex();
-      common_vendor.index.__f__("log", "at components/TaskProgress.vue:112", "task onshow", excIndex);
+      console.log("task onshow", excIndex);
       if (excIndex !== -1) {
         currentSwiperIndex.value = handleFindExecutingTaskIndex();
       }
@@ -120,15 +120,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const imageRegex = /\.(jpg|jpeg|png|gif|bmp)$/i;
       const videoRegex = /\.(mp4|avi|mov|mkv|flv|wmv)$/i;
       if (!input) {
-        common_vendor.index.__f__("log", "at components/TaskProgress.vue:135", "==============", "是空值");
+        console.log("==============", "是空值");
         return 0;
       }
       if (checkContent(input) == 1) {
         if (imageRegex.test(input)) {
-          common_vendor.index.__f__("log", "at components/TaskProgress.vue:141", "==============", "是图片");
+          console.log("==============", "是图片");
           return 1;
         } else if (videoRegex.test(input)) {
-          common_vendor.index.__f__("log", "at components/TaskProgress.vue:146", "==============", "是视频");
+          console.log("==============", "是视频");
           return 2;
         }
       }
@@ -150,7 +150,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }]);
     common_vendor.computed(() => {
       var _a, _b, _c, _d, _e, _f, _g, _h;
-      common_vendor.index.__f__("log", "at components/TaskProgress.vue:170", "----------------------------{{generateParams}}----------------", localTasks.value[currentSwiperIndex.value]);
+      console.log("----------------------------{{generateParams}}----------------", localTasks.value[currentSwiperIndex.value]);
       const output = (_a = localTasks.value[currentSwiperIndex.value]) == null ? void 0 : _a.output[currentSwiperIndex.value];
       const contentType = judgeContent(output);
       allValueList.value = [];
@@ -167,10 +167,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           textImg: " "
           // 替换为实际图片路径
         });
-        common_vendor.index.__f__("log", "at components/TaskProgress.vue:186", "----------------------------{{generateParams}}------allValueList----------", allValueList.value);
+        console.log("----------------------------{{generateParams}}------allValueList----------", allValueList.value);
         StringImag.value = output;
         StringCont.value = "";
-        common_vendor.index.__f__("log", "at components/TaskProgress.vue:189", "----------output---showOrSleep.value = 0;---------", output);
+        console.log("----------output---showOrSleep.value = 0;---------", output);
       } else if (contentType === 2) {
         allValueList.value.push({
           class: "video",
@@ -184,7 +184,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         showOrSleep.value = 1;
         StringCont.value = "";
         StringImag.value = "output";
-        common_vendor.index.__f__("log", "at components/TaskProgress.vue:201", "----------output---showOrSleep.value = 1;---------", output);
+        console.log("----------output---showOrSleep.value = 1;---------", output);
       } else if (contentType === 3) {
         allValueList.value.push({
           class: "text",
@@ -197,14 +197,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         });
         showOrSleep.value = 2;
         StringCont.value = output;
-        common_vendor.index.__f__("log", "at components/TaskProgress.vue:213", "----------output---showOrSleep.value = 2;---------", output, allValueList);
+        console.log("----------output---showOrSleep.value = 2;---------", output, allValueList);
         StringImag.value = (_h = (_g = localTasks.value[currentSwiperIndex.value]) == null ? void 0 : _g.params) == null ? void 0 : _h.image_path_mask;
       }
     });
+    const handleGotoHistory = () => {
+      common_vendor.index.navigateTo({ url: "/pages/history/history_fui/history_fui" });
+    };
     const handlePreview = () => {
       const currentTask = localTasks.value[currentSwiperIndex.value];
       if (currentTask && currentTask.status === 1) {
-        common_vendor.index.__f__("log", "at components/TaskProgress.vue:288", "preview");
+        console.log("preview");
         common_vendor.index.previewImage({ urls: currentTask.output });
       }
     };
@@ -221,17 +224,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     common_vendor.ref(false);
     function handleClick(e, StringTxt) {
       if (e.index == 0) {
-        common_vendor.index.__f__("log", "at components/TaskProgress.vue:305", "---------------(e)------------", e);
+        console.log("---------------(e)------------", e);
         common_vendor.index.setClipboardData({
           data: StringTxt,
           // 需要设置到剪切板的内容
           showToast: true,
           // 是否显示提示，默认为true
           success: function() {
-            common_vendor.index.__f__("log", "at components/TaskProgress.vue:310", "复制成功");
+            console.log("复制成功");
           },
           fail: function(err) {
-            common_vendor.index.__f__("error", "at components/TaskProgress.vue:313", "复制失败", err);
+            console.error("复制失败", err);
           }
         });
       } else if (e.index == 1) {
@@ -242,7 +245,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     function change(e) {
       current.value = e.detail.current;
     }
-    common_vendor.index.__f__("log", "at components/TaskProgress.vue:338", "--------****************------------", AllList, localTasks);
+    console.log("--------****************------------", AllList, localTasks);
     return (_ctx, _cache) => {
       return common_vendor.e({
         a: common_vendor.p({
@@ -321,8 +324,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         i: common_vendor.t(currentImageCount.value),
         j: common_vendor.o(handleTouchEnd),
         k: common_vendor.o(handleTouchStart),
-        l: common_vendor.o(($event) => showPopup.value = $event),
-        m: common_vendor.p({
+        l: common_vendor.p({
+          name: "download-simple",
+          size: "50rpx"
+        }),
+        m: common_vendor.o(handleGotoHistory),
+        n: common_vendor.p({
+          name: "right-arrow",
+          size: "50rpx"
+        }),
+        o: common_vendor.o(($event) => showPopup.value = $event),
+        p: common_vendor.p({
           modelValue: showPopup.value
         })
       });
@@ -331,4 +343,3 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
 });
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-defa837f"]]);
 wx.createComponent(Component);
-//# sourceMappingURL=../../.sourcemap/mp-weixin/components/TaskProgress.js.map

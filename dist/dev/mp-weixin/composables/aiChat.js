@@ -21,7 +21,7 @@ const getUserToken = () => {
       // 请求成功回调
       fail: (err) => {
         reject(err);
-        common_vendor.index.__f__("log", "at composables/aiChat.ts:30", "请求失败", err);
+        console.log("请求失败", err);
       }
       // 请求失败回调
     });
@@ -46,7 +46,7 @@ const getModelList = (data) => {
       // 请求成功回调
       fail: (err) => {
         reject(err);
-        common_vendor.index.__f__("log", "at composables/aiChat.ts:65", "请求失败", err);
+        console.log("请求失败", err);
       }
       // 请求失败回调
     });
@@ -77,7 +77,7 @@ const getUserKey = (data, Rtoken_value) => {
       // 请求成功回调
       fail: (err) => {
         reject(err);
-        common_vendor.index.__f__("log", "at composables/aiChat.ts:103", "请求失败", err);
+        console.log("请求失败", err);
       }
       // 请求失败回调
     });
@@ -102,15 +102,86 @@ const getUserInfo = (data) => {
       // 请求成功回调
       fail: (err) => {
         reject(err);
-        common_vendor.index.__f__("log", "at composables/aiChat.ts:135", "请求失败", err);
+        console.log("请求失败", err);
       }
       // 请求失败回调
     });
   });
 };
+const getdetail = (data, id) => {
+  const restoken = data.refresh_token;
+  return new Promise((resolve, reject) => {
+    common_vendor.index.request({
+      url: `${getBaseURL()}/draw/history/detail/${id}`,
+      // 请求地址
+      method: "GET",
+      header: {
+        "Authorization": "Bearer " + restoken
+      },
+      success: (res) => {
+        resolve(res);
+      },
+      // 请求成功回调
+      fail: (err) => {
+        reject(err);
+        console.log("请求失败", err);
+      }
+      // 请求失败回调
+    });
+  });
+};
+const Comment = (data, content) => {
+  const restoken = data.refresh_token;
+  return new Promise((resolve, reject) => {
+    common_vendor.index.request({
+      url: `${getBaseURL()}/comment`,
+      method: "POST",
+      header: {
+        "Authorization": "Bearer " + restoken
+      },
+      data: content,
+      success: (res) => {
+        resolve(res);
+      },
+      // 请求成功回调
+      fail: (err) => {
+        reject(err);
+        console.log("请求失败", err);
+      }
+      // 请求失败回调
+    });
+  });
+};
+const allUserName = (data) => {
+  const restoken = data.refresh_token;
+  return new Promise((resolve, reject) => {
+    common_vendor.index.request({
+      url: `${getBaseURL()}/users/allUserName`,
+      method: "GET",
+      header: {
+        "Authorization": "Bearer " + restoken
+      },
+      success: (res) => {
+        if (res.statusCode === 200 && res.data) {
+          common_vendor.index.setStorageSync("allUserNames", res.data);
+          resolve(res.data);
+        } else {
+          common_vendor.index.showToast({ title: "获取用户列表失败", icon: "none" });
+          reject(res);
+        }
+      },
+      fail: (err) => {
+        console.error("请求失败:", err);
+        reject(err);
+      }
+    });
+  });
+};
 exports.ChatAPiUrl = ChatAPiUrl;
+exports.Comment = Comment;
+exports.allUserName = allUserName;
 exports.getModelList = getModelList;
 exports.getUserInfo = getUserInfo;
 exports.getUserKey = getUserKey;
 exports.getUserToken = getUserToken;
-//# sourceMappingURL=../../.sourcemap/mp-weixin/composables/aiChat.js.map
+exports.getdetail = getdetail;

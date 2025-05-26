@@ -82,7 +82,9 @@
   animation: moveAnimation 1s ease-in-out forwards;
 }
 .content-default.data-v-6cf62e12 {
-  position: relative !important; /* 避免绝对定位影响 */
+  z-index: 9999;
+  position: fixed;
+  /* 修改为 fixed 定位 */
   width: 100rpx;
   height: 100rpx;
   background: linear-gradient(360deg, #857ed1 0%, #4338CA 100%);
@@ -101,7 +103,7 @@
     transform: translateY(0);
 }
 50% {
-    transform: translateY(-20px);
+    transform: translateY(20px);
     /* 上移 */
 }
 100% {

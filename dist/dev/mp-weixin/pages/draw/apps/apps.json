@@ -1,5 +1,8 @@
 {
   "navigationBarTitleText": "Fuzi-AI",
+  "navigationStyle": "custom",
+  "enableShareAppMessage": true,
+  "enableShareTimeline": true,
   "usingComponents": {
     "fui-icon": "../../../components/firstui/fui-icon/fui-icon",
     "fui-nav-bar": "../../../components/firstui/fui-nav-bar/fui-nav-bar",

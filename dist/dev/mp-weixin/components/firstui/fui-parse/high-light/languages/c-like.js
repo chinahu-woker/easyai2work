@@ -236,4 +236,3 @@ function cLike(hljs) {
   };
 }
 exports.cLike = cLike;
-//# sourceMappingURL=../../../../../../.sourcemap/mp-weixin/components/firstui/fui-parse/high-light/languages/c-like.js.map

@@ -46,4 +46,3 @@ function sql(hljs) {
   };
 }
 exports.sql = sql;
-//# sourceMappingURL=../../../../../../.sourcemap/mp-weixin/components/firstui/fui-parse/high-light/languages/sql.js.map

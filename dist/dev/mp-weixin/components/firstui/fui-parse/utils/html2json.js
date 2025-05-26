@@ -1,5 +1,4 @@
 "use strict";
-const common_vendor = require("../../../../common/vendor.js");
 const components_firstui_fuiParse_utils_wxDiscode = require("./wxDiscode.js");
 const components_firstui_fuiParse_utils_htmlparser = require("./htmlparser.js");
 var __placeImgeUrlHttps = "https";
@@ -153,7 +152,7 @@ function html2json(html, bindName) {
     end: function(tag) {
       var node = bufArray.shift();
       if (node.tag !== tag)
-        common_vendor.index.__f__("error", "at components/firstui/fui-parse/utils/html2json.js:225", "invalid state: mismatch end tag");
+        console.error("invalid state: mismatch end tag");
       if (node.tag === "video" && results.source) {
         node.attr.src = results.source;
         delete results.source;
@@ -230,4 +229,3 @@ const HtmlToJson = {
   emojisInit
 };
 exports.HtmlToJson = HtmlToJson;
-//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/components/firstui/fui-parse/utils/html2json.js.map

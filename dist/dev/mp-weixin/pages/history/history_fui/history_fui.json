@@ -8,10 +8,12 @@
     "fui-gallery": "../../../components/firstui/fui-gallery/fui-gallery",
     "fui-icon": "../../../components/firstui/fui-icon/fui-icon",
     "fui-load-ani": "../../../components/firstui/fui-load-ani/fui-load-ani",
+    "tn-icon": "../../../node-modules/@tuniao/tnui-vue3-uniapp/components/icon/src/icon",
     "fui-collapse-item": "../../../components/firstui/fui-collapse-item/fui-collapse-item",
     "fui-timeaxis-node": "../../../components/firstui/fui-timeaxis-node/fui-timeaxis-node",
     "fui-timeaxis": "../../../components/firstui/fui-timeaxis/fui-timeaxis",
     "fui-waterfall-item": "../../../components/firstui/fui-waterfall-item/fui-waterfall-item",
-    "fui-waterfall": "../../../components/firstui/fui-waterfall/fui-waterfall"
+    "fui-waterfall": "../../../components/firstui/fui-waterfall/fui-waterfall",
+    "my-navbar": "../../../components/common/MyNavbar"
   }
 }

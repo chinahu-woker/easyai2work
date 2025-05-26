@@ -28,7 +28,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const getHistoryData = async (pageNumber) => {
       const { items } = await utils_request.request(`/draw/history/${pageNumber}`);
       historyData.value = items;
-      common_vendor.index.__f__("log", "at pages/history/history.vue:40", "historyData", historyData.value);
+      console.log("historyData", historyData.value);
     };
     const timeLineDataComptRef = common_vendor.computed(() => {
       const tempTimeLineData = [];
@@ -45,7 +45,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           });
         }
       });
-      common_vendor.index.__f__("log", "at pages/history/history.vue:60", "tempTimeLineData:", tempTimeLineData);
+      console.log("tempTimeLineData:", tempTimeLineData);
       return tempTimeLineData.sort((a, b) => {
         return new Date(b.day).getTime() - new Date(a.day).getTime();
       });
@@ -145,4 +145,3 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
 });
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-73685b36"]]);
 wx.createPage(MiniProgramPage);
-//# sourceMappingURL=../../../.sourcemap/mp-weixin/pages/history/history.js.map

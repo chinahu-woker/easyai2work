@@ -8,4 +8,3 @@ function cpp(hljs) {
   return lang;
 }
 exports.cpp = cpp;
-//# sourceMappingURL=../../../../../../.sourcemap/mp-weixin/components/firstui/fui-parse/high-light/languages/cpp.js.map

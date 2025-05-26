@@ -139,3 +139,87 @@ export const getUserInfo = (data) => {
 		// console.log('requestTask', requestTask)
 	});
 }
+
+
+export const getdetail = (data,id) => {
+	// 获取用户Key值
+	const restoken = data.refresh_token
+	// console.log("获取用户restoken值", restoken)
+
+	return new Promise((resolve, reject) => {
+		const requestTask = uni.request({
+			url: `${getBaseURL()}/draw/history/detail/${id}`, // 请求地址
+			method: "GET",
+			header: {
+				'Authorization': 'Bearer ' + restoken,
+				
+			},
+			success: (res) => {
+				resolve(res);
+				// console.log('getUserInfo请求成功', res.data);
+				// uni.parseStreamData(res.data)
+			}, // 请求成功回调
+			fail: (err) => {
+				reject(err);
+				console.log('请求失败', err);
+			} // 请求失败回调
+		});
+		// console.log('requestTask', requestTask)
+	});
+}
+
+
+export const Comment = (data,content) => {
+	// 获取用户Key值
+	const restoken = data.refresh_token
+	// console.log("获取用户restoken值", restoken)
+
+	return new Promise((resolve, reject) => {
+		const requestTask = uni.request({
+			url: `${getBaseURL()}/comment`, 
+			method: "POST",
+			header: {
+				'Authorization': 'Bearer ' + restoken,
+				
+			},
+			data:content,
+			success: (res) => {
+				resolve(res);
+				// console.log('getUserInfo请求成功', res.data);
+				// uni.parseStreamData(res.data)
+			}, // 请求成功回调
+			fail: (err) => {
+				reject(err);
+				console.log('请求失败', err);
+			} // 请求失败回调
+		});
+		// console.log('requestTask', requestTask)
+	});
+}
+export const allUserName = (data) => {
+  const restoken = data.refresh_token;
+
+  return new Promise((resolve, reject) => {
+    uni.request({
+      url: `${getBaseURL()}/users/allUserName`,
+      method: "GET",
+      header: {
+        'Authorization': 'Bearer ' + restoken,
+      },
+      success: (res) => {
+        if (res.statusCode === 200 && res.data) {
+          // ✅ 正确保存数组
+          uni.setStorageSync('allUserNames', res.data);
+          resolve(res.data);
+        } else {
+          uni.showToast({ title: '获取用户列表失败', icon: 'none' });
+          reject(res);
+        }
+      },
+      fail: (err) => {
+        console.error('请求失败:', err);
+        reject(err);
+      }
+    });
+  });
+}

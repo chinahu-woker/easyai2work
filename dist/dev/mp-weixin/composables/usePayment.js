@@ -20,8 +20,8 @@ const usePayHandlePayment = async (product) => {
     order_channel: types_index.IPayChannel.MP_WEIXIN
   });
   const { nonceStr, package: _, signType, paySign, timeStamp } = await composables_useCommon.getPrePay(order._id);
-  common_vendor.index.__f__("log", "at composables/usePayment.ts:24", "paySign", paySign);
-  common_vendor.index.__f__("log", "at composables/usePayment.ts:27", "created order", order);
+  console.log("paySign", paySign);
+  console.log("created order", order);
   common_vendor.index.requestPayment({
     provider: "wxpay",
     orderInfo: order.product_id.name,
@@ -31,12 +31,11 @@ const usePayHandlePayment = async (product) => {
     signType,
     paySign,
     success: function(res) {
-      common_vendor.index.__f__("log", "at composables/usePayment.ts:37", "success", res);
+      console.log("success", res);
     },
     fail: function(err) {
-      common_vendor.index.__f__("log", "at composables/usePayment.ts:40", "fail", err);
+      console.log("fail", err);
     }
   });
 };
 exports.usePayHandlePayment = usePayHandlePayment;
-//# sourceMappingURL=../../.sourcemap/mp-weixin/composables/usePayment.js.map

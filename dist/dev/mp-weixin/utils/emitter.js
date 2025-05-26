@@ -12,4 +12,3 @@ const off = (event, callback) => {
 exports.emit = emit;
 exports.off = off;
 exports.on = on;
-//# sourceMappingURL=../../.sourcemap/mp-weixin/utils/emitter.js.map

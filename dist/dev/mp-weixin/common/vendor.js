@@ -1,4 +1,11 @@
 "use strict";
+const _export_sfc = (sfc, props2) => {
+  const target = sfc.__vccOpts || sfc;
+  for (const [key, val] of props2) {
+    target[key] = val;
+  }
+  return target;
+};
 /**
 * @vue/shared v3.4.21
 * (c) 2018-present Yuxi (Evan) You and Vue contributors
@@ -173,44 +180,6 @@ const stringifySymbol = (v, i = "") => {
   var _a;
   return isSymbol(v) ? `Symbol(${(_a = v.description) != null ? _a : i})` : v;
 };
-const LOCALE_ZH_HANS = "zh-Hans";
-const LOCALE_ZH_HANT = "zh-Hant";
-const LOCALE_EN = "en";
-const LOCALE_FR = "fr";
-const LOCALE_ES = "es";
-function include(str, parts) {
-  return !!parts.find((part) => str.indexOf(part) !== -1);
-}
-function startsWith(str, parts) {
-  return parts.find((part) => str.indexOf(part) === 0);
-}
-function normalizeLocale(locale, messages2) {
-  if (!locale) {
-    return;
-  }
-  locale = locale.trim().replace(/_/g, "-");
-  locale = locale.toLowerCase();
-  if (locale === "chinese") {
-    return LOCALE_ZH_HANS;
-  }
-  if (locale.indexOf("zh") === 0) {
-    if (locale.indexOf("-hans") > -1) {
-      return LOCALE_ZH_HANS;
-    }
-    if (locale.indexOf("-hant") > -1) {
-      return LOCALE_ZH_HANT;
-    }
-    if (include(locale, ["-tw", "-hk", "-mo", "-cht"])) {
-      return LOCALE_ZH_HANT;
-    }
-    return LOCALE_ZH_HANS;
-  }
-  let locales = [LOCALE_EN, LOCALE_FR, LOCALE_ES];
-  const lang = startsWith(locale, locales);
-  if (lang) {
-    return lang;
-  }
-}
 const SLOT_DEFAULT_NAME = "d";
 const ON_SHOW = "onShow";
 const ON_HIDE = "onHide";
@@ -447,6 +416,1305 @@ E.prototype = {
   }
 };
 var E$1 = E;
+const LOCALE_ZH_HANS = "zh-Hans";
+const LOCALE_ZH_HANT = "zh-Hant";
+const LOCALE_EN = "en";
+const LOCALE_FR = "fr";
+const LOCALE_ES = "es";
+function include(str, parts) {
+  return !!parts.find((part) => str.indexOf(part) !== -1);
+}
+function startsWith(str, parts) {
+  return parts.find((part) => str.indexOf(part) === 0);
+}
+function normalizeLocale(locale, messages2) {
+  if (!locale) {
+    return;
+  }
+  locale = locale.trim().replace(/_/g, "-");
+  locale = locale.toLowerCase();
+  if (locale === "chinese") {
+    return LOCALE_ZH_HANS;
+  }
+  if (locale.indexOf("zh") === 0) {
+    if (locale.indexOf("-hans") > -1) {
+      return LOCALE_ZH_HANS;
+    }
+    if (locale.indexOf("-hant") > -1) {
+      return LOCALE_ZH_HANT;
+    }
+    if (include(locale, ["-tw", "-hk", "-mo", "-cht"])) {
+      return LOCALE_ZH_HANT;
+    }
+    return LOCALE_ZH_HANS;
+  }
+  let locales = [LOCALE_EN, LOCALE_FR, LOCALE_ES];
+  const lang = startsWith(locale, locales);
+  if (lang) {
+    return lang;
+  }
+}
+function validateProtocolFail(name, msg) {
+  console.warn(`${name}: ${msg}`);
+}
+function validateProtocol(name, data, protocol, onFail) {
+  if (!onFail) {
+    onFail = validateProtocolFail;
+  }
+  for (const key in protocol) {
+    const errMsg = validateProp$1(key, data[key], protocol[key], !hasOwn(data, key));
+    if (isString(errMsg)) {
+      onFail(name, errMsg);
+    }
+  }
+}
+function validateProtocols(name, args, protocol, onFail) {
+  if (!protocol) {
+    return;
+  }
+  if (!isArray$1(protocol)) {
+    return validateProtocol(name, args[0] || /* @__PURE__ */ Object.create(null), protocol, onFail);
+  }
+  const len = protocol.length;
+  const argsLen = args.length;
+  for (let i = 0; i < len; i++) {
+    const opts = protocol[i];
+    const data = /* @__PURE__ */ Object.create(null);
+    if (argsLen > i) {
+      data[opts.name] = args[i];
+    }
+    validateProtocol(name, data, { [opts.name]: opts }, onFail);
+  }
+}
+function validateProp$1(name, value2, prop, isAbsent) {
+  if (!isPlainObject$2(prop)) {
+    prop = { type: prop };
+  }
+  const { type: type2, required: required2, validator } = prop;
+  if (required2 && isAbsent) {
+    return 'Missing required args: "' + name + '"';
+  }
+  if (value2 == null && !required2) {
+    return;
+  }
+  if (type2 != null) {
+    let isValid = false;
+    const types2 = isArray$1(type2) ? type2 : [type2];
+    const expectedTypes = [];
+    for (let i = 0; i < types2.length && !isValid; i++) {
+      const { valid, expectedType } = assertType$1(value2, types2[i]);
+      expectedTypes.push(expectedType || "");
+      isValid = valid;
+    }
+    if (!isValid) {
+      return getInvalidTypeMessage$1(name, value2, expectedTypes);
+    }
+  }
+  if (validator) {
+    return validator(value2);
+  }
+}
+const isSimpleType$1 = /* @__PURE__ */ makeMap("String,Number,Boolean,Function,Symbol");
+function assertType$1(value2, type2) {
+  let valid;
+  const expectedType = getType$1(type2);
+  if (isSimpleType$1(expectedType)) {
+    const t2 = typeof value2;
+    valid = t2 === expectedType.toLowerCase();
+    if (!valid && t2 === "object") {
+      valid = value2 instanceof type2;
+    }
+  } else if (expectedType === "Object") {
+    valid = isObject$1(value2);
+  } else if (expectedType === "Array") {
+    valid = isArray$1(value2);
+  } else {
+    {
+      valid = value2 instanceof type2;
+    }
+  }
+  return {
+    valid,
+    expectedType
+  };
+}
+function getInvalidTypeMessage$1(name, value2, expectedTypes) {
+  let message = `Invalid args: type check failed for args "${name}". Expected ${expectedTypes.map(capitalize).join(", ")}`;
+  const expectedType = expectedTypes[0];
+  const receivedType = toRawType(value2);
+  const expectedValue = styleValue$1(value2, expectedType);
+  const receivedValue = styleValue$1(value2, receivedType);
+  if (expectedTypes.length === 1 && isExplicable$1(expectedType) && !isBoolean$2(expectedType, receivedType)) {
+    message += ` with value ${expectedValue}`;
+  }
+  message += `, got ${receivedType} `;
+  if (isExplicable$1(receivedType)) {
+    message += `with value ${receivedValue}.`;
+  }
+  return message;
+}
+function getType$1(ctor) {
+  const match = ctor && ctor.toString().match(/^\s*function (\w+)/);
+  return match ? match[1] : "";
+}
+function styleValue$1(value2, type2) {
+  if (type2 === "String") {
+    return `"${value2}"`;
+  } else if (type2 === "Number") {
+    return `${Number(value2)}`;
+  } else {
+    return `${value2}`;
+  }
+}
+function isExplicable$1(type2) {
+  const explicitTypes = ["string", "number", "boolean"];
+  return explicitTypes.some((elem) => type2.toLowerCase() === elem);
+}
+function isBoolean$2(...args) {
+  return args.some((elem) => elem.toLowerCase() === "boolean");
+}
+function tryCatch(fn) {
+  return function() {
+    try {
+      return fn.apply(fn, arguments);
+    } catch (e2) {
+      console.error(e2);
+    }
+  };
+}
+let invokeCallbackId = 1;
+const invokeCallbacks = {};
+function addInvokeCallback(id, name, callback, keepAlive = false) {
+  invokeCallbacks[id] = {
+    name,
+    keepAlive,
+    callback
+  };
+  return id;
+}
+function invokeCallback(id, res, extras) {
+  if (typeof id === "number") {
+    const opts = invokeCallbacks[id];
+    if (opts) {
+      if (!opts.keepAlive) {
+        delete invokeCallbacks[id];
+      }
+      return opts.callback(res, extras);
+    }
+  }
+  return res;
+}
+const API_SUCCESS = "success";
+const API_FAIL = "fail";
+const API_COMPLETE = "complete";
+function getApiCallbacks(args) {
+  const apiCallbacks = {};
+  for (const name in args) {
+    const fn = args[name];
+    if (isFunction(fn)) {
+      apiCallbacks[name] = tryCatch(fn);
+      delete args[name];
+    }
+  }
+  return apiCallbacks;
+}
+function normalizeErrMsg(errMsg, name) {
+  if (!errMsg || errMsg.indexOf(":fail") === -1) {
+    return name + ":ok";
+  }
+  return name + errMsg.substring(errMsg.indexOf(":fail"));
+}
+function createAsyncApiCallback(name, args = {}, { beforeAll, beforeSuccess } = {}) {
+  if (!isPlainObject$2(args)) {
+    args = {};
+  }
+  const { success, fail, complete } = getApiCallbacks(args);
+  const hasSuccess = isFunction(success);
+  const hasFail = isFunction(fail);
+  const hasComplete = isFunction(complete);
+  const callbackId = invokeCallbackId++;
+  addInvokeCallback(callbackId, name, (res) => {
+    res = res || {};
+    res.errMsg = normalizeErrMsg(res.errMsg, name);
+    isFunction(beforeAll) && beforeAll(res);
+    if (res.errMsg === name + ":ok") {
+      isFunction(beforeSuccess) && beforeSuccess(res, args);
+      hasSuccess && success(res);
+    } else {
+      hasFail && fail(res);
+    }
+    hasComplete && complete(res);
+  });
+  return callbackId;
+}
+const HOOK_SUCCESS = "success";
+const HOOK_FAIL = "fail";
+const HOOK_COMPLETE = "complete";
+const globalInterceptors = {};
+const scopedInterceptors = {};
+function wrapperHook(hook, params) {
+  return function(data) {
+    return hook(data, params) || data;
+  };
+}
+function queue$1(hooks, data, params) {
+  let promise2 = false;
+  for (let i = 0; i < hooks.length; i++) {
+    const hook = hooks[i];
+    if (promise2) {
+      promise2 = Promise.resolve(wrapperHook(hook, params));
+    } else {
+      const res = hook(data, params);
+      if (isPromise(res)) {
+        promise2 = Promise.resolve(res);
+      }
+      if (res === false) {
+        return {
+          then() {
+          },
+          catch() {
+          }
+        };
+      }
+    }
+  }
+  return promise2 || {
+    then(callback) {
+      return callback(data);
+    },
+    catch() {
+    }
+  };
+}
+function wrapperOptions(interceptors2, options = {}) {
+  [HOOK_SUCCESS, HOOK_FAIL, HOOK_COMPLETE].forEach((name) => {
+    const hooks = interceptors2[name];
+    if (!isArray$1(hooks)) {
+      return;
+    }
+    const oldCallback = options[name];
+    options[name] = function callbackInterceptor(res) {
+      queue$1(hooks, res, options).then((res2) => {
+        return isFunction(oldCallback) && oldCallback(res2) || res2;
+      });
+    };
+  });
+  return options;
+}
+function wrapperReturnValue(method2, returnValue) {
+  const returnValueHooks = [];
+  if (isArray$1(globalInterceptors.returnValue)) {
+    returnValueHooks.push(...globalInterceptors.returnValue);
+  }
+  const interceptor = scopedInterceptors[method2];
+  if (interceptor && isArray$1(interceptor.returnValue)) {
+    returnValueHooks.push(...interceptor.returnValue);
+  }
+  returnValueHooks.forEach((hook) => {
+    returnValue = hook(returnValue) || returnValue;
+  });
+  return returnValue;
+}
+function getApiInterceptorHooks(method2) {
+  const interceptor = /* @__PURE__ */ Object.create(null);
+  Object.keys(globalInterceptors).forEach((hook) => {
+    if (hook !== "returnValue") {
+      interceptor[hook] = globalInterceptors[hook].slice();
+    }
+  });
+  const scopedInterceptor = scopedInterceptors[method2];
+  if (scopedInterceptor) {
+    Object.keys(scopedInterceptor).forEach((hook) => {
+      if (hook !== "returnValue") {
+        interceptor[hook] = (interceptor[hook] || []).concat(scopedInterceptor[hook]);
+      }
+    });
+  }
+  return interceptor;
+}
+function invokeApi(method2, api, options, params) {
+  const interceptor = getApiInterceptorHooks(method2);
+  if (interceptor && Object.keys(interceptor).length) {
+    if (isArray$1(interceptor.invoke)) {
+      const res = queue$1(interceptor.invoke, options);
+      return res.then((options2) => {
+        return api(wrapperOptions(getApiInterceptorHooks(method2), options2), ...params);
+      });
+    } else {
+      return api(wrapperOptions(interceptor, options), ...params);
+    }
+  }
+  return api(options, ...params);
+}
+function hasCallback(args) {
+  if (isPlainObject$2(args) && [API_SUCCESS, API_FAIL, API_COMPLETE].find((cb) => isFunction(args[cb]))) {
+    return true;
+  }
+  return false;
+}
+function handlePromise(promise2) {
+  return promise2;
+}
+function promisify$1(name, fn) {
+  return (args = {}, ...rest) => {
+    if (hasCallback(args)) {
+      return wrapperReturnValue(name, invokeApi(name, fn, args, rest));
+    }
+    return wrapperReturnValue(name, handlePromise(new Promise((resolve2, reject) => {
+      invokeApi(name, fn, extend(args, { success: resolve2, fail: reject }), rest);
+    })));
+  };
+}
+function formatApiArgs(args, options) {
+  args[0];
+  {
+    return;
+  }
+}
+function invokeSuccess(id, name, res) {
+  const result = {
+    errMsg: name + ":ok"
+  };
+  return invokeCallback(id, extend(res || {}, result));
+}
+function invokeFail(id, name, errMsg, errRes = {}) {
+  const errMsgPrefix = name + ":fail";
+  let apiErrMsg = "";
+  if (!errMsg) {
+    apiErrMsg = errMsgPrefix;
+  } else if (errMsg.indexOf(errMsgPrefix) === 0) {
+    apiErrMsg = errMsg;
+  } else {
+    apiErrMsg = errMsgPrefix + " " + errMsg;
+  }
+  {
+    delete errRes.errCode;
+  }
+  let res = extend({ errMsg: apiErrMsg }, errRes);
+  return invokeCallback(id, res);
+}
+function beforeInvokeApi(name, args, protocol, options) {
+  {
+    validateProtocols(name, args, protocol);
+  }
+  const errMsg = formatApiArgs(args);
+  if (errMsg) {
+    return errMsg;
+  }
+}
+function parseErrMsg(errMsg) {
+  if (!errMsg || isString(errMsg)) {
+    return errMsg;
+  }
+  if (errMsg.stack) {
+    if (typeof globalThis === "undefined" || !globalThis.harmonyChannel) {
+      console.error(errMsg.message + "\n" + errMsg.stack);
+    }
+    return errMsg.message;
+  }
+  return errMsg;
+}
+function wrapperTaskApi(name, fn, protocol, options) {
+  return (args) => {
+    const id = createAsyncApiCallback(name, args, options);
+    const errMsg = beforeInvokeApi(name, [args], protocol);
+    if (errMsg) {
+      return invokeFail(id, name, errMsg);
+    }
+    return fn(args, {
+      resolve: (res) => invokeSuccess(id, name, res),
+      reject: (errMsg2, errRes) => invokeFail(id, name, parseErrMsg(errMsg2), errRes)
+    });
+  };
+}
+function wrapperSyncApi(name, fn, protocol, options) {
+  return (...args) => {
+    const errMsg = beforeInvokeApi(name, args, protocol);
+    if (errMsg) {
+      throw new Error(errMsg);
+    }
+    return fn.apply(null, args);
+  };
+}
+function wrapperAsyncApi(name, fn, protocol, options) {
+  return wrapperTaskApi(name, fn, protocol, options);
+}
+function defineSyncApi(name, fn, protocol, options) {
+  return wrapperSyncApi(name, fn, protocol);
+}
+function defineAsyncApi(name, fn, protocol, options) {
+  return promisify$1(name, wrapperAsyncApi(name, fn, protocol, options));
+}
+const API_UPX2PX = "upx2px";
+const Upx2pxProtocol = [
+  {
+    name: "upx",
+    type: [Number, String],
+    required: true
+  }
+];
+const EPS = 1e-4;
+const BASE_DEVICE_WIDTH = 750;
+let isIOS = false;
+let deviceWidth = 0;
+let deviceDPR = 0;
+function checkDeviceWidth() {
+  const { windowWidth, pixelRatio, platform: platform2 } = Object.assign({}, wx.getWindowInfo(), {
+    platform: wx.getDeviceInfo().platform
+  });
+  deviceWidth = windowWidth;
+  deviceDPR = pixelRatio;
+  isIOS = platform2 === "ios";
+}
+const upx2px = defineSyncApi(API_UPX2PX, (number2, newDeviceWidth) => {
+  if (deviceWidth === 0) {
+    checkDeviceWidth();
+  }
+  number2 = Number(number2);
+  if (number2 === 0) {
+    return 0;
+  }
+  let width = newDeviceWidth || deviceWidth;
+  let result = number2 / BASE_DEVICE_WIDTH * width;
+  if (result < 0) {
+    result = -result;
+  }
+  result = Math.floor(result + EPS);
+  if (result === 0) {
+    if (deviceDPR === 1 || !isIOS) {
+      result = 1;
+    } else {
+      result = 0.5;
+    }
+  }
+  return number2 < 0 ? -result : result;
+}, Upx2pxProtocol);
+function __f__(type2, filename, ...args) {
+  if (filename) {
+    args.push(filename);
+  }
+  console[type2].apply(console, args);
+}
+const API_ADD_INTERCEPTOR = "addInterceptor";
+const API_REMOVE_INTERCEPTOR = "removeInterceptor";
+const AddInterceptorProtocol = [
+  {
+    name: "method",
+    type: [String, Object],
+    required: true
+  }
+];
+const RemoveInterceptorProtocol = AddInterceptorProtocol;
+function mergeInterceptorHook(interceptors2, interceptor) {
+  Object.keys(interceptor).forEach((hook) => {
+    if (isFunction(interceptor[hook])) {
+      interceptors2[hook] = mergeHook(interceptors2[hook], interceptor[hook]);
+    }
+  });
+}
+function removeInterceptorHook(interceptors2, interceptor) {
+  if (!interceptors2 || !interceptor) {
+    return;
+  }
+  Object.keys(interceptor).forEach((name) => {
+    const hooks = interceptors2[name];
+    const hook = interceptor[name];
+    if (isArray$1(hooks) && isFunction(hook)) {
+      remove(hooks, hook);
+    }
+  });
+}
+function mergeHook(parentVal, childVal) {
+  const res = childVal ? parentVal ? parentVal.concat(childVal) : isArray$1(childVal) ? childVal : [childVal] : parentVal;
+  return res ? dedupeHooks(res) : res;
+}
+function dedupeHooks(hooks) {
+  const res = [];
+  for (let i = 0; i < hooks.length; i++) {
+    if (res.indexOf(hooks[i]) === -1) {
+      res.push(hooks[i]);
+    }
+  }
+  return res;
+}
+const addInterceptor = defineSyncApi(API_ADD_INTERCEPTOR, (method2, interceptor) => {
+  if (isString(method2) && isPlainObject$2(interceptor)) {
+    mergeInterceptorHook(scopedInterceptors[method2] || (scopedInterceptors[method2] = {}), interceptor);
+  } else if (isPlainObject$2(method2)) {
+    mergeInterceptorHook(globalInterceptors, method2);
+  }
+}, AddInterceptorProtocol);
+const removeInterceptor = defineSyncApi(API_REMOVE_INTERCEPTOR, (method2, interceptor) => {
+  if (isString(method2)) {
+    if (isPlainObject$2(interceptor)) {
+      removeInterceptorHook(scopedInterceptors[method2], interceptor);
+    } else {
+      delete scopedInterceptors[method2];
+    }
+  } else if (isPlainObject$2(method2)) {
+    removeInterceptorHook(globalInterceptors, method2);
+  }
+}, RemoveInterceptorProtocol);
+const interceptors = {};
+const API_ON = "$on";
+const OnProtocol = [
+  {
+    name: "event",
+    type: String,
+    required: true
+  },
+  {
+    name: "callback",
+    type: Function,
+    required: true
+  }
+];
+const API_ONCE = "$once";
+const OnceProtocol = OnProtocol;
+const API_OFF = "$off";
+const OffProtocol = [
+  {
+    name: "event",
+    type: [String, Array]
+  },
+  {
+    name: "callback",
+    type: [Function, Number]
+  }
+];
+const API_EMIT = "$emit";
+const EmitProtocol = [
+  {
+    name: "event",
+    type: String,
+    required: true
+  }
+];
+class EventBus {
+  constructor() {
+    this.$emitter = new E$1();
+  }
+  on(name, callback) {
+    return this.$emitter.on(name, callback);
+  }
+  once(name, callback) {
+    return this.$emitter.once(name, callback);
+  }
+  off(name, callback) {
+    if (!name) {
+      this.$emitter.e = {};
+      return;
+    }
+    this.$emitter.off(name, callback);
+  }
+  emit(name, ...args) {
+    this.$emitter.emit(name, ...args);
+  }
+}
+const eventBus = new EventBus();
+const $on = defineSyncApi(API_ON, (name, callback) => {
+  eventBus.on(name, callback);
+  return () => eventBus.off(name, callback);
+}, OnProtocol);
+const $once = defineSyncApi(API_ONCE, (name, callback) => {
+  eventBus.once(name, callback);
+  return () => eventBus.off(name, callback);
+}, OnceProtocol);
+const $off = defineSyncApi(API_OFF, (name, callback) => {
+  if (!isArray$1(name))
+    name = name ? [name] : [];
+  name.forEach((n2) => eventBus.off(n2, callback));
+}, OffProtocol);
+const $emit = defineSyncApi(API_EMIT, (name, ...args) => {
+  eventBus.emit(name, ...args);
+}, EmitProtocol);
+let cid;
+let cidErrMsg;
+let enabled;
+function normalizePushMessage(message) {
+  try {
+    return JSON.parse(message);
+  } catch (e2) {
+  }
+  return message;
+}
+function invokePushCallback(args) {
+  if (args.type === "enabled") {
+    enabled = true;
+  } else if (args.type === "clientId") {
+    cid = args.cid;
+    cidErrMsg = args.errMsg;
+    invokeGetPushCidCallbacks(cid, args.errMsg);
+  } else if (args.type === "pushMsg") {
+    const message = {
+      type: "receive",
+      data: normalizePushMessage(args.message)
+    };
+    for (let i = 0; i < onPushMessageCallbacks.length; i++) {
+      const callback = onPushMessageCallbacks[i];
+      callback(message);
+      if (message.stopped) {
+        break;
+      }
+    }
+  } else if (args.type === "click") {
+    onPushMessageCallbacks.forEach((callback) => {
+      callback({
+        type: "click",
+        data: normalizePushMessage(args.message)
+      });
+    });
+  }
+}
+const getPushCidCallbacks = [];
+function invokeGetPushCidCallbacks(cid2, errMsg) {
+  getPushCidCallbacks.forEach((callback) => {
+    callback(cid2, errMsg);
+  });
+  getPushCidCallbacks.length = 0;
+}
+const API_GET_PUSH_CLIENT_ID = "getPushClientId";
+const getPushClientId = defineAsyncApi(API_GET_PUSH_CLIENT_ID, (_, { resolve: resolve2, reject }) => {
+  Promise.resolve().then(() => {
+    if (typeof enabled === "undefined") {
+      enabled = false;
+      cid = "";
+      cidErrMsg = "uniPush is not enabled";
+    }
+    getPushCidCallbacks.push((cid2, errMsg) => {
+      if (cid2) {
+        resolve2({ cid: cid2 });
+      } else {
+        reject(errMsg);
+      }
+    });
+    if (typeof cid !== "undefined") {
+      invokeGetPushCidCallbacks(cid, cidErrMsg);
+    }
+  });
+});
+const onPushMessageCallbacks = [];
+const onPushMessage = (fn) => {
+  if (onPushMessageCallbacks.indexOf(fn) === -1) {
+    onPushMessageCallbacks.push(fn);
+  }
+};
+const offPushMessage = (fn) => {
+  if (!fn) {
+    onPushMessageCallbacks.length = 0;
+  } else {
+    const index2 = onPushMessageCallbacks.indexOf(fn);
+    if (index2 > -1) {
+      onPushMessageCallbacks.splice(index2, 1);
+    }
+  }
+};
+const SYNC_API_RE = /^\$|__f__|getLocale|setLocale|sendNativeEvent|restoreGlobal|requireGlobal|getCurrentSubNVue|getMenuButtonBoundingClientRect|^report|interceptors|Interceptor$|getSubNVueById|requireNativePlugin|upx2px|rpx2px|hideKeyboard|canIUse|^create|Sync$|Manager$|base64ToArrayBuffer|arrayBufferToBase64|getDeviceInfo|getAppBaseInfo|getWindowInfo|getSystemSetting|getAppAuthorizeSetting/;
+const CONTEXT_API_RE = /^create|Manager$/;
+const CONTEXT_API_RE_EXC = ["createBLEConnection"];
+const TASK_APIS = ["request", "downloadFile", "uploadFile", "connectSocket"];
+const ASYNC_API = ["createBLEConnection"];
+const CALLBACK_API_RE = /^on|^off/;
+function isContextApi(name) {
+  return CONTEXT_API_RE.test(name) && CONTEXT_API_RE_EXC.indexOf(name) === -1;
+}
+function isSyncApi(name) {
+  return SYNC_API_RE.test(name) && ASYNC_API.indexOf(name) === -1;
+}
+function isCallbackApi(name) {
+  return CALLBACK_API_RE.test(name) && name !== "onPush";
+}
+function isTaskApi(name) {
+  return TASK_APIS.indexOf(name) !== -1;
+}
+function shouldPromise(name) {
+  if (isContextApi(name) || isSyncApi(name) || isCallbackApi(name)) {
+    return false;
+  }
+  return true;
+}
+if (!Promise.prototype.finally) {
+  Promise.prototype.finally = function(onfinally) {
+    const promise2 = this.constructor;
+    return this.then((value2) => promise2.resolve(onfinally && onfinally()).then(() => value2), (reason) => promise2.resolve(onfinally && onfinally()).then(() => {
+      throw reason;
+    }));
+  };
+}
+function promisify(name, api) {
+  if (!shouldPromise(name)) {
+    return api;
+  }
+  if (!isFunction(api)) {
+    return api;
+  }
+  return function promiseApi(options = {}, ...rest) {
+    if (isFunction(options.success) || isFunction(options.fail) || isFunction(options.complete)) {
+      return wrapperReturnValue(name, invokeApi(name, api, options, rest));
+    }
+    return wrapperReturnValue(name, handlePromise(new Promise((resolve2, reject) => {
+      invokeApi(name, api, extend({}, options, {
+        success: resolve2,
+        fail: reject
+      }), rest);
+    })));
+  };
+}
+const CALLBACKS = ["success", "fail", "cancel", "complete"];
+function initWrapper(protocols2) {
+  function processCallback(methodName, method2, returnValue) {
+    return function(res) {
+      return method2(processReturnValue(methodName, res, returnValue));
+    };
+  }
+  function processArgs(methodName, fromArgs, argsOption = {}, returnValue = {}, keepFromArgs = false) {
+    if (isPlainObject$2(fromArgs)) {
+      const toArgs = keepFromArgs === true ? fromArgs : {};
+      if (isFunction(argsOption)) {
+        argsOption = argsOption(fromArgs, toArgs) || {};
+      }
+      for (const key in fromArgs) {
+        if (hasOwn(argsOption, key)) {
+          let keyOption = argsOption[key];
+          if (isFunction(keyOption)) {
+            keyOption = keyOption(fromArgs[key], fromArgs, toArgs);
+          }
+          if (!keyOption) {
+            console.warn(`微信小程序 ${methodName} 暂不支持 ${key}`);
+          } else if (isString(keyOption)) {
+            toArgs[keyOption] = fromArgs[key];
+          } else if (isPlainObject$2(keyOption)) {
+            toArgs[keyOption.name ? keyOption.name : key] = keyOption.value;
+          }
+        } else if (CALLBACKS.indexOf(key) !== -1) {
+          const callback = fromArgs[key];
+          if (isFunction(callback)) {
+            toArgs[key] = processCallback(methodName, callback, returnValue);
+          }
+        } else {
+          if (!keepFromArgs && !hasOwn(toArgs, key)) {
+            toArgs[key] = fromArgs[key];
+          }
+        }
+      }
+      return toArgs;
+    } else if (isFunction(fromArgs)) {
+      if (isFunction(argsOption)) {
+        argsOption(fromArgs, {});
+      }
+      fromArgs = processCallback(methodName, fromArgs, returnValue);
+    }
+    return fromArgs;
+  }
+  function processReturnValue(methodName, res, returnValue, keepReturnValue = false) {
+    if (isFunction(protocols2.returnValue)) {
+      res = protocols2.returnValue(methodName, res);
+    }
+    const realKeepReturnValue = keepReturnValue || false;
+    return processArgs(methodName, res, returnValue, {}, realKeepReturnValue);
+  }
+  return function wrapper(methodName, method2) {
+    const hasProtocol = hasOwn(protocols2, methodName);
+    const needWrapper = hasProtocol || isFunction(protocols2.returnValue) || isContextApi(methodName) || isTaskApi(methodName);
+    const hasMethod = hasProtocol || isFunction(method2);
+    if (!hasProtocol && !method2) {
+      return function() {
+        console.error(`微信小程序 暂不支持${methodName}`);
+      };
+    }
+    if (!needWrapper || !hasMethod) {
+      return method2;
+    }
+    const protocol = protocols2[methodName];
+    return function(arg1, arg2) {
+      let options = protocol || {};
+      if (isFunction(protocol)) {
+        options = protocol(arg1);
+      }
+      arg1 = processArgs(methodName, arg1, options.args, options.returnValue);
+      const args = [arg1];
+      if (typeof arg2 !== "undefined") {
+        args.push(arg2);
+      }
+      const returnValue = wx[options.name || methodName].apply(wx, args);
+      if (isContextApi(methodName) || isTaskApi(methodName)) {
+        if (returnValue && !returnValue.__v_skip) {
+          returnValue.__v_skip = true;
+        }
+      }
+      if (isSyncApi(methodName)) {
+        return processReturnValue(methodName, returnValue, options.returnValue, isContextApi(methodName));
+      }
+      return returnValue;
+    };
+  };
+}
+const getLocale = () => {
+  const app = isFunction(getApp) && getApp({ allowDefault: true });
+  if (app && app.$vm) {
+    return app.$vm.$locale;
+  }
+  return normalizeLocale(wx.getAppBaseInfo().language) || LOCALE_EN;
+};
+const setLocale = (locale) => {
+  const app = isFunction(getApp) && getApp();
+  if (!app) {
+    return false;
+  }
+  const oldLocale = app.$vm.$locale;
+  if (oldLocale !== locale) {
+    app.$vm.$locale = locale;
+    onLocaleChangeCallbacks.forEach((fn) => fn({ locale }));
+    return true;
+  }
+  return false;
+};
+const onLocaleChangeCallbacks = [];
+const onLocaleChange = (fn) => {
+  if (onLocaleChangeCallbacks.indexOf(fn) === -1) {
+    onLocaleChangeCallbacks.push(fn);
+  }
+};
+if (typeof global !== "undefined") {
+  global.getLocale = getLocale;
+}
+const UUID_KEY = "__DC_STAT_UUID";
+let deviceId;
+function useDeviceId(global2 = wx) {
+  return function addDeviceId(_, toRes) {
+    deviceId = deviceId || global2.getStorageSync(UUID_KEY);
+    if (!deviceId) {
+      deviceId = Date.now() + "" + Math.floor(Math.random() * 1e7);
+      wx.setStorage({
+        key: UUID_KEY,
+        data: deviceId
+      });
+    }
+    toRes.deviceId = deviceId;
+  };
+}
+function addSafeAreaInsets(fromRes, toRes) {
+  if (fromRes.safeArea) {
+    const safeArea = fromRes.safeArea;
+    toRes.safeAreaInsets = {
+      top: safeArea.top,
+      left: safeArea.left,
+      right: fromRes.windowWidth - safeArea.right,
+      bottom: fromRes.screenHeight - safeArea.bottom
+    };
+  }
+}
+function getOSInfo(system, platform2) {
+  let osName = "";
+  let osVersion = "";
+  if (platform2 && false) {
+    osName = platform2;
+    osVersion = system;
+  } else {
+    osName = system.split(" ")[0] || "";
+    osVersion = system.split(" ")[1] || "";
+  }
+  return {
+    osName: osName.toLocaleLowerCase(),
+    osVersion
+  };
+}
+function populateParameters(fromRes, toRes) {
+  const { brand = "", model = "", system = "", language = "", theme, version: version2, platform: platform2, fontSizeSetting, SDKVersion, pixelRatio, deviceOrientation } = fromRes;
+  const { osName, osVersion } = getOSInfo(system, platform2);
+  let hostVersion = version2;
+  let deviceType = getGetDeviceType(fromRes, model);
+  let deviceBrand = getDeviceBrand(brand);
+  let _hostName = getHostName(fromRes);
+  let _deviceOrientation = deviceOrientation;
+  let _devicePixelRatio = pixelRatio;
+  let _SDKVersion = SDKVersion;
+  const hostLanguage = (language || "").replace(/_/g, "-");
+  const parameters = {
+    appId: "__UNI__F9C76ED",
+    appName: "FuziAI",
+    appVersion: "1.0.0",
+    appVersionCode: "100",
+    appLanguage: getAppLanguage(hostLanguage),
+    uniCompileVersion: "4.45",
+    uniCompilerVersion: "4.45",
+    uniRuntimeVersion: "4.45",
+    uniPlatform: "mp-weixin",
+    deviceBrand,
+    deviceModel: model,
+    deviceType,
+    devicePixelRatio: _devicePixelRatio,
+    deviceOrientation: _deviceOrientation,
+    osName,
+    osVersion,
+    hostTheme: theme,
+    hostVersion,
+    hostLanguage,
+    hostName: _hostName,
+    hostSDKVersion: _SDKVersion,
+    hostFontSizeSetting: fontSizeSetting,
+    windowTop: 0,
+    windowBottom: 0,
+    // TODO
+    osLanguage: void 0,
+    osTheme: void 0,
+    ua: void 0,
+    hostPackageName: void 0,
+    browserName: void 0,
+    browserVersion: void 0,
+    isUniAppX: false
+  };
+  extend(toRes, parameters);
+}
+function getGetDeviceType(fromRes, model) {
+  let deviceType = fromRes.deviceType || "phone";
+  {
+    const deviceTypeMaps = {
+      ipad: "pad",
+      windows: "pc",
+      mac: "pc"
+    };
+    const deviceTypeMapsKeys = Object.keys(deviceTypeMaps);
+    const _model = model.toLocaleLowerCase();
+    for (let index2 = 0; index2 < deviceTypeMapsKeys.length; index2++) {
+      const _m = deviceTypeMapsKeys[index2];
+      if (_model.indexOf(_m) !== -1) {
+        deviceType = deviceTypeMaps[_m];
+        break;
+      }
+    }
+  }
+  return deviceType;
+}
+function getDeviceBrand(brand) {
+  let deviceBrand = brand;
+  if (deviceBrand) {
+    deviceBrand = deviceBrand.toLocaleLowerCase();
+  }
+  return deviceBrand;
+}
+function getAppLanguage(defaultLanguage) {
+  return getLocale ? getLocale() : defaultLanguage;
+}
+function getHostName(fromRes) {
+  const _platform = "WeChat";
+  let _hostName = fromRes.hostName || _platform;
+  {
+    if (fromRes.environment) {
+      _hostName = fromRes.environment;
+    } else if (fromRes.host && fromRes.host.env) {
+      _hostName = fromRes.host.env;
+    }
+  }
+  return _hostName;
+}
+const getSystemInfo = {
+  returnValue: (fromRes, toRes) => {
+    addSafeAreaInsets(fromRes, toRes);
+    useDeviceId()(fromRes, toRes);
+    populateParameters(fromRes, toRes);
+  }
+};
+const getSystemInfoSync = getSystemInfo;
+const redirectTo = {};
+const previewImage = {
+  args(fromArgs, toArgs) {
+    let currentIndex = parseInt(fromArgs.current);
+    if (isNaN(currentIndex)) {
+      return;
+    }
+    const urls = fromArgs.urls;
+    if (!isArray$1(urls)) {
+      return;
+    }
+    const len = urls.length;
+    if (!len) {
+      return;
+    }
+    if (currentIndex < 0) {
+      currentIndex = 0;
+    } else if (currentIndex >= len) {
+      currentIndex = len - 1;
+    }
+    if (currentIndex > 0) {
+      toArgs.current = urls[currentIndex];
+      toArgs.urls = urls.filter((item, index2) => index2 < currentIndex ? item !== urls[currentIndex] : true);
+    } else {
+      toArgs.current = urls[0];
+    }
+    return {
+      indicator: false,
+      loop: false
+    };
+  }
+};
+const showActionSheet = {
+  args(fromArgs, toArgs) {
+    toArgs.alertText = fromArgs.title;
+  }
+};
+const getDeviceInfo = {
+  returnValue: (fromRes, toRes) => {
+    const { brand, model, system = "", platform: platform2 = "" } = fromRes;
+    let deviceType = getGetDeviceType(fromRes, model);
+    let deviceBrand = getDeviceBrand(brand);
+    useDeviceId()(fromRes, toRes);
+    const { osName, osVersion } = getOSInfo(system, platform2);
+    toRes = sortObject(extend(toRes, {
+      deviceType,
+      deviceBrand,
+      deviceModel: model,
+      osName,
+      osVersion
+    }));
+  }
+};
+const getAppBaseInfo = {
+  returnValue: (fromRes, toRes) => {
+    const { version: version2, language, SDKVersion, theme } = fromRes;
+    let _hostName = getHostName(fromRes);
+    let hostLanguage = (language || "").replace(/_/g, "-");
+    const parameters = {
+      hostVersion: version2,
+      hostLanguage,
+      hostName: _hostName,
+      hostSDKVersion: SDKVersion,
+      hostTheme: theme,
+      appId: "__UNI__F9C76ED",
+      appName: "FuziAI",
+      appVersion: "1.0.0",
+      appVersionCode: "100",
+      appLanguage: getAppLanguage(hostLanguage),
+      isUniAppX: false,
+      uniPlatform: "mp-weixin",
+      uniCompileVersion: "4.45",
+      uniCompilerVersion: "4.45",
+      uniRuntimeVersion: "4.45"
+    };
+    extend(toRes, parameters);
+  }
+};
+const getWindowInfo = {
+  returnValue: (fromRes, toRes) => {
+    addSafeAreaInsets(fromRes, toRes);
+    toRes = sortObject(extend(toRes, {
+      windowTop: 0,
+      windowBottom: 0
+    }));
+  }
+};
+const getAppAuthorizeSetting = {
+  returnValue: function(fromRes, toRes) {
+    const { locationReducedAccuracy } = fromRes;
+    toRes.locationAccuracy = "unsupported";
+    if (locationReducedAccuracy === true) {
+      toRes.locationAccuracy = "reduced";
+    } else if (locationReducedAccuracy === false) {
+      toRes.locationAccuracy = "full";
+    }
+  }
+};
+const onError = {
+  args(fromArgs) {
+    const app = getApp({ allowDefault: true }) || {};
+    if (!app.$vm) {
+      if (!wx.$onErrorHandlers) {
+        wx.$onErrorHandlers = [];
+      }
+      wx.$onErrorHandlers.push(fromArgs);
+    } else {
+      injectHook(ON_ERROR, fromArgs, app.$vm.$);
+    }
+  }
+};
+const offError = {
+  args(fromArgs) {
+    const app = getApp({ allowDefault: true }) || {};
+    if (!app.$vm) {
+      if (!wx.$onErrorHandlers) {
+        return;
+      }
+      const index2 = wx.$onErrorHandlers.findIndex((fn) => fn === fromArgs);
+      if (index2 !== -1) {
+        wx.$onErrorHandlers.splice(index2, 1);
+      }
+    } else if (fromArgs.__weh) {
+      const onErrors = app.$vm.$[ON_ERROR];
+      if (onErrors) {
+        const index2 = onErrors.indexOf(fromArgs.__weh);
+        if (index2 > -1) {
+          onErrors.splice(index2, 1);
+        }
+      }
+    }
+  }
+};
+const onSocketOpen = {
+  args() {
+    if (wx.__uni_console__) {
+      if (wx.__uni_console_warned__) {
+        return;
+      }
+      wx.__uni_console_warned__ = true;
+      console.warn(`开发模式下小程序日志回显会使用 socket 连接，为了避免冲突，建议使用 SocketTask 的方式去管理 WebSocket 或手动关闭日志回显功能。[详情](https://uniapp.dcloud.net.cn/tutorial/run/mp-log.html)`);
+    }
+  }
+};
+const onSocketMessage = onSocketOpen;
+const baseApis = {
+  $on,
+  $off,
+  $once,
+  $emit,
+  upx2px,
+  rpx2px: upx2px,
+  interceptors,
+  addInterceptor,
+  removeInterceptor,
+  onCreateVueApp,
+  invokeCreateVueAppHook,
+  getLocale,
+  setLocale,
+  onLocaleChange,
+  getPushClientId,
+  onPushMessage,
+  offPushMessage,
+  invokePushCallback,
+  __f__
+};
+function initUni(api, protocols2, platform2 = wx) {
+  const wrapper = initWrapper(protocols2);
+  const UniProxyHandlers = {
+    get(target, key) {
+      if (hasOwn(target, key)) {
+        return target[key];
+      }
+      if (hasOwn(api, key)) {
+        return promisify(key, api[key]);
+      }
+      if (hasOwn(baseApis, key)) {
+        return promisify(key, baseApis[key]);
+      }
+      return promisify(key, wrapper(key, platform2[key]));
+    }
+  };
+  return new Proxy({}, UniProxyHandlers);
+}
+function initGetProvider(providers) {
+  return function getProvider2({ service, success, fail, complete }) {
+    let res;
+    if (providers[service]) {
+      res = {
+        errMsg: "getProvider:ok",
+        service,
+        provider: providers[service]
+      };
+      isFunction(success) && success(res);
+    } else {
+      res = {
+        errMsg: "getProvider:fail:服务[" + service + "]不存在"
+      };
+      isFunction(fail) && fail(res);
+    }
+    isFunction(complete) && complete(res);
+  };
+}
+const objectKeys = [
+  "qy",
+  "env",
+  "error",
+  "version",
+  "lanDebug",
+  "cloud",
+  "serviceMarket",
+  "router",
+  "worklet",
+  "__webpack_require_UNI_MP_PLUGIN__"
+];
+const singlePageDisableKey = ["lanDebug", "router", "worklet"];
+const launchOption = wx.getLaunchOptionsSync ? wx.getLaunchOptionsSync() : null;
+function isWxKey(key) {
+  if (launchOption && launchOption.scene === 1154 && singlePageDisableKey.includes(key)) {
+    return false;
+  }
+  return objectKeys.indexOf(key) > -1 || typeof wx[key] === "function";
+}
+function initWx() {
+  const newWx = {};
+  for (const key in wx) {
+    if (isWxKey(key)) {
+      newWx[key] = wx[key];
+    }
+  }
+  if (typeof globalThis !== "undefined" && typeof requireMiniProgram === "undefined") {
+    globalThis.wx = newWx;
+  }
+  return newWx;
+}
+const mocks$1 = ["__route__", "__wxExparserNodeId__", "__wxWebviewId__"];
+const getProvider = initGetProvider({
+  oauth: ["weixin"],
+  share: ["weixin"],
+  payment: ["wxpay"],
+  push: ["weixin"]
+});
+function initComponentMocks(component) {
+  const res = /* @__PURE__ */ Object.create(null);
+  mocks$1.forEach((name) => {
+    res[name] = component[name];
+  });
+  return res;
+}
+function createSelectorQuery() {
+  const query = wx$2.createSelectorQuery();
+  const oldIn = query.in;
+  query.in = function newIn(component) {
+    return oldIn.call(this, initComponentMocks(component));
+  };
+  return query;
+}
+const wx$2 = initWx();
+let baseInfo = wx$2.getAppBaseInfo && wx$2.getAppBaseInfo();
+if (!baseInfo) {
+  baseInfo = wx$2.getSystemInfoSync();
+}
+const host = baseInfo ? baseInfo.host : null;
+const shareVideoMessage = host && host.env === "SAAASDK" ? wx$2.miniapp.shareVideoMessage : wx$2.shareVideoMessage;
+var shims = /* @__PURE__ */ Object.freeze({
+  __proto__: null,
+  createSelectorQuery,
+  getProvider,
+  shareVideoMessage
+});
+const compressImage = {
+  args(fromArgs, toArgs) {
+    if (fromArgs.compressedHeight && !toArgs.compressHeight) {
+      toArgs.compressHeight = fromArgs.compressedHeight;
+    }
+    if (fromArgs.compressedWidth && !toArgs.compressWidth) {
+      toArgs.compressWidth = fromArgs.compressedWidth;
+    }
+  }
+};
+var protocols = /* @__PURE__ */ Object.freeze({
+  __proto__: null,
+  compressImage,
+  getAppAuthorizeSetting,
+  getAppBaseInfo,
+  getDeviceInfo,
+  getSystemInfo,
+  getSystemInfoSync,
+  getWindowInfo,
+  offError,
+  onError,
+  onSocketMessage,
+  onSocketOpen,
+  previewImage,
+  redirectTo,
+  showActionSheet
+});
+const wx$1 = initWx();
+var index$2 = initUni(shims, protocols, wx$1);
 /**
 * @dcloudio/uni-mp-vue v3.4.21
 * (c) 2018-present Yuxi (Evan) You and Vue contributors
@@ -993,7 +2261,7 @@ function get$1(target, key, isReadonly2 = false, isShallow2 = false) {
     target.get(key);
   }
 }
-function has$1(key, isReadonly2 = false) {
+function has(key, isReadonly2 = false) {
   const target = this["__v_raw"];
   const rawTarget = toRaw(target);
   const rawKey = toRaw(key);
@@ -1130,7 +2398,7 @@ function createInstrumentations() {
     get size() {
       return size(this);
     },
-    has: has$1,
+    has,
     add,
     set: set$1$1,
     delete: deleteEntry,
@@ -1144,7 +2412,7 @@ function createInstrumentations() {
     get size() {
       return size(this);
     },
-    has: has$1,
+    has,
     add,
     set: set$1$1,
     delete: deleteEntry,
@@ -1159,7 +2427,7 @@ function createInstrumentations() {
       return size(this, true);
     },
     has(key) {
-      return has$1.call(this, key, true);
+      return has.call(this, key, true);
     },
     add: createReadonlyMethod("add"),
     set: createReadonlyMethod("set"),
@@ -1175,7 +2443,7 @@ function createInstrumentations() {
       return size(this, true);
     },
     has(key) {
-      return has$1.call(this, key, true);
+      return has.call(this, key, true);
     },
     add: createReadonlyMethod("add"),
     set: createReadonlyMethod("set"),
@@ -1798,7 +3066,7 @@ function logError(err, type2, contextVNode, throwInDev = true) {
 }
 let isFlushing = false;
 let isFlushPending = false;
-const queue$1 = [];
+const queue = [];
 let flushIndex = 0;
 const pendingPostFlushCbs = [];
 let activePostFlushCbs = null;
@@ -1812,10 +3080,10 @@ function nextTick$1(fn) {
 }
 function findInsertionIndex(id) {
   let start = flushIndex + 1;
-  let end = queue$1.length;
+  let end = queue.length;
   while (start < end) {
     const middle = start + end >>> 1;
-    const middleJob = queue$1[middle];
+    const middleJob = queue[middle];
     const middleJobId = getId(middleJob);
     if (middleJobId < id || middleJobId === id && middleJob.pre) {
       start = middle + 1;
@@ -1826,14 +3094,14 @@ function findInsertionIndex(id) {
   return start;
 }
 function queueJob(job) {
-  if (!queue$1.length || !queue$1.includes(
+  if (!queue.length || !queue.includes(
     job,
     isFlushing && job.allowRecurse ? flushIndex + 1 : flushIndex
   )) {
     if (job.id == null) {
-      queue$1.push(job);
+      queue.push(job);
     } else {
-      queue$1.splice(findInsertionIndex(job.id), 0, job);
+      queue.splice(findInsertionIndex(job.id), 0, job);
     }
     queueFlush();
   }
@@ -1845,12 +3113,12 @@ function queueFlush() {
   }
 }
 function hasQueueJob(job) {
-  return queue$1.indexOf(job) > -1;
+  return queue.indexOf(job) > -1;
 }
 function invalidateJob(job) {
-  const i = queue$1.indexOf(job);
+  const i = queue.indexOf(job);
   if (i > flushIndex) {
-    queue$1.splice(i, 1);
+    queue.splice(i, 1);
   }
 }
 function queuePostFlushCb(cb) {
@@ -1870,13 +3138,13 @@ function flushPreFlushCbs(instance, seen, i = isFlushing ? flushIndex + 1 : 0) {
   {
     seen = seen || /* @__PURE__ */ new Map();
   }
-  for (; i < queue$1.length; i++) {
-    const cb = queue$1[i];
+  for (; i < queue.length; i++) {
+    const cb = queue[i];
     if (cb && cb.pre) {
       if (checkRecursiveUpdates(seen, cb)) {
         continue;
       }
-      queue$1.splice(i, 1);
+      queue.splice(i, 1);
       i--;
       cb();
     }
@@ -1923,11 +3191,11 @@ function flushJobs(seen) {
   {
     seen = seen || /* @__PURE__ */ new Map();
   }
-  queue$1.sort(comparator);
+  queue.sort(comparator);
   const check = (job) => checkRecursiveUpdates(seen, job);
   try {
-    for (flushIndex = 0; flushIndex < queue$1.length; flushIndex++) {
-      const job = queue$1[flushIndex];
+    for (flushIndex = 0; flushIndex < queue.length; flushIndex++) {
+      const job = queue[flushIndex];
       if (job && job.active !== false) {
         if (check(job)) {
           continue;
@@ -1937,11 +3205,11 @@ function flushJobs(seen) {
     }
   } finally {
     flushIndex = 0;
-    queue$1.length = 0;
+    queue.length = 0;
     flushPostFlushCbs(seen);
     isFlushing = false;
     currentFlushPromise = null;
-    if (queue$1.length || pendingPostFlushCbs.length) {
+    if (queue.length || pendingPostFlushCbs.length) {
       flushJobs(seen);
     }
   }
@@ -3728,7 +4996,7 @@ function validatePropName(key) {
   }
   return false;
 }
-function getType$1(ctor) {
+function getType(ctor) {
   if (ctor === null) {
     return "null";
   }
@@ -3741,7 +5009,7 @@ function getType$1(ctor) {
   return "";
 }
 function isSameType(a, b) {
-  return getType$1(a) === getType$1(b);
+  return getType(a) === getType(b);
 }
 function getTypeIndex(type2, expectedTypes) {
   if (isArray$1(expectedTypes)) {
@@ -3758,7 +5026,7 @@ function validateProps(rawProps, props2, instance) {
     let opt = options[key];
     if (opt == null)
       continue;
-    validateProp$1(
+    validateProp(
       key,
       resolvedValues[key],
       opt,
@@ -3767,7 +5035,7 @@ function validateProps(rawProps, props2, instance) {
     );
   }
 }
-function validateProp$1(name, value2, prop, props2, isAbsent) {
+function validateProp(name, value2, prop, props2, isAbsent) {
   const { type: type2, required: required2, validator, skipCheck } = prop;
   if (required2 && isAbsent) {
     warn$1('Missing required prop: "' + name + '"');
@@ -3781,12 +5049,12 @@ function validateProp$1(name, value2, prop, props2, isAbsent) {
     const types2 = isArray$1(type2) ? type2 : [type2];
     const expectedTypes = [];
     for (let i = 0; i < types2.length && !isValid; i++) {
-      const { valid, expectedType } = assertType$1(value2, types2[i]);
+      const { valid, expectedType } = assertType(value2, types2[i]);
       expectedTypes.push(expectedType || "");
       isValid = valid;
     }
     if (!isValid) {
-      warn$1(getInvalidTypeMessage$1(name, value2, expectedTypes));
+      warn$1(getInvalidTypeMessage(name, value2, expectedTypes));
       return;
     }
   }
@@ -3794,13 +5062,13 @@ function validateProp$1(name, value2, prop, props2, isAbsent) {
     warn$1('Invalid prop: custom validator check failed for prop "' + name + '".');
   }
 }
-const isSimpleType$1 = /* @__PURE__ */ makeMap(
+const isSimpleType = /* @__PURE__ */ makeMap(
   "String,Number,Boolean,Function,Symbol,BigInt"
 );
-function assertType$1(value2, type2) {
+function assertType(value2, type2) {
   let valid;
-  const expectedType = getType$1(type2);
-  if (isSimpleType$1(expectedType)) {
+  const expectedType = getType(type2);
+  if (isSimpleType(expectedType)) {
     const t2 = typeof value2;
     valid = t2 === expectedType.toLowerCase();
     if (!valid && t2 === "object") {
@@ -3820,25 +5088,25 @@ function assertType$1(value2, type2) {
     expectedType
   };
 }
-function getInvalidTypeMessage$1(name, value2, expectedTypes) {
+function getInvalidTypeMessage(name, value2, expectedTypes) {
   if (expectedTypes.length === 0) {
     return `Prop type [] for prop "${name}" won't match anything. Did you mean to use type Array instead?`;
   }
   let message = `Invalid prop: type check failed for prop "${name}". Expected ${expectedTypes.map(capitalize).join(" | ")}`;
   const expectedType = expectedTypes[0];
   const receivedType = toRawType(value2);
-  const expectedValue = styleValue$1(value2, expectedType);
-  const receivedValue = styleValue$1(value2, receivedType);
-  if (expectedTypes.length === 1 && isExplicable$1(expectedType) && !isBoolean$2(expectedType, receivedType)) {
+  const expectedValue = styleValue(value2, expectedType);
+  const receivedValue = styleValue(value2, receivedType);
+  if (expectedTypes.length === 1 && isExplicable(expectedType) && !isBoolean$1(expectedType, receivedType)) {
     message += ` with value ${expectedValue}`;
   }
   message += `, got ${receivedType} `;
-  if (isExplicable$1(receivedType)) {
+  if (isExplicable(receivedType)) {
     message += `with value ${receivedValue}.`;
   }
   return message;
 }
-function styleValue$1(value2, type2) {
+function styleValue(value2, type2) {
   if (type2 === "String") {
     return `"${value2}"`;
   } else if (type2 === "Number") {
@@ -3847,11 +5115,11 @@ function styleValue$1(value2, type2) {
     return `${value2}`;
   }
 }
-function isExplicable$1(type2) {
+function isExplicable(type2) {
   const explicitTypes = ["string", "number", "boolean"];
   return explicitTypes.some((elem) => type2.toLowerCase() === elem);
 }
-function isBoolean$2(...args) {
+function isBoolean$1(...args) {
   return args.some((elem) => elem.toLowerCase() === "boolean");
 }
 let supported;
@@ -4456,7 +5724,7 @@ function setResult(result, k, v) {
   result[k] = v;
 }
 function hasComponentEffect(instance) {
-  return queue$1.includes(instance.update);
+  return queue.includes(instance.update);
 }
 function flushCallbacks(instance) {
   const ctx = instance.ctx;
@@ -5486,1771 +6754,6 @@ function createApp$1(rootComponent, rootProps = null) {
   return createVueApp(rootComponent, rootProps).use(plugin);
 }
 const createSSRApp = createApp$1;
-function validateProtocolFail(name, msg) {
-  console.warn(`${name}: ${msg}`);
-}
-function validateProtocol(name, data, protocol, onFail) {
-  if (!onFail) {
-    onFail = validateProtocolFail;
-  }
-  for (const key in protocol) {
-    const errMsg = validateProp(key, data[key], protocol[key], !hasOwn(data, key));
-    if (isString(errMsg)) {
-      onFail(name, errMsg);
-    }
-  }
-}
-function validateProtocols(name, args, protocol, onFail) {
-  if (!protocol) {
-    return;
-  }
-  if (!isArray$1(protocol)) {
-    return validateProtocol(name, args[0] || /* @__PURE__ */ Object.create(null), protocol, onFail);
-  }
-  const len = protocol.length;
-  const argsLen = args.length;
-  for (let i = 0; i < len; i++) {
-    const opts = protocol[i];
-    const data = /* @__PURE__ */ Object.create(null);
-    if (argsLen > i) {
-      data[opts.name] = args[i];
-    }
-    validateProtocol(name, data, { [opts.name]: opts }, onFail);
-  }
-}
-function validateProp(name, value2, prop, isAbsent) {
-  if (!isPlainObject$2(prop)) {
-    prop = { type: prop };
-  }
-  const { type: type2, required: required2, validator } = prop;
-  if (required2 && isAbsent) {
-    return 'Missing required args: "' + name + '"';
-  }
-  if (value2 == null && !required2) {
-    return;
-  }
-  if (type2 != null) {
-    let isValid = false;
-    const types2 = isArray$1(type2) ? type2 : [type2];
-    const expectedTypes = [];
-    for (let i = 0; i < types2.length && !isValid; i++) {
-      const { valid, expectedType } = assertType(value2, types2[i]);
-      expectedTypes.push(expectedType || "");
-      isValid = valid;
-    }
-    if (!isValid) {
-      return getInvalidTypeMessage(name, value2, expectedTypes);
-    }
-  }
-  if (validator) {
-    return validator(value2);
-  }
-}
-const isSimpleType = /* @__PURE__ */ makeMap("String,Number,Boolean,Function,Symbol");
-function assertType(value2, type2) {
-  let valid;
-  const expectedType = getType(type2);
-  if (isSimpleType(expectedType)) {
-    const t2 = typeof value2;
-    valid = t2 === expectedType.toLowerCase();
-    if (!valid && t2 === "object") {
-      valid = value2 instanceof type2;
-    }
-  } else if (expectedType === "Object") {
-    valid = isObject$1(value2);
-  } else if (expectedType === "Array") {
-    valid = isArray$1(value2);
-  } else {
-    {
-      valid = value2 instanceof type2;
-    }
-  }
-  return {
-    valid,
-    expectedType
-  };
-}
-function getInvalidTypeMessage(name, value2, expectedTypes) {
-  let message = `Invalid args: type check failed for args "${name}". Expected ${expectedTypes.map(capitalize).join(", ")}`;
-  const expectedType = expectedTypes[0];
-  const receivedType = toRawType(value2);
-  const expectedValue = styleValue(value2, expectedType);
-  const receivedValue = styleValue(value2, receivedType);
-  if (expectedTypes.length === 1 && isExplicable(expectedType) && !isBoolean$1(expectedType, receivedType)) {
-    message += ` with value ${expectedValue}`;
-  }
-  message += `, got ${receivedType} `;
-  if (isExplicable(receivedType)) {
-    message += `with value ${receivedValue}.`;
-  }
-  return message;
-}
-function getType(ctor) {
-  const match = ctor && ctor.toString().match(/^\s*function (\w+)/);
-  return match ? match[1] : "";
-}
-function styleValue(value2, type2) {
-  if (type2 === "String") {
-    return `"${value2}"`;
-  } else if (type2 === "Number") {
-    return `${Number(value2)}`;
-  } else {
-    return `${value2}`;
-  }
-}
-function isExplicable(type2) {
-  const explicitTypes = ["string", "number", "boolean"];
-  return explicitTypes.some((elem) => type2.toLowerCase() === elem);
-}
-function isBoolean$1(...args) {
-  return args.some((elem) => elem.toLowerCase() === "boolean");
-}
-function tryCatch(fn) {
-  return function() {
-    try {
-      return fn.apply(fn, arguments);
-    } catch (e2) {
-      console.error(e2);
-    }
-  };
-}
-let invokeCallbackId = 1;
-const invokeCallbacks = {};
-function addInvokeCallback(id, name, callback, keepAlive = false) {
-  invokeCallbacks[id] = {
-    name,
-    keepAlive,
-    callback
-  };
-  return id;
-}
-function invokeCallback(id, res, extras) {
-  if (typeof id === "number") {
-    const opts = invokeCallbacks[id];
-    if (opts) {
-      if (!opts.keepAlive) {
-        delete invokeCallbacks[id];
-      }
-      return opts.callback(res, extras);
-    }
-  }
-  return res;
-}
-const API_SUCCESS = "success";
-const API_FAIL = "fail";
-const API_COMPLETE = "complete";
-function getApiCallbacks(args) {
-  const apiCallbacks = {};
-  for (const name in args) {
-    const fn = args[name];
-    if (isFunction(fn)) {
-      apiCallbacks[name] = tryCatch(fn);
-      delete args[name];
-    }
-  }
-  return apiCallbacks;
-}
-function normalizeErrMsg(errMsg, name) {
-  if (!errMsg || errMsg.indexOf(":fail") === -1) {
-    return name + ":ok";
-  }
-  return name + errMsg.substring(errMsg.indexOf(":fail"));
-}
-function createAsyncApiCallback(name, args = {}, { beforeAll, beforeSuccess } = {}) {
-  if (!isPlainObject$2(args)) {
-    args = {};
-  }
-  const { success, fail, complete } = getApiCallbacks(args);
-  const hasSuccess = isFunction(success);
-  const hasFail = isFunction(fail);
-  const hasComplete = isFunction(complete);
-  const callbackId = invokeCallbackId++;
-  addInvokeCallback(callbackId, name, (res) => {
-    res = res || {};
-    res.errMsg = normalizeErrMsg(res.errMsg, name);
-    isFunction(beforeAll) && beforeAll(res);
-    if (res.errMsg === name + ":ok") {
-      isFunction(beforeSuccess) && beforeSuccess(res, args);
-      hasSuccess && success(res);
-    } else {
-      hasFail && fail(res);
-    }
-    hasComplete && complete(res);
-  });
-  return callbackId;
-}
-const HOOK_SUCCESS = "success";
-const HOOK_FAIL = "fail";
-const HOOK_COMPLETE = "complete";
-const globalInterceptors = {};
-const scopedInterceptors = {};
-function wrapperHook(hook, params) {
-  return function(data) {
-    return hook(data, params) || data;
-  };
-}
-function queue(hooks, data, params) {
-  let promise2 = false;
-  for (let i = 0; i < hooks.length; i++) {
-    const hook = hooks[i];
-    if (promise2) {
-      promise2 = Promise.resolve(wrapperHook(hook, params));
-    } else {
-      const res = hook(data, params);
-      if (isPromise(res)) {
-        promise2 = Promise.resolve(res);
-      }
-      if (res === false) {
-        return {
-          then() {
-          },
-          catch() {
-          }
-        };
-      }
-    }
-  }
-  return promise2 || {
-    then(callback) {
-      return callback(data);
-    },
-    catch() {
-    }
-  };
-}
-function wrapperOptions(interceptors2, options = {}) {
-  [HOOK_SUCCESS, HOOK_FAIL, HOOK_COMPLETE].forEach((name) => {
-    const hooks = interceptors2[name];
-    if (!isArray$1(hooks)) {
-      return;
-    }
-    const oldCallback = options[name];
-    options[name] = function callbackInterceptor(res) {
-      queue(hooks, res, options).then((res2) => {
-        return isFunction(oldCallback) && oldCallback(res2) || res2;
-      });
-    };
-  });
-  return options;
-}
-function wrapperReturnValue(method2, returnValue) {
-  const returnValueHooks = [];
-  if (isArray$1(globalInterceptors.returnValue)) {
-    returnValueHooks.push(...globalInterceptors.returnValue);
-  }
-  const interceptor = scopedInterceptors[method2];
-  if (interceptor && isArray$1(interceptor.returnValue)) {
-    returnValueHooks.push(...interceptor.returnValue);
-  }
-  returnValueHooks.forEach((hook) => {
-    returnValue = hook(returnValue) || returnValue;
-  });
-  return returnValue;
-}
-function getApiInterceptorHooks(method2) {
-  const interceptor = /* @__PURE__ */ Object.create(null);
-  Object.keys(globalInterceptors).forEach((hook) => {
-    if (hook !== "returnValue") {
-      interceptor[hook] = globalInterceptors[hook].slice();
-    }
-  });
-  const scopedInterceptor = scopedInterceptors[method2];
-  if (scopedInterceptor) {
-    Object.keys(scopedInterceptor).forEach((hook) => {
-      if (hook !== "returnValue") {
-        interceptor[hook] = (interceptor[hook] || []).concat(scopedInterceptor[hook]);
-      }
-    });
-  }
-  return interceptor;
-}
-function invokeApi(method2, api, options, params) {
-  const interceptor = getApiInterceptorHooks(method2);
-  if (interceptor && Object.keys(interceptor).length) {
-    if (isArray$1(interceptor.invoke)) {
-      const res = queue(interceptor.invoke, options);
-      return res.then((options2) => {
-        return api(wrapperOptions(getApiInterceptorHooks(method2), options2), ...params);
-      });
-    } else {
-      return api(wrapperOptions(interceptor, options), ...params);
-    }
-  }
-  return api(options, ...params);
-}
-function hasCallback(args) {
-  if (isPlainObject$2(args) && [API_SUCCESS, API_FAIL, API_COMPLETE].find((cb) => isFunction(args[cb]))) {
-    return true;
-  }
-  return false;
-}
-function handlePromise(promise2) {
-  return promise2;
-}
-function promisify$1(name, fn) {
-  return (args = {}, ...rest) => {
-    if (hasCallback(args)) {
-      return wrapperReturnValue(name, invokeApi(name, fn, args, rest));
-    }
-    return wrapperReturnValue(name, handlePromise(new Promise((resolve2, reject) => {
-      invokeApi(name, fn, extend(args, { success: resolve2, fail: reject }), rest);
-    })));
-  };
-}
-function formatApiArgs(args, options) {
-  args[0];
-  {
-    return;
-  }
-}
-function invokeSuccess(id, name, res) {
-  const result = {
-    errMsg: name + ":ok"
-  };
-  return invokeCallback(id, extend(res || {}, result));
-}
-function invokeFail(id, name, errMsg, errRes = {}) {
-  const errMsgPrefix = name + ":fail";
-  let apiErrMsg = "";
-  if (!errMsg) {
-    apiErrMsg = errMsgPrefix;
-  } else if (errMsg.indexOf(errMsgPrefix) === 0) {
-    apiErrMsg = errMsg;
-  } else {
-    apiErrMsg = errMsgPrefix + " " + errMsg;
-  }
-  {
-    delete errRes.errCode;
-  }
-  let res = extend({ errMsg: apiErrMsg }, errRes);
-  return invokeCallback(id, res);
-}
-function beforeInvokeApi(name, args, protocol, options) {
-  {
-    validateProtocols(name, args, protocol);
-  }
-  const errMsg = formatApiArgs(args);
-  if (errMsg) {
-    return errMsg;
-  }
-}
-function parseErrMsg(errMsg) {
-  if (!errMsg || isString(errMsg)) {
-    return errMsg;
-  }
-  if (errMsg.stack) {
-    if (typeof globalThis === "undefined" || !globalThis.harmonyChannel) {
-      console.error(errMsg.message + "\n" + errMsg.stack);
-    }
-    return errMsg.message;
-  }
-  return errMsg;
-}
-function wrapperTaskApi(name, fn, protocol, options) {
-  return (args) => {
-    const id = createAsyncApiCallback(name, args, options);
-    const errMsg = beforeInvokeApi(name, [args], protocol);
-    if (errMsg) {
-      return invokeFail(id, name, errMsg);
-    }
-    return fn(args, {
-      resolve: (res) => invokeSuccess(id, name, res),
-      reject: (errMsg2, errRes) => invokeFail(id, name, parseErrMsg(errMsg2), errRes)
-    });
-  };
-}
-function wrapperSyncApi(name, fn, protocol, options) {
-  return (...args) => {
-    const errMsg = beforeInvokeApi(name, args, protocol);
-    if (errMsg) {
-      throw new Error(errMsg);
-    }
-    return fn.apply(null, args);
-  };
-}
-function wrapperAsyncApi(name, fn, protocol, options) {
-  return wrapperTaskApi(name, fn, protocol, options);
-}
-function defineSyncApi(name, fn, protocol, options) {
-  return wrapperSyncApi(name, fn, protocol);
-}
-function defineAsyncApi(name, fn, protocol, options) {
-  return promisify$1(name, wrapperAsyncApi(name, fn, protocol, options));
-}
-const API_UPX2PX = "upx2px";
-const Upx2pxProtocol = [
-  {
-    name: "upx",
-    type: [Number, String],
-    required: true
-  }
-];
-const EPS = 1e-4;
-const BASE_DEVICE_WIDTH = 750;
-let isIOS = false;
-let deviceWidth = 0;
-let deviceDPR = 0;
-function checkDeviceWidth() {
-  const { windowWidth, pixelRatio, platform: platform2 } = Object.assign({}, wx.getWindowInfo(), {
-    platform: wx.getDeviceInfo().platform
-  });
-  deviceWidth = windowWidth;
-  deviceDPR = pixelRatio;
-  isIOS = platform2 === "ios";
-}
-const upx2px = defineSyncApi(API_UPX2PX, (number2, newDeviceWidth) => {
-  if (deviceWidth === 0) {
-    checkDeviceWidth();
-  }
-  number2 = Number(number2);
-  if (number2 === 0) {
-    return 0;
-  }
-  let width = newDeviceWidth || deviceWidth;
-  let result = number2 / BASE_DEVICE_WIDTH * width;
-  if (result < 0) {
-    result = -result;
-  }
-  result = Math.floor(result + EPS);
-  if (result === 0) {
-    if (deviceDPR === 1 || !isIOS) {
-      result = 1;
-    } else {
-      result = 0.5;
-    }
-  }
-  return number2 < 0 ? -result : result;
-}, Upx2pxProtocol);
-function __f__(type2, filename, ...args) {
-  if (filename) {
-    args.push(filename);
-  }
-  console[type2].apply(console, args);
-}
-const API_ADD_INTERCEPTOR = "addInterceptor";
-const API_REMOVE_INTERCEPTOR = "removeInterceptor";
-const AddInterceptorProtocol = [
-  {
-    name: "method",
-    type: [String, Object],
-    required: true
-  }
-];
-const RemoveInterceptorProtocol = AddInterceptorProtocol;
-function mergeInterceptorHook(interceptors2, interceptor) {
-  Object.keys(interceptor).forEach((hook) => {
-    if (isFunction(interceptor[hook])) {
-      interceptors2[hook] = mergeHook(interceptors2[hook], interceptor[hook]);
-    }
-  });
-}
-function removeInterceptorHook(interceptors2, interceptor) {
-  if (!interceptors2 || !interceptor) {
-    return;
-  }
-  Object.keys(interceptor).forEach((name) => {
-    const hooks = interceptors2[name];
-    const hook = interceptor[name];
-    if (isArray$1(hooks) && isFunction(hook)) {
-      remove(hooks, hook);
-    }
-  });
-}
-function mergeHook(parentVal, childVal) {
-  const res = childVal ? parentVal ? parentVal.concat(childVal) : isArray$1(childVal) ? childVal : [childVal] : parentVal;
-  return res ? dedupeHooks(res) : res;
-}
-function dedupeHooks(hooks) {
-  const res = [];
-  for (let i = 0; i < hooks.length; i++) {
-    if (res.indexOf(hooks[i]) === -1) {
-      res.push(hooks[i]);
-    }
-  }
-  return res;
-}
-const addInterceptor = defineSyncApi(API_ADD_INTERCEPTOR, (method2, interceptor) => {
-  if (isString(method2) && isPlainObject$2(interceptor)) {
-    mergeInterceptorHook(scopedInterceptors[method2] || (scopedInterceptors[method2] = {}), interceptor);
-  } else if (isPlainObject$2(method2)) {
-    mergeInterceptorHook(globalInterceptors, method2);
-  }
-}, AddInterceptorProtocol);
-const removeInterceptor = defineSyncApi(API_REMOVE_INTERCEPTOR, (method2, interceptor) => {
-  if (isString(method2)) {
-    if (isPlainObject$2(interceptor)) {
-      removeInterceptorHook(scopedInterceptors[method2], interceptor);
-    } else {
-      delete scopedInterceptors[method2];
-    }
-  } else if (isPlainObject$2(method2)) {
-    removeInterceptorHook(globalInterceptors, method2);
-  }
-}, RemoveInterceptorProtocol);
-const interceptors = {};
-const API_ON = "$on";
-const OnProtocol = [
-  {
-    name: "event",
-    type: String,
-    required: true
-  },
-  {
-    name: "callback",
-    type: Function,
-    required: true
-  }
-];
-const API_ONCE = "$once";
-const OnceProtocol = OnProtocol;
-const API_OFF = "$off";
-const OffProtocol = [
-  {
-    name: "event",
-    type: [String, Array]
-  },
-  {
-    name: "callback",
-    type: [Function, Number]
-  }
-];
-const API_EMIT = "$emit";
-const EmitProtocol = [
-  {
-    name: "event",
-    type: String,
-    required: true
-  }
-];
-class EventBus {
-  constructor() {
-    this.$emitter = new E$1();
-  }
-  on(name, callback) {
-    return this.$emitter.on(name, callback);
-  }
-  once(name, callback) {
-    return this.$emitter.once(name, callback);
-  }
-  off(name, callback) {
-    if (!name) {
-      this.$emitter.e = {};
-      return;
-    }
-    this.$emitter.off(name, callback);
-  }
-  emit(name, ...args) {
-    this.$emitter.emit(name, ...args);
-  }
-}
-const eventBus = new EventBus();
-const $on = defineSyncApi(API_ON, (name, callback) => {
-  eventBus.on(name, callback);
-  return () => eventBus.off(name, callback);
-}, OnProtocol);
-const $once = defineSyncApi(API_ONCE, (name, callback) => {
-  eventBus.once(name, callback);
-  return () => eventBus.off(name, callback);
-}, OnceProtocol);
-const $off = defineSyncApi(API_OFF, (name, callback) => {
-  if (!isArray$1(name))
-    name = name ? [name] : [];
-  name.forEach((n2) => eventBus.off(n2, callback));
-}, OffProtocol);
-const $emit = defineSyncApi(API_EMIT, (name, ...args) => {
-  eventBus.emit(name, ...args);
-}, EmitProtocol);
-let cid;
-let cidErrMsg;
-let enabled;
-function normalizePushMessage(message) {
-  try {
-    return JSON.parse(message);
-  } catch (e2) {
-  }
-  return message;
-}
-function invokePushCallback(args) {
-  if (args.type === "enabled") {
-    enabled = true;
-  } else if (args.type === "clientId") {
-    cid = args.cid;
-    cidErrMsg = args.errMsg;
-    invokeGetPushCidCallbacks(cid, args.errMsg);
-  } else if (args.type === "pushMsg") {
-    const message = {
-      type: "receive",
-      data: normalizePushMessage(args.message)
-    };
-    for (let i = 0; i < onPushMessageCallbacks.length; i++) {
-      const callback = onPushMessageCallbacks[i];
-      callback(message);
-      if (message.stopped) {
-        break;
-      }
-    }
-  } else if (args.type === "click") {
-    onPushMessageCallbacks.forEach((callback) => {
-      callback({
-        type: "click",
-        data: normalizePushMessage(args.message)
-      });
-    });
-  }
-}
-const getPushCidCallbacks = [];
-function invokeGetPushCidCallbacks(cid2, errMsg) {
-  getPushCidCallbacks.forEach((callback) => {
-    callback(cid2, errMsg);
-  });
-  getPushCidCallbacks.length = 0;
-}
-const API_GET_PUSH_CLIENT_ID = "getPushClientId";
-const getPushClientId = defineAsyncApi(API_GET_PUSH_CLIENT_ID, (_, { resolve: resolve2, reject }) => {
-  Promise.resolve().then(() => {
-    if (typeof enabled === "undefined") {
-      enabled = false;
-      cid = "";
-      cidErrMsg = "uniPush is not enabled";
-    }
-    getPushCidCallbacks.push((cid2, errMsg) => {
-      if (cid2) {
-        resolve2({ cid: cid2 });
-      } else {
-        reject(errMsg);
-      }
-    });
-    if (typeof cid !== "undefined") {
-      invokeGetPushCidCallbacks(cid, cidErrMsg);
-    }
-  });
-});
-const onPushMessageCallbacks = [];
-const onPushMessage = (fn) => {
-  if (onPushMessageCallbacks.indexOf(fn) === -1) {
-    onPushMessageCallbacks.push(fn);
-  }
-};
-const offPushMessage = (fn) => {
-  if (!fn) {
-    onPushMessageCallbacks.length = 0;
-  } else {
-    const index2 = onPushMessageCallbacks.indexOf(fn);
-    if (index2 > -1) {
-      onPushMessageCallbacks.splice(index2, 1);
-    }
-  }
-};
-const SYNC_API_RE = /^\$|__f__|getLocale|setLocale|sendNativeEvent|restoreGlobal|requireGlobal|getCurrentSubNVue|getMenuButtonBoundingClientRect|^report|interceptors|Interceptor$|getSubNVueById|requireNativePlugin|upx2px|rpx2px|hideKeyboard|canIUse|^create|Sync$|Manager$|base64ToArrayBuffer|arrayBufferToBase64|getDeviceInfo|getAppBaseInfo|getWindowInfo|getSystemSetting|getAppAuthorizeSetting/;
-const CONTEXT_API_RE = /^create|Manager$/;
-const CONTEXT_API_RE_EXC = ["createBLEConnection"];
-const TASK_APIS = ["request", "downloadFile", "uploadFile", "connectSocket"];
-const ASYNC_API = ["createBLEConnection"];
-const CALLBACK_API_RE = /^on|^off/;
-function isContextApi(name) {
-  return CONTEXT_API_RE.test(name) && CONTEXT_API_RE_EXC.indexOf(name) === -1;
-}
-function isSyncApi(name) {
-  return SYNC_API_RE.test(name) && ASYNC_API.indexOf(name) === -1;
-}
-function isCallbackApi(name) {
-  return CALLBACK_API_RE.test(name) && name !== "onPush";
-}
-function isTaskApi(name) {
-  return TASK_APIS.indexOf(name) !== -1;
-}
-function shouldPromise(name) {
-  if (isContextApi(name) || isSyncApi(name) || isCallbackApi(name)) {
-    return false;
-  }
-  return true;
-}
-if (!Promise.prototype.finally) {
-  Promise.prototype.finally = function(onfinally) {
-    const promise2 = this.constructor;
-    return this.then((value2) => promise2.resolve(onfinally && onfinally()).then(() => value2), (reason) => promise2.resolve(onfinally && onfinally()).then(() => {
-      throw reason;
-    }));
-  };
-}
-function promisify(name, api) {
-  if (!shouldPromise(name)) {
-    return api;
-  }
-  if (!isFunction(api)) {
-    return api;
-  }
-  return function promiseApi(options = {}, ...rest) {
-    if (isFunction(options.success) || isFunction(options.fail) || isFunction(options.complete)) {
-      return wrapperReturnValue(name, invokeApi(name, api, options, rest));
-    }
-    return wrapperReturnValue(name, handlePromise(new Promise((resolve2, reject) => {
-      invokeApi(name, api, extend({}, options, {
-        success: resolve2,
-        fail: reject
-      }), rest);
-    })));
-  };
-}
-const CALLBACKS = ["success", "fail", "cancel", "complete"];
-function initWrapper(protocols2) {
-  function processCallback(methodName, method2, returnValue) {
-    return function(res) {
-      return method2(processReturnValue(methodName, res, returnValue));
-    };
-  }
-  function processArgs(methodName, fromArgs, argsOption = {}, returnValue = {}, keepFromArgs = false) {
-    if (isPlainObject$2(fromArgs)) {
-      const toArgs = keepFromArgs === true ? fromArgs : {};
-      if (isFunction(argsOption)) {
-        argsOption = argsOption(fromArgs, toArgs) || {};
-      }
-      for (const key in fromArgs) {
-        if (hasOwn(argsOption, key)) {
-          let keyOption = argsOption[key];
-          if (isFunction(keyOption)) {
-            keyOption = keyOption(fromArgs[key], fromArgs, toArgs);
-          }
-          if (!keyOption) {
-            console.warn(`微信小程序 ${methodName} 暂不支持 ${key}`);
-          } else if (isString(keyOption)) {
-            toArgs[keyOption] = fromArgs[key];
-          } else if (isPlainObject$2(keyOption)) {
-            toArgs[keyOption.name ? keyOption.name : key] = keyOption.value;
-          }
-        } else if (CALLBACKS.indexOf(key) !== -1) {
-          const callback = fromArgs[key];
-          if (isFunction(callback)) {
-            toArgs[key] = processCallback(methodName, callback, returnValue);
-          }
-        } else {
-          if (!keepFromArgs && !hasOwn(toArgs, key)) {
-            toArgs[key] = fromArgs[key];
-          }
-        }
-      }
-      return toArgs;
-    } else if (isFunction(fromArgs)) {
-      if (isFunction(argsOption)) {
-        argsOption(fromArgs, {});
-      }
-      fromArgs = processCallback(methodName, fromArgs, returnValue);
-    }
-    return fromArgs;
-  }
-  function processReturnValue(methodName, res, returnValue, keepReturnValue = false) {
-    if (isFunction(protocols2.returnValue)) {
-      res = protocols2.returnValue(methodName, res);
-    }
-    const realKeepReturnValue = keepReturnValue || false;
-    return processArgs(methodName, res, returnValue, {}, realKeepReturnValue);
-  }
-  return function wrapper(methodName, method2) {
-    const hasProtocol = hasOwn(protocols2, methodName);
-    const needWrapper = hasProtocol || isFunction(protocols2.returnValue) || isContextApi(methodName) || isTaskApi(methodName);
-    const hasMethod = hasProtocol || isFunction(method2);
-    if (!hasProtocol && !method2) {
-      return function() {
-        console.error(`微信小程序 暂不支持${methodName}`);
-      };
-    }
-    if (!needWrapper || !hasMethod) {
-      return method2;
-    }
-    const protocol = protocols2[methodName];
-    return function(arg1, arg2) {
-      let options = protocol || {};
-      if (isFunction(protocol)) {
-        options = protocol(arg1);
-      }
-      arg1 = processArgs(methodName, arg1, options.args, options.returnValue);
-      const args = [arg1];
-      if (typeof arg2 !== "undefined") {
-        args.push(arg2);
-      }
-      const returnValue = wx[options.name || methodName].apply(wx, args);
-      if (isContextApi(methodName) || isTaskApi(methodName)) {
-        if (returnValue && !returnValue.__v_skip) {
-          returnValue.__v_skip = true;
-        }
-      }
-      if (isSyncApi(methodName)) {
-        return processReturnValue(methodName, returnValue, options.returnValue, isContextApi(methodName));
-      }
-      return returnValue;
-    };
-  };
-}
-const getLocale = () => {
-  const app = isFunction(getApp) && getApp({ allowDefault: true });
-  if (app && app.$vm) {
-    return app.$vm.$locale;
-  }
-  return normalizeLocale(wx.getAppBaseInfo().language) || LOCALE_EN;
-};
-const setLocale = (locale) => {
-  const app = isFunction(getApp) && getApp();
-  if (!app) {
-    return false;
-  }
-  const oldLocale = app.$vm.$locale;
-  if (oldLocale !== locale) {
-    app.$vm.$locale = locale;
-    onLocaleChangeCallbacks.forEach((fn) => fn({ locale }));
-    return true;
-  }
-  return false;
-};
-const onLocaleChangeCallbacks = [];
-const onLocaleChange = (fn) => {
-  if (onLocaleChangeCallbacks.indexOf(fn) === -1) {
-    onLocaleChangeCallbacks.push(fn);
-  }
-};
-if (typeof global !== "undefined") {
-  global.getLocale = getLocale;
-}
-const UUID_KEY = "__DC_STAT_UUID";
-let deviceId;
-function useDeviceId(global2 = wx) {
-  return function addDeviceId(_, toRes) {
-    deviceId = deviceId || global2.getStorageSync(UUID_KEY);
-    if (!deviceId) {
-      deviceId = Date.now() + "" + Math.floor(Math.random() * 1e7);
-      wx.setStorage({
-        key: UUID_KEY,
-        data: deviceId
-      });
-    }
-    toRes.deviceId = deviceId;
-  };
-}
-function addSafeAreaInsets(fromRes, toRes) {
-  if (fromRes.safeArea) {
-    const safeArea = fromRes.safeArea;
-    toRes.safeAreaInsets = {
-      top: safeArea.top,
-      left: safeArea.left,
-      right: fromRes.windowWidth - safeArea.right,
-      bottom: fromRes.screenHeight - safeArea.bottom
-    };
-  }
-}
-function getOSInfo(system, platform2) {
-  let osName = "";
-  let osVersion = "";
-  if (platform2 && false) {
-    osName = platform2;
-    osVersion = system;
-  } else {
-    osName = system.split(" ")[0] || "";
-    osVersion = system.split(" ")[1] || "";
-  }
-  return {
-    osName: osName.toLocaleLowerCase(),
-    osVersion
-  };
-}
-function populateParameters(fromRes, toRes) {
-  const { brand = "", model = "", system = "", language = "", theme, version: version2, platform: platform2, fontSizeSetting, SDKVersion, pixelRatio, deviceOrientation } = fromRes;
-  const { osName, osVersion } = getOSInfo(system, platform2);
-  let hostVersion = version2;
-  let deviceType = getGetDeviceType(fromRes, model);
-  let deviceBrand = getDeviceBrand(brand);
-  let _hostName = getHostName(fromRes);
-  let _deviceOrientation = deviceOrientation;
-  let _devicePixelRatio = pixelRatio;
-  let _SDKVersion = SDKVersion;
-  const hostLanguage = (language || "").replace(/_/g, "-");
-  const parameters = {
-    appId: "__UNI__F9C76ED",
-    appName: "FuziAI",
-    appVersion: "1.0.0",
-    appVersionCode: "100",
-    appLanguage: getAppLanguage(hostLanguage),
-    uniCompileVersion: "4.45",
-    uniCompilerVersion: "4.45",
-    uniRuntimeVersion: "4.45",
-    uniPlatform: "mp-weixin",
-    deviceBrand,
-    deviceModel: model,
-    deviceType,
-    devicePixelRatio: _devicePixelRatio,
-    deviceOrientation: _deviceOrientation,
-    osName,
-    osVersion,
-    hostTheme: theme,
-    hostVersion,
-    hostLanguage,
-    hostName: _hostName,
-    hostSDKVersion: _SDKVersion,
-    hostFontSizeSetting: fontSizeSetting,
-    windowTop: 0,
-    windowBottom: 0,
-    // TODO
-    osLanguage: void 0,
-    osTheme: void 0,
-    ua: void 0,
-    hostPackageName: void 0,
-    browserName: void 0,
-    browserVersion: void 0,
-    isUniAppX: false
-  };
-  extend(toRes, parameters);
-}
-function getGetDeviceType(fromRes, model) {
-  let deviceType = fromRes.deviceType || "phone";
-  {
-    const deviceTypeMaps = {
-      ipad: "pad",
-      windows: "pc",
-      mac: "pc"
-    };
-    const deviceTypeMapsKeys = Object.keys(deviceTypeMaps);
-    const _model = model.toLocaleLowerCase();
-    for (let index2 = 0; index2 < deviceTypeMapsKeys.length; index2++) {
-      const _m = deviceTypeMapsKeys[index2];
-      if (_model.indexOf(_m) !== -1) {
-        deviceType = deviceTypeMaps[_m];
-        break;
-      }
-    }
-  }
-  return deviceType;
-}
-function getDeviceBrand(brand) {
-  let deviceBrand = brand;
-  if (deviceBrand) {
-    deviceBrand = deviceBrand.toLocaleLowerCase();
-  }
-  return deviceBrand;
-}
-function getAppLanguage(defaultLanguage) {
-  return getLocale ? getLocale() : defaultLanguage;
-}
-function getHostName(fromRes) {
-  const _platform = "WeChat";
-  let _hostName = fromRes.hostName || _platform;
-  {
-    if (fromRes.environment) {
-      _hostName = fromRes.environment;
-    } else if (fromRes.host && fromRes.host.env) {
-      _hostName = fromRes.host.env;
-    }
-  }
-  return _hostName;
-}
-const getSystemInfo = {
-  returnValue: (fromRes, toRes) => {
-    addSafeAreaInsets(fromRes, toRes);
-    useDeviceId()(fromRes, toRes);
-    populateParameters(fromRes, toRes);
-  }
-};
-const getSystemInfoSync = getSystemInfo;
-const redirectTo = {};
-const previewImage = {
-  args(fromArgs, toArgs) {
-    let currentIndex = parseInt(fromArgs.current);
-    if (isNaN(currentIndex)) {
-      return;
-    }
-    const urls = fromArgs.urls;
-    if (!isArray$1(urls)) {
-      return;
-    }
-    const len = urls.length;
-    if (!len) {
-      return;
-    }
-    if (currentIndex < 0) {
-      currentIndex = 0;
-    } else if (currentIndex >= len) {
-      currentIndex = len - 1;
-    }
-    if (currentIndex > 0) {
-      toArgs.current = urls[currentIndex];
-      toArgs.urls = urls.filter((item, index2) => index2 < currentIndex ? item !== urls[currentIndex] : true);
-    } else {
-      toArgs.current = urls[0];
-    }
-    return {
-      indicator: false,
-      loop: false
-    };
-  }
-};
-const showActionSheet = {
-  args(fromArgs, toArgs) {
-    toArgs.alertText = fromArgs.title;
-  }
-};
-const getDeviceInfo = {
-  returnValue: (fromRes, toRes) => {
-    const { brand, model, system = "", platform: platform2 = "" } = fromRes;
-    let deviceType = getGetDeviceType(fromRes, model);
-    let deviceBrand = getDeviceBrand(brand);
-    useDeviceId()(fromRes, toRes);
-    const { osName, osVersion } = getOSInfo(system, platform2);
-    toRes = sortObject(extend(toRes, {
-      deviceType,
-      deviceBrand,
-      deviceModel: model,
-      osName,
-      osVersion
-    }));
-  }
-};
-const getAppBaseInfo = {
-  returnValue: (fromRes, toRes) => {
-    const { version: version2, language, SDKVersion, theme } = fromRes;
-    let _hostName = getHostName(fromRes);
-    let hostLanguage = (language || "").replace(/_/g, "-");
-    const parameters = {
-      hostVersion: version2,
-      hostLanguage,
-      hostName: _hostName,
-      hostSDKVersion: SDKVersion,
-      hostTheme: theme,
-      appId: "__UNI__F9C76ED",
-      appName: "FuziAI",
-      appVersion: "1.0.0",
-      appVersionCode: "100",
-      appLanguage: getAppLanguage(hostLanguage),
-      isUniAppX: false,
-      uniPlatform: "mp-weixin",
-      uniCompileVersion: "4.45",
-      uniCompilerVersion: "4.45",
-      uniRuntimeVersion: "4.45"
-    };
-    extend(toRes, parameters);
-  }
-};
-const getWindowInfo = {
-  returnValue: (fromRes, toRes) => {
-    addSafeAreaInsets(fromRes, toRes);
-    toRes = sortObject(extend(toRes, {
-      windowTop: 0,
-      windowBottom: 0
-    }));
-  }
-};
-const getAppAuthorizeSetting = {
-  returnValue: function(fromRes, toRes) {
-    const { locationReducedAccuracy } = fromRes;
-    toRes.locationAccuracy = "unsupported";
-    if (locationReducedAccuracy === true) {
-      toRes.locationAccuracy = "reduced";
-    } else if (locationReducedAccuracy === false) {
-      toRes.locationAccuracy = "full";
-    }
-  }
-};
-const onError = {
-  args(fromArgs) {
-    const app = getApp({ allowDefault: true }) || {};
-    if (!app.$vm) {
-      if (!wx.$onErrorHandlers) {
-        wx.$onErrorHandlers = [];
-      }
-      wx.$onErrorHandlers.push(fromArgs);
-    } else {
-      injectHook(ON_ERROR, fromArgs, app.$vm.$);
-    }
-  }
-};
-const offError = {
-  args(fromArgs) {
-    const app = getApp({ allowDefault: true }) || {};
-    if (!app.$vm) {
-      if (!wx.$onErrorHandlers) {
-        return;
-      }
-      const index2 = wx.$onErrorHandlers.findIndex((fn) => fn === fromArgs);
-      if (index2 !== -1) {
-        wx.$onErrorHandlers.splice(index2, 1);
-      }
-    } else if (fromArgs.__weh) {
-      const onErrors = app.$vm.$[ON_ERROR];
-      if (onErrors) {
-        const index2 = onErrors.indexOf(fromArgs.__weh);
-        if (index2 > -1) {
-          onErrors.splice(index2, 1);
-        }
-      }
-    }
-  }
-};
-const onSocketOpen = {
-  args() {
-    if (wx.__uni_console__) {
-      if (wx.__uni_console_warned__) {
-        return;
-      }
-      wx.__uni_console_warned__ = true;
-      console.warn(`开发模式下小程序日志回显会使用 socket 连接，为了避免冲突，建议使用 SocketTask 的方式去管理 WebSocket 或手动关闭日志回显功能。[详情](https://uniapp.dcloud.net.cn/tutorial/run/mp-log.html)`);
-    }
-  }
-};
-const onSocketMessage = onSocketOpen;
-const baseApis = {
-  $on,
-  $off,
-  $once,
-  $emit,
-  upx2px,
-  rpx2px: upx2px,
-  interceptors,
-  addInterceptor,
-  removeInterceptor,
-  onCreateVueApp,
-  invokeCreateVueAppHook,
-  getLocale,
-  setLocale,
-  onLocaleChange,
-  getPushClientId,
-  onPushMessage,
-  offPushMessage,
-  invokePushCallback,
-  __f__
-};
-function initUni(api, protocols2, platform2 = wx) {
-  const wrapper = initWrapper(protocols2);
-  const UniProxyHandlers = {
-    get(target, key) {
-      if (hasOwn(target, key)) {
-        return target[key];
-      }
-      if (hasOwn(api, key)) {
-        return promisify(key, api[key]);
-      }
-      if (hasOwn(baseApis, key)) {
-        return promisify(key, baseApis[key]);
-      }
-      return promisify(key, wrapper(key, platform2[key]));
-    }
-  };
-  return new Proxy({}, UniProxyHandlers);
-}
-function initGetProvider(providers) {
-  return function getProvider2({ service, success, fail, complete }) {
-    let res;
-    if (providers[service]) {
-      res = {
-        errMsg: "getProvider:ok",
-        service,
-        provider: providers[service]
-      };
-      isFunction(success) && success(res);
-    } else {
-      res = {
-        errMsg: "getProvider:fail:服务[" + service + "]不存在"
-      };
-      isFunction(fail) && fail(res);
-    }
-    isFunction(complete) && complete(res);
-  };
-}
-const objectKeys = [
-  "qy",
-  "env",
-  "error",
-  "version",
-  "lanDebug",
-  "cloud",
-  "serviceMarket",
-  "router",
-  "worklet",
-  "__webpack_require_UNI_MP_PLUGIN__"
-];
-const singlePageDisableKey = ["lanDebug", "router", "worklet"];
-const launchOption = wx.getLaunchOptionsSync ? wx.getLaunchOptionsSync() : null;
-function isWxKey(key) {
-  if (launchOption && launchOption.scene === 1154 && singlePageDisableKey.includes(key)) {
-    return false;
-  }
-  return objectKeys.indexOf(key) > -1 || typeof wx[key] === "function";
-}
-function initWx() {
-  const newWx = {};
-  for (const key in wx) {
-    if (isWxKey(key)) {
-      newWx[key] = wx[key];
-    }
-  }
-  if (typeof globalThis !== "undefined" && typeof requireMiniProgram === "undefined") {
-    globalThis.wx = newWx;
-  }
-  return newWx;
-}
-const mocks$1 = ["__route__", "__wxExparserNodeId__", "__wxWebviewId__"];
-const getProvider = initGetProvider({
-  oauth: ["weixin"],
-  share: ["weixin"],
-  payment: ["wxpay"],
-  push: ["weixin"]
-});
-function initComponentMocks(component) {
-  const res = /* @__PURE__ */ Object.create(null);
-  mocks$1.forEach((name) => {
-    res[name] = component[name];
-  });
-  return res;
-}
-function createSelectorQuery() {
-  const query = wx$2.createSelectorQuery();
-  const oldIn = query.in;
-  query.in = function newIn(component) {
-    return oldIn.call(this, initComponentMocks(component));
-  };
-  return query;
-}
-const wx$2 = initWx();
-let baseInfo = wx$2.getAppBaseInfo && wx$2.getAppBaseInfo();
-if (!baseInfo) {
-  baseInfo = wx$2.getSystemInfoSync();
-}
-const host = baseInfo ? baseInfo.host : null;
-const shareVideoMessage = host && host.env === "SAAASDK" ? wx$2.miniapp.shareVideoMessage : wx$2.shareVideoMessage;
-var shims = /* @__PURE__ */ Object.freeze({
-  __proto__: null,
-  createSelectorQuery,
-  getProvider,
-  shareVideoMessage
-});
-const compressImage = {
-  args(fromArgs, toArgs) {
-    if (fromArgs.compressedHeight && !toArgs.compressHeight) {
-      toArgs.compressHeight = fromArgs.compressedHeight;
-    }
-    if (fromArgs.compressedWidth && !toArgs.compressWidth) {
-      toArgs.compressWidth = fromArgs.compressedWidth;
-    }
-  }
-};
-var protocols = /* @__PURE__ */ Object.freeze({
-  __proto__: null,
-  compressImage,
-  getAppAuthorizeSetting,
-  getAppBaseInfo,
-  getDeviceInfo,
-  getSystemInfo,
-  getSystemInfoSync,
-  getWindowInfo,
-  offError,
-  onError,
-  onSocketMessage,
-  onSocketOpen,
-  previewImage,
-  redirectTo,
-  showActionSheet
-});
-const wx$1 = initWx();
-var index$2 = initUni(shims, protocols, wx$1);
-const CONSOLE_TYPES = ["log", "warn", "error", "info", "debug"];
-let sendConsole = null;
-const messageQueue = [];
-function sendConsoleMessages(messages2) {
-  if (sendConsole == null) {
-    messageQueue.push(...messages2);
-    return;
-  }
-  sendConsole(JSON.stringify({
-    type: "console",
-    data: messages2
-  }));
-}
-function setSendConsole(value2) {
-  sendConsole = value2;
-  if (value2 != null && messageQueue.length > 0) {
-    const messages2 = messageQueue.slice();
-    messageQueue.length = 0;
-    sendConsoleMessages(messages2);
-  }
-}
-const originalConsole = /* @__PURE__ */ CONSOLE_TYPES.reduce((methods, type2) => {
-  methods[type2] = console[type2].bind(console);
-  return methods;
-}, {});
-const atFileRegex = /^at\s+[\w/./-]+:\d+$/;
-function rewriteConsole() {
-  function wrapConsole(type2) {
-    return function(...args) {
-      const originalArgs = [...args];
-      if (originalArgs.length) {
-        const maybeAtFile = originalArgs[originalArgs.length - 1];
-        if (typeof maybeAtFile === "string" && atFileRegex.test(maybeAtFile)) {
-          originalArgs.pop();
-        }
-      }
-      {
-        originalConsole[type2](...originalArgs);
-      }
-      sendConsoleMessages([formatMessage(type2, args)]);
-    };
-  }
-  if (isConsoleWritable()) {
-    CONSOLE_TYPES.forEach((type2) => {
-      console[type2] = wrapConsole(type2);
-    });
-    return function restoreConsole() {
-      CONSOLE_TYPES.forEach((type2) => {
-        console[type2] = originalConsole[type2];
-      });
-    };
-  } else {
-    const oldLog = index$2.__f__;
-    if (oldLog) {
-      index$2.__f__ = function(...args) {
-        const [type2, filename, ...rest] = args;
-        oldLog(type2, "", ...rest);
-        sendConsoleMessages([formatMessage(type2, [...rest, filename])]);
-      };
-      return function restoreConsole() {
-        index$2.__f__ = oldLog;
-      };
-    }
-  }
-  return function restoreConsole() {
-  };
-}
-function isConsoleWritable() {
-  const value2 = console.log;
-  const sym = Symbol();
-  try {
-    console.log = sym;
-  } catch (ex) {
-    return false;
-  }
-  const isWritable = console.log === sym;
-  console.log = value2;
-  return isWritable;
-}
-function formatMessage(type2, args) {
-  try {
-    return {
-      type: type2,
-      args: formatArgs(args)
-    };
-  } catch (e2) {
-    originalConsole.error(e2);
-  }
-  return {
-    type: type2,
-    args: []
-  };
-}
-function formatArgs(args) {
-  return args.map((arg) => formatArg(arg));
-}
-function formatArg(arg, depth = 0) {
-  if (depth >= 7) {
-    return {
-      type: "object",
-      value: "[Maximum depth reached]"
-    };
-  }
-  return ARG_FORMATTERS[typeof arg](arg, depth);
-}
-function formatObject(value2, depth) {
-  if (value2 === null) {
-    return {
-      type: "null"
-    };
-  }
-  if (isComponentPublicInstance(value2)) {
-    return formatComponentPublicInstance(value2, depth);
-  }
-  if (isComponentInternalInstance(value2)) {
-    return formatComponentInternalInstance(value2, depth);
-  }
-  if (isUniElement(value2)) {
-    return formatUniElement(value2, depth);
-  }
-  if (isCSSStyleDeclaration(value2)) {
-    return formatCSSStyleDeclaration(value2, depth);
-  }
-  if (Array.isArray(value2)) {
-    return {
-      type: "object",
-      subType: "array",
-      value: {
-        properties: value2.map((v, i) => formatArrayElement(v, i, depth + 1))
-      }
-    };
-  }
-  if (value2 instanceof Set) {
-    return {
-      type: "object",
-      subType: "set",
-      className: "Set",
-      description: `Set(${value2.size})`,
-      value: {
-        entries: Array.from(value2).map((v) => formatSetEntry(v, depth + 1))
-      }
-    };
-  }
-  if (value2 instanceof Map) {
-    return {
-      type: "object",
-      subType: "map",
-      className: "Map",
-      description: `Map(${value2.size})`,
-      value: {
-        entries: Array.from(value2.entries()).map((v) => formatMapEntry(v, depth + 1))
-      }
-    };
-  }
-  if (value2 instanceof Promise) {
-    return {
-      type: "object",
-      subType: "promise",
-      value: {
-        properties: []
-      }
-    };
-  }
-  if (value2 instanceof RegExp) {
-    return {
-      type: "object",
-      subType: "regexp",
-      value: String(value2),
-      className: "Regexp"
-    };
-  }
-  if (value2 instanceof Date) {
-    return {
-      type: "object",
-      subType: "date",
-      value: String(value2),
-      className: "Date"
-    };
-  }
-  if (value2 instanceof Error) {
-    return {
-      type: "object",
-      subType: "error",
-      value: value2.message || String(value2),
-      className: value2.name || "Error"
-    };
-  }
-  return {
-    type: "object",
-    value: {
-      properties: Object.entries(value2).map(([name, value22]) => formatObjectProperty(name, value22, depth + 1))
-    }
-  };
-}
-function isComponentPublicInstance(value2) {
-  return value2.$ && isComponentInternalInstance(value2.$);
-}
-function isComponentInternalInstance(value2) {
-  return value2.type && value2.uid != null && value2.appContext;
-}
-function formatComponentPublicInstance(value2, depth) {
-  return {
-    type: "object",
-    className: "ComponentPublicInstance",
-    value: {
-      properties: Object.entries(value2.$.type).map(([name, value22]) => formatObjectProperty(name, value22, depth + 1))
-    }
-  };
-}
-function formatComponentInternalInstance(value2, depth) {
-  return {
-    type: "object",
-    className: "ComponentInternalInstance",
-    value: {
-      properties: Object.entries(value2.type).map(([name, value22]) => formatObjectProperty(name, value22, depth + 1))
-    }
-  };
-}
-function isUniElement(value2) {
-  return value2.style && value2.tagName != null && value2.nodeName != null;
-}
-function formatUniElement(value2, depth) {
-  return {
-    type: "object",
-    // 非 x 没有 UniElement 的概念
-    // className: 'UniElement',
-    value: {
-      properties: Object.entries(value2).filter(([name]) => [
-        "id",
-        "tagName",
-        "nodeName",
-        "dataset",
-        "offsetTop",
-        "offsetLeft",
-        "style"
-      ].includes(name)).map(([name, value22]) => formatObjectProperty(name, value22, depth + 1))
-    }
-  };
-}
-function isCSSStyleDeclaration(value2) {
-  return typeof value2.getPropertyValue === "function" && typeof value2.setProperty === "function" && value2.$styles;
-}
-function formatCSSStyleDeclaration(style, depth) {
-  return {
-    type: "object",
-    value: {
-      properties: Object.entries(style.$styles).map(([name, value2]) => formatObjectProperty(name, value2, depth + 1))
-    }
-  };
-}
-function formatObjectProperty(name, value2, depth) {
-  return Object.assign(formatArg(value2, depth), {
-    name
-  });
-}
-function formatArrayElement(value2, index2, depth) {
-  return Object.assign(formatArg(value2, depth), {
-    name: `${index2}`
-  });
-}
-function formatSetEntry(value2, depth) {
-  return {
-    value: formatArg(value2, depth)
-  };
-}
-function formatMapEntry(value2, depth) {
-  return {
-    key: formatArg(value2[0], depth),
-    value: formatArg(value2[1], depth)
-  };
-}
-const ARG_FORMATTERS = {
-  function(value2) {
-    return {
-      type: "function",
-      value: `function ${value2.name}() {}`
-    };
-  },
-  undefined() {
-    return {
-      type: "undefined"
-    };
-  },
-  object(value2, depth) {
-    return formatObject(value2, depth);
-  },
-  boolean(value2) {
-    return {
-      type: "boolean",
-      value: String(value2)
-    };
-  },
-  number(value2) {
-    return {
-      type: "number",
-      value: String(value2)
-    };
-  },
-  bigint(value2) {
-    return {
-      type: "bigint",
-      value: String(value2)
-    };
-  },
-  string(value2) {
-    return {
-      type: "string",
-      value: value2
-    };
-  },
-  symbol(value2) {
-    return {
-      type: "symbol",
-      value: value2.description
-    };
-  }
-};
-function initRuntimeSocket(hosts, port, id) {
-  return hosts.split(",").reduce((promise2, host2) => {
-    return promise2.then((socket) => {
-      if (socket)
-        return socket;
-      return tryConnectSocket(host2, port, id);
-    });
-  }, Promise.resolve(null));
-}
-const SOCKET_TIMEOUT = 500;
-function tryConnectSocket(host2, port, id) {
-  return new Promise((resolve2, reject) => {
-    const socket = index$2.connectSocket({
-      url: `ws://${host2}:${port}/${id}`,
-      // 支付宝小程序 是否开启多实例
-      multiple: true,
-      fail() {
-        resolve2(null);
-      }
-    });
-    const timer = setTimeout(() => {
-      socket.close({
-        code: 1006,
-        reason: "connect timeout"
-      });
-      resolve2(null);
-    }, SOCKET_TIMEOUT);
-    socket.onOpen((e2) => {
-      clearTimeout(timer);
-      resolve2(socket);
-    });
-    socket.onClose((e2) => {
-      clearTimeout(timer);
-      resolve2(null);
-    });
-    socket.onError((e2) => {
-      clearTimeout(timer);
-      resolve2(null);
-    });
-  });
-}
-let sendError = null;
-const errorQueue = /* @__PURE__ */ new Set();
-function sendErrorMessages(errors) {
-  if (sendError == null) {
-    errors.forEach((error2) => {
-      errorQueue.add(error2);
-    });
-    return;
-  }
-  sendError(JSON.stringify({
-    type: "error",
-    data: errors.map((err) => {
-      const isPromiseRejection = err && "promise" in err && "reason" in err;
-      const prefix = isPromiseRejection ? "UnhandledPromiseRejection: " : "";
-      if (isPromiseRejection) {
-        err = err.reason;
-      }
-      if (err instanceof Error && err.stack) {
-        return prefix + err.stack;
-      }
-      if (typeof err === "object" && err !== null) {
-        try {
-          return prefix + JSON.stringify(err);
-        } catch (err2) {
-          return prefix + String(err2);
-        }
-      }
-      return prefix + String(err);
-    })
-  }));
-}
-function setSendError(value2) {
-  sendError = value2;
-  if (value2 != null && errorQueue.size > 0) {
-    const errors = Array.from(errorQueue);
-    errorQueue.clear();
-    sendErrorMessages(errors);
-  }
-}
-function initOnError() {
-  function onError2(error2) {
-    try {
-      if (typeof PromiseRejectionEvent !== "undefined" && error2 instanceof PromiseRejectionEvent && error2.reason instanceof Error && error2.reason.message && error2.reason.message.includes(`Cannot create property 'errMsg' on string 'taskId`)) {
-        return;
-      }
-      if (true) {
-        originalConsole.error(error2);
-      }
-      sendErrorMessages([error2]);
-    } catch (err) {
-      originalConsole.error(err);
-    }
-  }
-  if (typeof index$2.onError === "function") {
-    index$2.onError(onError2);
-  }
-  if (typeof index$2.onUnhandledRejection === "function") {
-    index$2.onUnhandledRejection(onError2);
-  }
-  return function offError2() {
-    if (typeof index$2.offError === "function") {
-      index$2.offError(onError2);
-    }
-    if (typeof index$2.offUnhandledRejection === "function") {
-      index$2.offUnhandledRejection(onError2);
-    }
-  };
-}
-function initRuntimeSocketService() {
-  const hosts = "192.168.12.1,192.168.243.1,192.168.31.11,127.0.0.1";
-  const port = "8090";
-  const id = "mp-weixin_AH_f21";
-  const lazy = typeof swan !== "undefined";
-  let restoreError = lazy ? () => {
-  } : initOnError();
-  let restoreConsole = lazy ? () => {
-  } : rewriteConsole();
-  return Promise.resolve().then(() => {
-    if (lazy) {
-      restoreError = initOnError();
-      restoreConsole = rewriteConsole();
-    }
-    return initRuntimeSocket(hosts, port, id).then((socket) => {
-      if (!socket) {
-        restoreError();
-        restoreConsole();
-        originalConsole.error(wrapError("开发模式下日志通道建立 socket 连接失败。"));
-        originalConsole.error(wrapError("如果是小程序平台，请勾选不校验合法域名配置。"));
-        originalConsole.error(wrapError("如果是运行到真机，请确认手机与电脑处于同一网络。"));
-        return false;
-      }
-      initMiniProgramGlobalFlag();
-      socket.onClose(() => {
-        originalConsole.error(wrapError("开发模式下日志通道 socket 连接关闭，请在 HBuilderX 中重新运行。"));
-        restoreError();
-        restoreConsole();
-      });
-      setSendConsole((data) => {
-        socket.send({
-          data
-        });
-      });
-      setSendError((data) => {
-        socket.send({
-          data
-        });
-      });
-      return true;
-    });
-  });
-}
-const ERROR_CHAR = "‌";
-function wrapError(error2) {
-  return `${ERROR_CHAR}${error2}${ERROR_CHAR}`;
-}
-function initMiniProgramGlobalFlag() {
-  if (typeof wx$1 !== "undefined") {
-    wx$1.__uni_console__ = true;
-  } else if (typeof my !== "undefined") {
-    my.__uni_console__ = true;
-  } else if (typeof tt !== "undefined") {
-    tt.__uni_console__ = true;
-  } else if (typeof swan !== "undefined") {
-    swan.__uni_console__ = true;
-  } else if (typeof qq !== "undefined") {
-    qq.__uni_console__ = true;
-  } else if (typeof ks !== "undefined") {
-    ks.__uni_console__ = true;
-  } else if (typeof jd !== "undefined") {
-    jd.__uni_console__ = true;
-  } else if (typeof xhs !== "undefined") {
-    xhs.__uni_console__ = true;
-  } else if (typeof has !== "undefined") {
-    has.__uni_console__ = true;
-  } else if (typeof qa !== "undefined") {
-    qa.__uni_console__ = true;
-  }
-}
-initRuntimeSocketService();
-const _export_sfc = (sfc, props2) => {
-  const target = sfc.__vccOpts || sfc;
-  for (const [key, val] of props2) {
-    target[key] = val;
-  }
-  return target;
-};
 function initVueIds(vueIds, mpInstance) {
   if (!vueIds) {
     return;
@@ -23424,4 +22927,3 @@ exports.w = w;
 exports.watch = watch;
 exports.waterFallProps = waterFallProps;
 exports.wx$1 = wx$1;
-//# sourceMappingURL=../../.sourcemap/mp-weixin/common/vendor.js.map

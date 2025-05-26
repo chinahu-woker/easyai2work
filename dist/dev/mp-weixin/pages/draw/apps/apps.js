@@ -40,8 +40,6 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       handleGetWorkFlwById,
       workFlowParamLists,
       bindParam,
-      params_component_list,
-      socketInit,
       handleFindComponentName,
       handleSubmitTaskTask
     } = composables_useWorkFlow.useWorkFlow();
@@ -50,32 +48,39 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const currentPage = getCurrentPages().pop();
       const query = currentPage == null ? void 0 : currentPage.options;
       workflowId.value = query.id;
-      handleGetWorkFlwById(query.id).then(() => common_vendor.index.__f__("log", "at pages/draw/apps/apps.vue:80", workflow.value));
-      socketInit();
+      handleGetWorkFlwById(query.id).then(() => {
+        if (query.isRegenerate && query.regenerateParams) {
+          const params = JSON.parse(decodeURIComponent(query.regenerateParams));
+          bindParam.value = { ...params };
+        }
+      });
     });
     const showPopup = common_vendor.ref(false);
     const FlotButton = common_vendor.ref("空闲");
+    const currentSwiperIndex = common_vendor.ref(0);
+    common_vendor.watch(currentSwiperIndex, () => {
+      console.log("currentSwiperIndex", currentSwiperIndex.value);
+    });
     const { localTasks } = common_vendor.storeToRefs(stores_appStore.useAppStore());
     const currentProgress = common_vendor.computed(() => {
-      const excuTask = localTasks.value.find((item) => item.status === 0);
-      common_vendor.index.__f__("log", "at pages/draw/apps/apps.vue:124", "进度条：", excuTask);
-      if (!excuTask) {
-        return FlotButton.value;
+      const excuTask = localTasks.value[currentSwiperIndex.value];
+      if (excuTask && excuTask.status === 4) {
+        return `${excuTask.progress || 0} % `;
+      } else if (excuTask && excuTask.status === 0 && excuTask.queue) {
+        return `对列:${excuTask.queue}`;
       } else {
-        return excuTask.power === void 0 ? "0%" : excuTask.power + "%" || "返回";
+        return FlotButton.value;
       }
     });
     const endPos = common_vendor.ref({ x: 0, y: 0 });
     const anims = common_vendor.ref([]);
     const startAnimation = async () => {
-      common_vendor.index.__f__("log", "at pages/draw/apps/apps.vue:155", "seedRef.value", seedRef.value);
       if (seedRef.value && seedRef.value.length > 0) {
         for (const item of seedRef.value) {
           item.getSeed();
         }
       }
       handleSubmitTaskTask();
-      common_vendor.index.__f__("log", "at pages/draw/apps/apps.vue:164", "handleSubmitTaskTask", handleSubmitTaskTask);
       const key = utils_common.randomId(5);
       anims.value.push({
         key,
@@ -120,7 +125,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const handToggelePregress = () => {
       showPopup.value = !showPopup.value;
-      if (showPopup.value == true) {
+      if (showPopup.value) {
         FlotButton.value = "返回";
       } else {
         FlotButton.value = "空闲";
@@ -134,18 +139,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const imageRegex = /\.(jpg|jpeg|png|gif|bmp)$/i;
       const videoRegex = /\.(mp3|wav|ogg)$/i;
       if (!input) {
-        common_vendor.index.__f__("log", "at pages/draw/apps/apps.vue:265", "==============", "是空值");
+        console.log("==============", "是空值");
         return 0;
       } else if (imageRegex.test(input)) {
-        common_vendor.index.__f__("log", "at pages/draw/apps/apps.vue:270", "==============", "是图片");
+        console.log("==============", "是图片");
         return 1;
       } else if (videoRegex.test(input)) {
-        common_vendor.index.__f__("log", "at pages/draw/apps/apps.vue:275", "==============", "是音频");
+        console.log("==============", "是音频");
         return 2;
       }
     }
     return (_ctx, _cache) => {
-      var _a;
+      var _a, _b;
       return common_vendor.e({
         a: common_vendor.p({
           name: "arrowleft"
@@ -272,13 +277,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             M: common_vendor.unref(handleFindComponentName)(item.name) === "ImageSelectPreview"
           });
         }),
-        h: common_vendor.o(startAnimation),
-        i: common_vendor.p({
+        h: common_vendor.t(((_b = common_vendor.unref(workflow)) == null ? void 0 : _b.power) || 0),
+        i: common_vendor.o(startAnimation),
+        j: common_vendor.p({
           icon: "edit-pen",
           type: "primary",
           shape: "circle"
         }),
-        j: common_vendor.f(anims.value, (item, k0, i0) => {
+        k: common_vendor.f(anims.value, (item, k0, i0) => {
           return {
             a: "6cf62e12-17-" + i0 + ",6cf62e12-3",
             b: item.key,
@@ -287,14 +293,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             e: `translate(${item.x}px, ${item.y}px)`
           };
         }),
-        k: common_vendor.p({
+        l: common_vendor.p({
           name: "rocket",
           size: "40rpx"
         }),
-        l: common_vendor.t(currentProgress.value),
-        m: common_vendor.o(handToggelePregress),
-        n: common_vendor.o(($event) => endPos.value = $event),
-        o: common_vendor.p({
+        m: common_vendor.t(currentProgress.value),
+        n: common_vendor.o(handToggelePregress),
+        o: common_vendor.o(($event) => endPos.value = $event),
+        p: common_vendor.p({
           modelValue: endPos.value
         })
       });
@@ -303,4 +309,3 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
 });
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-6cf62e12"]]);
 wx.createPage(MiniProgramPage);
-//# sourceMappingURL=../../../../.sourcemap/mp-weixin/pages/draw/apps/apps.js.map

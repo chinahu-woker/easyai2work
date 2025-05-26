@@ -11,11 +11,11 @@
 		</fui-nav-bar>
 
 	</view>
-
+<fui-background-image :src="backGroundImage">
+		</fui-background-image>
 	<view v-show="pageindex==0">
 
-		<fui-background-image :src="backGroundImage">
-		</fui-background-image>
+		
 		<AppSwiper />
 
 		<up-gap height="10"></up-gap>
@@ -38,8 +38,8 @@
 
 	</view>
 	<view v-show="pageindex==1">
-		<fui-background-image :src="backGroundImage">
-		</fui-background-image>
+		<!-- <fui-background-image :src="backGroundImage">
+		</fui-background-image> -->
 
 
 
@@ -50,11 +50,12 @@
 				<template v-for="(graphicData,KeyIndex) in graphicDatas" :key="KeyIndex">
 
 					<view>
-						<MyGraphicCard :avatar="graphicData.avatar" :title="graphicData.title"
+					 <!--  -->
+						<MyGraphicCard @click="goToEntire(graphicData.id)" :avatar="graphicData.avatar" :title="graphicData.title"
 							:username="graphicData.username" :description="graphicData.description"
 							:tags="graphicData.tags" :content="graphicData.content" :images="graphicData.images"
 							:view-count="graphicData.viewCount" :comment-count="graphicData.commentCount"
-							:like-count="graphicData.likeCount" :view-user-avatars="graphicData.viewUserAvatars">
+							:like-count="graphicData.likeCount" :view-user-avatars="graphicData.viewUserAvatars" >
 						</MyGraphicCard>
 					</view>
 				</template>
@@ -68,8 +69,8 @@
 
 	</view>
 	<view v-show="pageindex==2">
-		<fui-background-image :src="backGroundImage">
-		</fui-background-image>
+		<!-- <fui-background-image :src="backGroundImage">
+		</fui-background-image> -->
 
 
 		<view class="fui-wrap">
@@ -326,7 +327,11 @@
 	import { TextEncoder, TextDecoder } from 'text-decoding'
 	global.TextEncoder = TextEncoder
 	global.TextDecoder = TextDecoder
-
+	onLoad((options) => {
+	if (options.pageindex) {
+		pageindex.value = parseInt(options.pageindex)
+	}
+	})
 	// 分享
 	onShareAppMessage(() => {
 		const inviteCode = useAppStore().user.my_invite_code
@@ -396,7 +401,21 @@
 			}
 		});
 	}
+// --------------------------------------------------------------------------------------
 
+let isNavigating = false
+function goToEntire(id) {
+  if (isNavigating) return
+  isNavigating = true
+
+  uni.navigateTo({
+    url: `/pages/drawLike/alike?id=${id}`,
+    complete: () => {
+      isNavigating = false
+    }
+  })
+}
+// --------------------------------------------------------------------------------------
 	async function chatAiGetToken() {
 		const requestTask = ref()
 		const userInfo = ref()

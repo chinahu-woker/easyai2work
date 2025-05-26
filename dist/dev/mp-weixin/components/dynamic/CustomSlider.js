@@ -29,7 +29,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   setup(__props) {
     const sliderValue = common_vendor.useModel(__props, "modelValue");
     const props = __props;
-    common_vendor.index.__f__("log", "at components/dynamic/CustomSlider.vue:26", props.options, typeof props.options);
+    console.log(props.options, typeof props.options);
     return (_ctx, _cache) => {
       return {
         a: common_vendor.p({
@@ -48,4 +48,3 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   }
 });
 wx.createComponent(_sfc_main);
-//# sourceMappingURL=../../../.sourcemap/mp-weixin/components/dynamic/CustomSlider.js.map

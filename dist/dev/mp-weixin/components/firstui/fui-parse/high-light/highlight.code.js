@@ -1,5 +1,4 @@
 "use strict";
-const common_vendor = require("../../../../common/vendor.js");
 const _hljs = function(factory) {
   var globalObject = typeof window === "object" && window || typeof self === "object" && self;
   if (globalObject) {
@@ -43,8 +42,8 @@ const _hljs = function(factory) {
     if (match) {
       var language = getLanguage(match[1]);
       if (!language) {
-        common_vendor.index.__f__("warn", "at components/firstui/fui-parse/high-light/highlight.code.js:98", LANGUAGE_NOT_FOUND.replace("{}", match[1]));
-        common_vendor.index.__f__("warn", "at components/firstui/fui-parse/high-light/highlight.code.js:99", "Falling back to no-highlight mode for this block.", block);
+        console.warn(LANGUAGE_NOT_FOUND.replace("{}", match[1]));
+        console.warn("Falling back to no-highlight mode for this block.", block);
       }
       return language ? match[1] : "no-highlight";
     }
@@ -511,7 +510,7 @@ const _hljs = function(factory) {
     }
     var language = getLanguage(languageName);
     if (!language) {
-      common_vendor.index.__f__("error", "at components/firstui/fui-parse/high-light/highlight.code.js:764", LANGUAGE_NOT_FOUND.replace("{}", languageName));
+      console.error(LANGUAGE_NOT_FOUND.replace("{}", languageName));
       throw new Error('Unknown language: "' + languageName + '"');
     }
     compileLanguage(language);
@@ -669,11 +668,11 @@ const _hljs = function(factory) {
     try {
       lang = language(hljs);
     } catch (error) {
-      common_vendor.index.__f__("error", "at components/firstui/fui-parse/high-light/highlight.code.js:974", "Language definition for '{}' could not be registered.".replace("{}", name));
+      console.error("Language definition for '{}' could not be registered.".replace("{}", name));
       if (!SAFE_MODE) {
         throw error;
       } else {
-        common_vendor.index.__f__("error", "at components/firstui/fui-parse/high-light/highlight.code.js:979", error);
+        console.error(error);
       }
       lang = PLAINTEXT_LANGUAGE;
     }
@@ -852,4 +851,3 @@ const _hljs = function(factory) {
   return hljs;
 });
 exports._hljs = _hljs;
-//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/components/firstui/fui-parse/high-light/highlight.code.js.map

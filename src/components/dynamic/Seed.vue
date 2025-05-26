@@ -7,6 +7,7 @@ import type {IDynamicOptions} from "@/types";
 import {generateRandomNumber} from "@/utils/common.ts";
 import {onLoad, onReady} from "@dcloudio/uni-app";
 
+
 const inputValue = defineModel({
   default: 0
 })

@@ -53,7 +53,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         btnPositon.value.x = old.x;
         btnPositon.value.y = old.y;
         let bWidth = (windowWidth.value - btnWidth.value) / 2;
-        common_vendor.index.__f__("log", "at components/common/DragButton2.vue:88", "bwidth", bWidth);
+        console.log("bwidth", bWidth);
         if (btnPositon.value.x <= 0 || btnPositon.value.x >= 0 && btnPositon.value.x <= bWidth) {
           common_vendor.nextTick$1((res) => {
             btnPositon.value.x = 0;
@@ -86,4 +86,3 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
 });
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-04def0fd"]]);
 wx.createComponent(Component);
-//# sourceMappingURL=../../../.sourcemap/mp-weixin/components/common/DragButton2.js.map

@@ -175,17 +175,17 @@
 			<view :class="[ns.e('bottom-info__left')]">
 				<view v-if="showHot" class="count-item-data" :class="[hotClass]" :style="hotStyle"
 					@tap.stop="handleHotClick">
-					<TnIcon :name="activeHot ? activeHotIcon : hotIcon" />
+					<TnIcon :name="activeHot ? activeHotIcon : hotIcon"  size="20px"  />
 					<view class="count">{{ hotCount }}</view>
 				</view>
 				<view v-if="showComment" class="count-item-data" :class="[commentClass]" :style="commentStyle"
 					@tap.stop="handleCommentClick">
-					<TnIcon :name="activeComment ? activeCommentIcon : commentIcon" />
+					<TnIcon :name="activeComment ? activeCommentIcon : commentIcon"  size="20px" />
 					<view class="count">{{ commentCount }}</view>
 				</view>
 				<view v-if="showLike" class="count-item-data" :class="[likeClass]" :style="likeStyle"
 					@tap.stop="handleLikeClick">
-					<TnIcon :name="activeLike ? activeLikeIcon : likeIcon" />
+					<TnIcon :name="activeLike ? activeLikeIcon : likeIcon"  size="20px" />
 					<view class="count">{{ likeCount }}</view>
 				</view>
 			</view>
