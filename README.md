@@ -1,5 +1,5 @@
 # EasyAI-uniapp 二次开发版本 🚀
-> 基于官方开源项目深度优化的 AI 绘画小程序解决方案 | 支持 ComfyUI 工作流定制
+> 基于EasyAI[官方地址](https://doc.51easyai.com/)官方开源项目深度优化的 AI 绘画小程序解决方案 | 支持 ComfyUI 工作流定制
 
 ---
 
