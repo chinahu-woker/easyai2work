@@ -1,1 +1,0 @@
-"use strict";const e=require("../../../../../../common/vendor.js"),a=e.defineComponent({__name:"avatar-group",props:e.avatarGroupProps,emits:e.avatarGroupEmits,setup(a,{emit:r}){const t=a,o=r,s=e.useNamespace("avatar");return e.useAvatarGroup(t,o),(a,r)=>({a:e.n(`${e.unref(s).b("group")}`)})}}),r=e._export_sfc(a,[["__scopeId","data-v-088ce5e4"]]);wx.createComponent(r);

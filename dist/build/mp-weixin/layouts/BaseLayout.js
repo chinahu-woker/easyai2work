@@ -1,1 +1,0 @@
-"use strict";const o=require("../common/vendor.js");Math||(e+n+s)();const e=()=>"../components/common/TaskExcuting.js",n=()=>"../components/home/PaymentPopup.js",s=()=>"../components/common/MyBackToTop.js",t=o.defineComponent({__name:"BaseLayout",setup:e=>(e,n)=>o.e({a:e.showPay},(e.showPay,{}))}),c=o._export_sfc(t,[["__scopeId","data-v-678057d8"]]);wx.createComponent(c);

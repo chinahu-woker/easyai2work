@@ -1,1 +1,0 @@
-<view style="{{a + ';' + virtualHostStyle}}" class="{{['u-gap', 'data-v-d1b5a85d', virtualHostClass]}}" hidden="{{virtualHostHidden}}" id="{{virtualHostId}}"></view>

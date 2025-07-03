@@ -1,1 +1,0 @@
-"use strict";const e=require("../../common/vendor.js");Math||o();const o=()=>"./CustomSlider.js",t=e.defineComponent({__name:"Height",props:{modelValue:{default:512},modelModifiers:{}},emits:["update:modelValue"],setup(o){const t=e.useModel(o,"modelValue");return(o,l)=>({a:e.o((e=>t.value=e)),b:e.p({title:"高度",modelValue:t.value})})}});wx.createComponent(t);

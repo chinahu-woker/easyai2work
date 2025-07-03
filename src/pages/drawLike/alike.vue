@@ -8,15 +8,15 @@
     <swiper class="carousel-swiper" :circular="false" :indicator-dots="true" :autoplay="false" :interval="3000"
       :duration="500" :style="{ height: swiperHeight + 'px' }" @change="onSwiperChange">
 
-      <swiper-item :key="index" class="carousel-item" v-for="(item, index) in draw_data.data.output">
+      <swiper-item :key="index" class="carousel-item" v-for="(item, index) in draw_data.data?.output">
         <template v-if="getItemType(item) === 'image'">
           <image class="carousel-image" :src="item" mode="aspectFill" @click="previewImage(item)" />
         </template>
         <template v-else>
           <view class="video-wrapper">
-            <video class="carousel-video" :src="item" :show-progress="false" :enable-progress-gesture="false"
-              :custom-cache="true" @play="handleVideoPlay(index)" @fullscreenchange="handleVideoFullscreenChange"
-              @error="handleVideoError"></video>
+            <video class="carousel-video" :id="`video-${index}`" :src="item" :show-progress="false"
+              :enable-progress-gesture="false" :custom-cache="true" @play="handleVideoPlay(index)"
+              @fullscreenchange="handleVideoFullscreenChange" @error="handleVideoError"></video>
             <!-- 可加播放按钮遮罩 -->
             <view v-if="currentVideoIndex !== index" class="video-play-overlay" @click="playVideo(index)">
               <fui-icon name="play" color="#fff" size="60"></fui-icon>
@@ -27,8 +27,8 @@
 
     </swiper>
     <!-- 自定义指示器 -->
-    <view class="thumbnail-nav" v-if="draw_data.data.output.length > 1">
-      <image v-for="(item, index_cer) in draw_data.data.output" :key="index_cer" :src="item"
+    <view class="thumbnail-nav" v-if="draw_data.data?.output?.length > 1">
+      <image v-for="(item, index_cer) in draw_data.data?.output" :key="index_cer" :src="item"
         :class="['thumbnail', { active: currentIndex === index_cer }]" @click="goToSlide(index_cer)" />
     </view>
   </view>
@@ -63,41 +63,77 @@
       <text>用户评论</text>
     </view>
 
+
+
     <!-- 评论列表 -->
     <view class="comment-list">
 
       <view class="comment-item" v-for="comment in draw_data.data.comment" :key="comment._id">
-        <view class="comment-header">
-          <fui-avatar size="small" :src="comment.author.avatar_url"></fui-avatar>
+        <!-- 在评论项的.comment-item容器内添加 -->
+        <!-- {{ comment.author._id == user._id   }}
+          
+        {{ user  }} -->
+        <view class="comment-content-wrapper">
 
-          <view class="comment-author">{{ comment.author.nickname || comment.author.username }}</view>
-        </view>
-        <view class="comment-content">{{ comment.content }}</view>
-        <view class="comment-time">{{ formatTime(comment.created_at) }}</view>
-        <view class="reply-list" v-if="comment.replies && comment.replies.length">
-          <view class="reply-item" v-for="reply in comment.replies" :key="reply._id">
-            <view class="reply-header">
-              <fui-avatar size="small" :src="reply.author.avatar_url"></fui-avatar>
-              <view class="reply-author">
-                {{ reply.author.nickname || reply.author.username }}
-                <text class="at-user">@{{ getUsernameById(reply.replyTo) }}</text>
-              </view>
-            </view>
-            <view class="reply-content">{{ reply.content }}</view>
-            <view class="comment-time">{{ formatTime(reply.created_at) }}</view>
+          <view class="comment-header">
+
+            <fui-avatar size="small" :src="comment.author?.avatar_url"></fui-avatar>
+            <view class="comment-author">{{ comment.author?.nickname || comment.author?.username }}</view>
+
           </view>
-        </view>
 
+          <view class="comment-content">{{ comment?.content }}</view>
+          <view class="comment-time">{{ formatTime(comment.created_at) }}</view>
+          <view class="reply-list" v-if="comment.replies && comment.replies?.length">
+            <view class="reply-item" v-for="reply in comment.replies" :key="reply._id">
+              <view class="reply-header">
+                <fui-avatar size="small" :src="reply.author?.avatar_url"></fui-avatar>
+                <view class="reply-author">
+                  {{ reply.author?.nickname || reply.author?.username }}
+                  <text class="comment-author">@{{ comment.author?.nickname || comment.author?.username }}</text>
+                </view>
+              </view>
+              <view class="reply-content">{{ reply.content }}</view>
+              <view class="comment-time">{{ formatTime(reply.created_at) }}</view>
+
+           
+                <!-- <text v-if="comment.author._id === user._id" class="delete-comment"
+                  @click="deleteComment(comment._id)">删除</text> -->
+                <!-- <text class="refrenc-comment"
+                  @click="RefComments(comment._id, comment._id, comment.author._id)">回复</text> -->
+         
+
+
+
+
+
+            </view>
+
+
+          </view>
+          <text v-if="comment.author._id === user._id" class="delete-comment"
+            @click="deleteComment(comment._id)">删除</text>
+          <text class="refrenc-comment" @click="RefComments(comment._id, comment._id, comment.author._id)">回复</text>
+
+
+        </view>
       </view>
 
       <!-- 暂无评论提示 -->
-      <view v-if="!draw_data.data.comment?.length" class="no-comment">暂无评论</view>
+      <view v-if="!draw_data?.data.comment?.length" class="no-comment">暂无评论</view>
+      <!-- <view v-if="draw_data.data.comment && !draw_data.data.comment.length" class="no-comment">暂无评论</view> -->
     </view>
 
     <!-- 评论输入框 -->
     <view class="comment-input-container">
+      <view v-if="activeReply" class="reply-target">
+        回复给：{{ activeReply.author.nickname || activeReply.author.username }}
+
+      </view>
       <input class="comment-input" placeholder="写点什么..." v-model="newComment" @confirm="submitComment" />
-      <button class="comment-btn submit-button"   @click="submitComment">发送</button>
+      <button class="comment-btn submit-button" @click="submitComment">发送</button>
+      <button v-if="activeReply" class="comment-btn submit-button" @click="clearReply">取消</button>
+      <!-- <text class="cancel-reply" @click="clearReply">取消</text> -->
       <!-- <up-button icon="chat-fill" class="submit-button comment-btn  " @click="submitComment" type="primary" shape="circle">
         发送
       </up-button> -->
@@ -110,12 +146,30 @@
 
 import { onLoad } from "@dcloudio/uni-app";
 import { ref } from 'vue'
-import { getdetail, Comment, allUserName } from "@/composables/aiChat.ts";
+import { getdetail, Comment, allUserName, delComment } from "@/composables/aiChat.ts";
 import { useAppStore } from "@/stores/appStore.ts";
+import {
+  isLogin
+} from "@/composables/useCommon.ts";
 import { storeToRefs } from "pinia";
 const { user } = storeToRefs(useAppStore())
+// 在 script setup 顶部添加
+interface CommentItem {
+  _id: string
+  content: string
+  created_at: number
+  author: {
+    _id: string
+    username: string
+    avatar_url?: string
+  }
+  replyTo?: {
+    _id: string
+  }
+  replies?: CommentItem[]
+}
 function leftClick() {
-  uni.reLaunch({ url: '/pages/index/index?pageindex=1' });
+  uni.navigateBack({ url: '/pages/index/index?pageindex=2' });
 
 }
 
@@ -196,13 +250,13 @@ function goToSlide(index: number) {
     console.warn('setCurrent 方法不可用或 swiper 未正确初始化')
   }
 }
-function getAvatarUrl(userId: string): string {
-  const users = uni.getStorageSync('allUserNames') || []
-  if (!Array.isArray(users)) return ''
+// function getAvatarUrl(userId: string): string {
+//   const users = uni.getStorageSync('allUserNames') || []
+//   if (!Array.isArray(users)) return ''
 
-  const user = users.find(u => u._id === userId)
-  return user?.avatar_url || '/static/default-avatar.png' // 默认头像路径
-}
+//   const user = users.find(u => u._id === userId)
+//   return user?.avatar_url || '/static/default-avatar.png' // 默认头像路径
+// }
 
 
 // function onSwiperChange(e) {
@@ -245,7 +299,13 @@ async function fetchAndSaveUserNames() {
     // console.error('获取用户列表失败:', err)
   }
 }
-const draw_data = ref<any>()
+// const draw_data = ref<any>()
+const draw_data = ref<{ data: { comment?: CommentItem[] } }>({
+  data: {}
+});
+
+const detailId = ref<string>('')
+
 onLoad(async (params) => {
   try {
     // 验证参数
@@ -254,6 +314,7 @@ onLoad(async (params) => {
     }
     // 加载数据
     console.log('id:', params.id, user.value, draw_data)
+    detailId.value = params.id // 保存 id 供后续使用
 
     await getdetail(user.value, params.id).then(res => {
       console.log('获取到的getUserKey信息:', res.data);
@@ -267,7 +328,7 @@ onLoad(async (params) => {
     error.value = '加载失败，请重试'
     loading.value = false
   }
-  fetchAndSaveUserNames()
+  // fetchAndSaveUserNames()
 })
 // ===================================================
 // 定义需要显示的字段
@@ -311,13 +372,30 @@ function generateSame() {
 
 // --------------------------------------------------------------------
 
-function getReplyToUsername(reply) {
-  const users = uni.getStorageSync('allUserNames') || []
-  if (!Array.isArray(users)) return '未知用户'
 
-  const user = users.find(u => u._id === reply.replyTo?._id)
-  return user?.username || '未知用户'
+// 删除评论方法
+async function deleteComment(commentId: string) {
+  uni.showModal({
+    title: '提示',
+    content: '确定要删除这条评论吗？',
+    success: async (res) => {
+      if (res.confirm) {
+        try {
+          await delComment(user.value, commentId)
+          uni.showToast({ title: '删除成功' })
+
+          // 重新获取数据保持列表同步
+          const res = await getdetail(user.value, detailId.value)
+          draw_data.value = res.data
+        } catch (err) {
+          console.error('删除失败:', err)
+          uni.showToast({ title: '删除失败', icon: 'none' })
+        }
+      }
+    }
+  })
 }
+
 
 function formatTime(timestamp: number): string {
   if (!timestamp || isNaN(timestamp)) {
@@ -328,8 +406,7 @@ function formatTime(timestamp: number): string {
 }
 const newComment = ref('')
 function getUsernameById(userId: string | { _id: string }): string {
-  const users = uni.getStorageSync('allUserNames') || []
-  if (!Array.isArray(users)) return '未知用户'
+
 
   let id: string
   if (typeof userId === 'string') {
@@ -340,13 +417,56 @@ function getUsernameById(userId: string | { _id: string }): string {
     return '未知用户'
   }
 
-  const foundUser = users.find(u => u._id === id)
-  return foundUser?.username || '未知用户'
+
+}
+
+// 回复相关状态
+const activeReply = ref<{
+  _id: string
+  author: { _id: string, nickname?: string, username: string }
+  rootId: string
+} | null>(null)
+
+// 回复目标评论
+// 当点击回复按钮时，只记录回复目标信息
+function RefComments(targetId: string, rootId: string, replyTo: string) {
+  activeReply.value = {
+    _id: targetId,
+    author: {
+      _id: replyTo,
+      username: getUsernameById(replyTo)
+    },
+    rootId: rootId
+  }
+
+  // 滚动到输入框位置
+  uni.createSelectorQuery()
+    .select('.comment-section')
+    .boundingClientRect(res => {
+      if (res) {
+        uni.pageScrollTo({
+          scrollTop: res.top - 100,
+          duration: 300
+        })
+      }
+    })
+    .exec()
+}
+
+// ==========================================================
+// 清除回复状态
+function clearReply() {
+  activeReply.value = null
 }
 async function submitComment() {
+  if (!isLogin.value) {
+    uni.showToast({ title: '请先登录', icon: 'error' })
+    return
+  }
+
   if (!newComment.value.trim()) {
-    uni.showToast({ title: '请输入内容', icon: 'none' });
-    return;
+    uni.showToast({ title: '请输入内容', icon: 'none' })
+    return
   }
 
   try {
@@ -354,39 +474,92 @@ async function submitComment() {
       targetType: "work",
       content: newComment.value,
       targetId: draw_data.value?.data?._id
-    };
+    }
 
     if (!putdata.targetId) {
-      uni.showToast({ title: '目标ID缺失', icon: 'none', duration: 2000 });
-      return;
+      uni.showToast({ title: '目标ID缺失', icon: 'none', duration: 2000 })
+      return
     }
-
-    const res = await Comment(user.value, putdata);
-
-    console.log('评论提交成功:', res.data);
-
-    const newCommentItem = {
-      ...res.data,
-      // author: {
-      //   _id: res.data.author,
-      //   username: getUsernameById(res.data.author)
-      // }
+    // 如果是回复
+    if (activeReply.value) {
+      putdata.rootId = activeReply.value._id
+      putdata.replyTo = activeReply.value.author._id
     }
+    await Comment(user.value, putdata)
+    uni.showToast({ title: '提交成功' })
 
-    // 使用 concat 避免直接修改响应式数组
-    draw_data.value.data.comment = [newCommentItem, ...draw_data.value.data.comment]
+    // 提交后重新拉取最新数据
+    const res = await getdetail(user.value, detailId.value)
+    draw_data.value = res.data
+
     newComment.value = ''
 
-    uni.showToast({ title: '评论成功' });
-
   } catch (err) {
-    console.error('评论提交失败:', err);
-    uni.showToast({ title: '评论失败，请重试', icon: 'none' });
+    console.error('评论提交失败:', err)
+    uni.showToast({ title: '评论失败，请重试', icon: 'none' })
   }
 }
 </script>
 
 <style>
+.comment-item {
+  position: relative;
+  padding: 30rpx 120rpx 30rpx 30rpx;
+}
+
+.refrenc-comment {
+  position: absolute;
+  /* top: 30rpx;         */
+  right: -5rpx;
+
+  font-size: 24rpx;
+  color: #999;
+  /* background: rgba(255, 255, 255, 0.98);   */
+  /* padding: 6rpx 14rpx;   */
+  /* border-radius: 30rpx;   */
+  /* box-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.12);   */
+  z-index: 2;
+  /* backdrop-filter: blur(4rpx);   */
+  transition: all 0.2s ease-in-out;
+
+  &:hover {
+    color: #ff4949;
+    background: rgba(255, 255, 255, 0.95);
+    transform: translateY(-2rpx);
+  }
+
+  &:active {
+    transform: scale(0.96) translateY(2rpx);
+    box-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.15);
+  }
+}
+
+.delete-comment {
+  position: absolute;
+  /* top: 0rpx;         */
+  right: 80rpx;
+  font-size: 24rpx;
+  color: #999;
+  /* background: rgba(255, 255, 255, 0.98);   */
+  /* padding: 6rpx 14rpx;   */
+  /* border-radius: 30rpx;   */
+  /* box-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.12);   */
+  z-index: 2;
+  /* backdrop-filter: blur(4rpx);   */
+  transition: all 0.2s ease-in-out;
+
+  &:hover {
+    color: #ff4949;
+    background: rgba(255, 255, 255, 0.95);
+    transform: translateY(-2rpx);
+  }
+
+  &:active {
+    transform: scale(0.96) translateY(2rpx);
+    box-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.15);
+  }
+}
+
 .comment-section {
   margin: 60rpx 30rpx;
   padding: 30rpx;
@@ -465,24 +638,21 @@ async function submitComment() {
   border-radius: 30rpx;
   margin-left: 20rpx;
   padding: 0;
-  display: flex; /* 确保内容正确显示 */
-  align-items: center; /* 垂直居中对齐 */
-  justify-content: center; /* 水平居中对齐 */
-   line-height: normal; /* 取消默认行高 */
+  display: flex;
+  /* 确保内容正确显示 */
+  align-items: center;
+  /* 垂直居中对齐 */
+  justify-content: center;
+  /* 水平居中对齐 */
+  line-height: normal;
+  /* 取消默认行高 */
 }
 
-.comment-item {
-  margin-bottom: 40rpx;
-  padding-bottom: 20rpx;
-  border-bottom: 2rpx solid #eee;
-  display: flex;
-  flex-direction: column;
-}
 
 .comment-header {
   display: flex;
   align-items: center;
-  margin-bottom: 10rpx;
+  margin-bottom: 20rpx;
 }
 
 .username {
@@ -529,28 +699,39 @@ async function submitComment() {
   color: #555;
   margin-left: 56rpx;
 }
-.submit-button {
-  border: none; /* 移除边框 */
-  box-shadow: none; /* 移除阴影 */
-  background: linear-gradient(to right, #7E56FF, #4D31B2); /* 设置渐变背景 */
-  border-radius: 50px; /* 圆角 */
-  color: #fff; /* 文字颜色为白色 */
 
- 
-  cursor: pointer; /* 鼠标悬停时变为指针 */
-  transition: all 0.3s ease; /* 平滑过渡效果 */
+.submit-button {
+  border: none;
+  /* 移除边框 */
+  box-shadow: none;
+  /* 移除阴影 */
+  background: linear-gradient(to right, #7E56FF, #4D31B2);
+  /* 设置渐变背景 */
+  border-radius: 50px;
+  /* 圆角 */
+  color: #fff;
+  /* 文字颜色为白色 */
+
+
+  cursor: pointer;
+  /* 鼠标悬停时变为指针 */
+  transition: all 0.3s ease;
+  /* 平滑过渡效果 */
   display: flex;
 
   /* 悬停状态 */
   &:hover {
-    background: linear-gradient(to right, #6A4AFF, #3C2A99); /* 悬停时渐变色加深 */
+    background: linear-gradient(to right, #6A4AFF, #3C2A99);
+    /* 悬停时渐变色加深 */
   }
 
   /* 点击状态 */
   &:active {
-    transform: scale(0.98); /* 点击时轻微缩放 */
+    transform: scale(0.98);
+    /* 点击时轻微缩放 */
   }
 }
+
 /* --------------------------------------------------------------- */
 .config-table {
   margin: 40rpx 30rpx;

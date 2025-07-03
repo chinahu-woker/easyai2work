@@ -1,9 +1,0 @@
-{
-  "component": true,
-  "usingComponents": {
-    "up-button": "../../node-modules/uview-plus/components/u-button/u-button",
-    "tn-popup": "../../node-modules/@tuniao/tnui-vue3-uniapp/components/popup/src/popup",
-    "tn-scroll-list": "../../node-modules/@tuniao/tnui-vue3-uniapp/components/scroll-list/src/scroll-list",
-    "tn-icon": "../../node-modules/@tuniao/tnui-vue3-uniapp/components/icon/src/icon"
-  }
-}

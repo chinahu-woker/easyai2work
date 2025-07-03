@@ -1,7 +1,0 @@
-{
-  "component": true,
-  "usingComponents": {
-    "fui-tabs": "./firstui/fui-tabs/fui-tabs",
-    "fui-nav-bar": "./firstui/fui-nav-bar/fui-nav-bar"
-  }
-}

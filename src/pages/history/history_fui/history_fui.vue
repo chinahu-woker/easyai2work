@@ -185,43 +185,53 @@ function handleClick(StringTxt) {
 
 }
 // 定义 dowonVideo 函数，并指定 url 参数的类型为 string
-async function dowonVideo(url: string) {
-	// 替换为你的视频地址
-	const videoUrl = url;
+async function downloadVideo(url: string) {
+  if (!url || !url.startsWith('https://')) {
+    uni.showToast({ title: '视频地址无效', icon: 'none' });
+    return;
+  }
 
-	try {
-		// 下载视频到临时路径，使用 await 等待 Promise 解析
-		const downloadResult = await uni.downloadFile({
-			url: videoUrl,
-		});
+  try {
+    const downloadResult = await uni.downloadFile({ url });
 
-		// 检查下载是否成功
-		if (downloadResult.statusCode === 200) {
-			const { tempFilePath } = downloadResult;
+    if (downloadResult.statusCode !== 200) {
+      console.error('下载失败，状态码:', downloadResult.statusCode);
+      uni.showToast({ title: '下载失败', icon: 'none' });
+      return;
+    }
 
-			// 保存到相册
-			await uni.saveVideoToPhotosAlbum({
-				filePath: tempFilePath,
-			});
-
-			uni.showToast({
-				title: '下载成功',
-				icon: 'success',
-			});
-		} else {
-			console.error('下载失败，状态码:', downloadResult.statusCode);
-			uni.showToast({
-				title: '下载失败',
-				icon: 'none',
-			});
-		}
-	} catch (error) {
-		console.error('下载失败:', error);
-		uni.showToast({
-			title: '下载失败',
-			icon: 'none',
-		});
-	}
+    // 尝试保存到相册
+    try {
+      await uni.saveVideoToPhotosAlbum({
+        filePath: downloadResult.tempFilePath
+      });
+      uni.showToast({ title: '保存到相册成功', icon: 'success' });
+    } catch (saveErr) {
+      // 处理保存失败（可能是权限被拒）
+      console.error('保存到相册失败:', saveErr);
+      if (saveErr.errMsg.includes('auth deny')) {
+        // 提示用户开启权限
+        uni.showModal({
+          title: '权限不足',
+          content: '请允许保存视频到相册',
+          success: (res) => {
+            if (res.confirm) {
+              uni.openSetting({
+                success: (settingRes) => {
+                  console.log('相册权限设置:', settingRes.authSetting);
+                }
+              });
+            }
+          }
+        });
+      } else {
+        uni.showToast({ title: '保存失败', icon: 'none' });
+      }
+    }
+  } catch (downloadErr) {
+    console.error('下载过程出错:', downloadErr);
+    uni.showToast({ title: '下载失败', icon: 'none' });
+  }
 }
 
 const isDeleting = ref(false)
@@ -312,10 +322,10 @@ const handleDeleteTouchEnd = () => {
 						</view> -->
 
 						<view class="video-controls">
-							<view class="control-button download-btn" @click="dowonVideo(item.output[0])">
+							<view class="control-button download-btn" @click="downloadVideo(item.output[0])">
 								<tn-icon name="download-simple" size="36"></tn-icon>
 							</view>
-							<view class="control-button delete-btn" @click="removeHistoryRecord(item._id)">
+							<view class="control-button delete-btn"  @click="item.output && item.output.length > 0 && downloadVideo(item.output[0])">
 								<tn-icon name="delete" size="36"></tn-icon>
 							</view>
 						</view>

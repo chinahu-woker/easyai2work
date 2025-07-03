@@ -1,8 +1,0 @@
-{
-  "component": true,
-  "usingComponents": {
-    "tn-number-box": "../../node-modules/@tuniao/tnui-vue3-uniapp/components/number-box/src/number-box",
-    "param-card": "../common/ParamCard",
-    "my-title": "../common/MyTitle"
-  }
-}

@@ -1,4 +1,45 @@
 
+.comment-item {
+  position: relative;
+  padding: 30rpx 120rpx 30rpx 30rpx;
+}
+.refrenc-comment {
+  position: absolute;
+  /* top: 30rpx;         */
+  right: -5rpx;
+
+  font-size: 24rpx;
+  color: #999;
+  /* background: rgba(255, 255, 255, 0.98);   */
+  /* padding: 6rpx 14rpx;   */
+  /* border-radius: 30rpx;   */
+  /* box-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.12);   */
+  z-index: 2;
+  /* backdrop-filter: blur(4rpx);   */
+  transition: all 0.2s ease-in-out;
+}
+.refrenc-comment:active {
+    transform: scale(0.96) translateY(2rpx);
+    box-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.15);
+}
+.delete-comment {
+  position: absolute;
+  /* top: 0rpx;         */
+  right: 80rpx;
+  font-size: 24rpx;
+  color: #999;
+  /* background: rgba(255, 255, 255, 0.98);   */
+  /* padding: 6rpx 14rpx;   */
+  /* border-radius: 30rpx;   */
+  /* box-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.12);   */
+  z-index: 2;
+  /* backdrop-filter: blur(4rpx);   */
+  transition: all 0.2s ease-in-out;
+}
+.delete-comment:active {
+    transform: scale(0.96) translateY(2rpx);
+    box-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.15);
+}
 .comment-section {
   margin: 60rpx 30rpx;
   padding: 30rpx;
@@ -66,22 +107,19 @@
   border-radius: 30rpx;
   margin-left: 20rpx;
   padding: 0;
-  display: flex; /* 确保内容正确显示 */
-  align-items: center; /* 垂直居中对齐 */
-  justify-content: center; /* 水平居中对齐 */
-   line-height: normal; /* 取消默认行高 */
-}
-.comment-item {
-  margin-bottom: 40rpx;
-  padding-bottom: 20rpx;
-  border-bottom: 2rpx solid #eee;
   display: flex;
-  flex-direction: column;
+  /* 确保内容正确显示 */
+  align-items: center;
+  /* 垂直居中对齐 */
+  justify-content: center;
+  /* 水平居中对齐 */
+  line-height: normal;
+  /* 取消默认行高 */
 }
 .comment-header {
   display: flex;
   align-items: center;
-  margin-bottom: 10rpx;
+  margin-bottom: 20rpx;
 }
 .username {
   margin-left: 16rpx;
@@ -122,23 +160,32 @@
   margin-left: 56rpx;
 }
 .submit-button {
-  border: none; /* 移除边框 */
-  box-shadow: none; /* 移除阴影 */
-  background: linear-gradient(to right, #7E56FF, #4D31B2); /* 设置渐变背景 */
-  border-radius: 50px; /* 圆角 */
-  color: #fff; /* 文字颜色为白色 */
+  border: none;
+  /* 移除边框 */
+  box-shadow: none;
+  /* 移除阴影 */
+  background: linear-gradient(to right, #7E56FF, #4D31B2);
+  /* 设置渐变背景 */
+  border-radius: 50px;
+  /* 圆角 */
+  color: #fff;
+  /* 文字颜色为白色 */
 
- 
-  cursor: pointer; /* 鼠标悬停时变为指针 */
-  transition: all 0.3s ease; /* 平滑过渡效果 */
+
+  cursor: pointer;
+  /* 鼠标悬停时变为指针 */
+  transition: all 0.3s ease;
+  /* 平滑过渡效果 */
   display: flex;
 
   /* 悬停状态 */
 }
 /* 点击状态 */
 .submit-button:active {
-    transform: scale(0.98); /* 点击时轻微缩放 */
+    transform: scale(0.98);
+    /* 点击时轻微缩放 */
 }
+
 /* --------------------------------------------------------------- */
 .config-table {
   margin: 40rpx 30rpx;

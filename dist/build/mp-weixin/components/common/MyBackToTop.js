@@ -1,1 +1,0 @@
-"use strict";const o=require("../../common/vendor.js");if(!Array){o.resolveComponent("up-back-top")()}Math;const e=o.defineComponent({__name:"MyBackToTop",setup(e){const n=o.ref(0);return o.onPageScroll((o=>{n.value=o.scrollTop})),(e,r)=>({a:o.p({"scroll-top":n.value})})}});e.__runtimeHooks=1,wx.createComponent(e);

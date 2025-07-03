@@ -168,7 +168,29 @@ export const getdetail = (data,id) => {
 	});
 }
 
+export const delComment = (data, id) => {
+	// 获取用户Key值
+	const restoken = data.refresh_token;
+	// console.log("获取用户restoken值", restoken)
 
+	return new Promise((resolve, reject) => {
+		const requestTask = uni.request({
+			url: `${getBaseURL()}/comment/${id}`, // 请求地址
+			method: "DELETE",
+			header: {
+				Authorization: "Bearer " + restoken,
+			},
+			success: (res) => {
+				resolve(res);
+			},
+			fail: (err) => {
+				reject(err);
+				console.log("请求失败", err);
+			},
+		});
+		// console.log('requestTask', requestTask)
+	});
+};
 export const Comment = (data,content) => {
 	// 获取用户Key值
 	const restoken = data.refresh_token

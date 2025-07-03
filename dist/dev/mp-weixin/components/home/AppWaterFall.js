@@ -16,7 +16,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const waterfallElement = common_vendor.ref();
     const showApps = common_vendor.ref();
     const getshowApps = () => {
-      console.log("home_tagActiveIndex", home_tagActiveIndex.value);
+      common_vendor.index.__f__("log", "at components/home/AppWaterFall.vue:25", "home_tagActiveIndex", home_tagActiveIndex.value);
       if (home_tagActiveIndex.value === 0) {
         showApps.value = [...workflows_all.value];
         return;
@@ -25,7 +25,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         var _a;
         return (_a = item.tags) == null ? void 0 : _a.includes(home_tagsList.value[home_tagActiveIndex.value].name);
       });
-      console.log("result", result);
+      common_vendor.index.__f__("log", "at components/home/AppWaterFall.vue:32", "result", result);
       showApps.value = [...result];
     };
     common_vendor.watch(home_tagActiveIndex, () => {
@@ -37,7 +37,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const appStore = stores_appStore.useAppStore();
     const handleNavigate = (item) => {
       appStore.tabbarIndex = null;
-      common_vendor.index.navigateTo({ url: "/pages/draw/draw_info/draw_info?id=" + item._id });
+      common_vendor.index.navigateTo({ url: "/pages/draw/apps/apps?id=" + item._id });
     };
     return (_ctx, _cache) => {
       return {
@@ -91,3 +91,4 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
 });
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-f26ed2f2"]]);
 wx.createComponent(Component);
+//# sourceMappingURL=../../../.sourcemap/mp-weixin/components/home/AppWaterFall.js.map

@@ -1,1 +1,0 @@
-<view style="{{'height:' + a + ';' + virtualHostStyle}}" class="{{['fui-waterfall__wrap', 'data-v-bd87e246', virtualHostClass]}}" hidden="{{virtualHostHidden}}" id="{{virtualHostId}}"><slot></slot></view>

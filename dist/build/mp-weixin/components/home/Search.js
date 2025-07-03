@@ -1,1 +1,0 @@
-"use strict";const e=require("../../common/vendor.js");if(!Array){e.resolveComponent("up-search")()}Math;const o=e.defineComponent({__name:"Search",setup(o){const n=e.ref("");return(o,r)=>({a:e.o((e=>n.value=e)),b:e.p({placeholder:"搜应用搜创意，一键直达",modelValue:n.value})})}});wx.createComponent(o);

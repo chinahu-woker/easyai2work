@@ -26,14 +26,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       imageList.value = modelValue.value || [];
     });
     common_vendor.watch(imageList, () => {
-      console.log("imageList", imageList);
+      common_vendor.index.__f__("log", "at components/dynamic/MoreImageUpload.vue:36", "imageList", imageList);
       modelValue.value = imageList.value;
     });
     const uploadFilePromise = async (file) => {
       const url = file.path;
       return new Promise(async (resolve, reject) => {
         const uploadResult = await utils_request.uploadFile(url);
-        console.log("uploadResult", uploadResult);
+        common_vendor.index.__f__("log", "at components/dynamic/MoreImageUpload.vue:52", "uploadResult", uploadResult);
         if (uploadResult) {
           resolve(uploadResult);
         }
@@ -60,3 +60,4 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
 });
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-96383370"]]);
 wx.createComponent(Component);
+//# sourceMappingURL=../../../.sourcemap/mp-weixin/components/dynamic/MoreImageUpload.js.map

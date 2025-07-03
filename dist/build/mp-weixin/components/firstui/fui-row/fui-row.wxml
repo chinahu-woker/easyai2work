@@ -1,1 +1,0 @@
-<view class="{{['fui-row__box', 'data-v-6ef06d51', a, b, c, virtualHostClass]}}" style="{{'margin-top:' + d + ';' + ('margin-bottom:' + e) + ';' + ('margin-left:' + f) + ';' + ('margin-right:' + g) + ';' + virtualHostStyle}}" hidden="{{virtualHostHidden}}" id="{{virtualHostId}}"><slot></slot></view>

@@ -59,26 +59,26 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const getHistoryData = async (pageNumber) => {
       const { items } = await utils_request.request(`/draw/history/${pageNumber}`);
       historyData.value = items;
-      console.log("pageNumber", pageNumber);
-      console.log("historyData", historyData.value);
+      common_vendor.index.__f__("log", "at pages/history/history_fui/history_fui.vue:57", "pageNumber", pageNumber);
+      common_vendor.index.__f__("log", "at pages/history/history_fui/history_fui.vue:58", "historyData", historyData.value);
     };
     const removeHistoryRecord = async (id) => {
       try {
-        console.log("Attempting to remove history record with id:", id);
+        common_vendor.index.__f__("log", "at pages/history/history_fui/history_fui.vue:63", "Attempting to remove history record with id:", id);
         const response = await utils_request.request(`/draw/history/${id}`, {
           method: "DELETE"
         });
-        console.log("Response status:", response.status);
-        console.log("History record removed:", id);
+        common_vendor.index.__f__("log", "at pages/history/history_fui/history_fui.vue:68", "Response status:", response.status);
+        common_vendor.index.__f__("log", "at pages/history/history_fui/history_fui.vue:78", "History record removed:", id);
         historyData.value = historyData.value.filter((item) => item._id !== id);
-        console.log("Updated historyData:", historyData.value);
+        common_vendor.index.__f__("log", "at pages/history/history_fui/history_fui.vue:80", "Updated historyData:", historyData.value);
         common_vendor.index.showToast({
           title: "删除成功",
           icon: "success",
           duration: 2e3
         });
       } catch (err) {
-        console.error("Failed to remove history record:", err);
+        common_vendor.index.__f__("error", "at pages/history/history_fui/history_fui.vue:87", "Failed to remove history record:", err);
       }
     };
     common_vendor.computed(() => {
@@ -96,7 +96,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           });
         }
       });
-      console.log("tempTimeLineData:", tempTimeLineData);
+      common_vendor.index.__f__("log", "at pages/history/history_fui/history_fui.vue:110", "tempTimeLineData:", tempTimeLineData);
       return tempTimeLineData.sort((a, b) => {
         return new Date(b.day).getTime() - new Date(a.day).getTime();
       });
@@ -114,7 +114,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const currentTabIndex = common_vendor.ref(0);
     const tabs = common_vendor.ref(["时间轴模式", "相册模式"]);
     function QieHuan(e) {
-      console.log("-----------------------------------", e);
+      common_vendor.index.__f__("log", "at pages/history/history_fui/history_fui.vue:134", "-----------------------------------", e);
       currentTabIndex.value = e.index;
     }
     const show = common_vendor.ref(false);
@@ -123,7 +123,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     function showGallery(data) {
       show.value = true;
       GalleryPic.value = data;
-      console.log(GalleryPic.value);
+      common_vendor.index.__f__("log", "at pages/history/history_fui/history_fui.vue:145", GalleryPic.value);
     }
     function hideGallery() {
       show.value = false;
@@ -146,41 +146,53 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         showToast: true,
         // 是否显示提示，默认为true
         success: function() {
-          console.log("复制成功");
+          common_vendor.index.__f__("log", "at pages/history/history_fui/history_fui.vue:179", "复制成功");
         },
         fail: function(err) {
-          console.error("复制失败", err);
+          common_vendor.index.__f__("error", "at pages/history/history_fui/history_fui.vue:182", "复制失败", err);
         }
       });
     }
-    async function dowonVideo(url) {
-      const videoUrl = url;
+    async function downloadVideo(url) {
+      if (!url || !url.startsWith("https://")) {
+        common_vendor.index.showToast({ title: "视频地址无效", icon: "none" });
+        return;
+      }
       try {
-        const downloadResult = await common_vendor.index.downloadFile({
-          url: videoUrl
-        });
-        if (downloadResult.statusCode === 200) {
-          const { tempFilePath } = downloadResult;
-          await common_vendor.index.saveVideoToPhotosAlbum({
-            filePath: tempFilePath
-          });
-          common_vendor.index.showToast({
-            title: "下载成功",
-            icon: "success"
-          });
-        } else {
-          console.error("下载失败，状态码:", downloadResult.statusCode);
-          common_vendor.index.showToast({
-            title: "下载失败",
-            icon: "none"
-          });
+        const downloadResult = await common_vendor.index.downloadFile({ url });
+        if (downloadResult.statusCode !== 200) {
+          common_vendor.index.__f__("error", "at pages/history/history_fui/history_fui.vue:198", "下载失败，状态码:", downloadResult.statusCode);
+          common_vendor.index.showToast({ title: "下载失败", icon: "none" });
+          return;
         }
-      } catch (error) {
-        console.error("下载失败:", error);
-        common_vendor.index.showToast({
-          title: "下载失败",
-          icon: "none"
-        });
+        try {
+          await common_vendor.index.saveVideoToPhotosAlbum({
+            filePath: downloadResult.tempFilePath
+          });
+          common_vendor.index.showToast({ title: "保存到相册成功", icon: "success" });
+        } catch (saveErr) {
+          common_vendor.index.__f__("error", "at pages/history/history_fui/history_fui.vue:211", "保存到相册失败:", saveErr);
+          if (saveErr.errMsg.includes("auth deny")) {
+            common_vendor.index.showModal({
+              title: "权限不足",
+              content: "请允许保存视频到相册",
+              success: (res) => {
+                if (res.confirm) {
+                  common_vendor.index.openSetting({
+                    success: (settingRes) => {
+                      common_vendor.index.__f__("log", "at pages/history/history_fui/history_fui.vue:221", "相册权限设置:", settingRes.authSetting);
+                    }
+                  });
+                }
+              }
+            });
+          } else {
+            common_vendor.index.showToast({ title: "保存失败", icon: "none" });
+          }
+        }
+      } catch (downloadErr) {
+        common_vendor.index.__f__("error", "at pages/history/history_fui/history_fui.vue:232", "下载过程出错:", downloadErr);
+        common_vendor.index.showToast({ title: "下载失败", icon: "none" });
       }
     }
     const isDeleting = common_vendor.ref(false);
@@ -282,13 +294,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               name: "download-simple",
               size: "36"
             }),
-            B: common_vendor.o(($event) => dowonVideo(item.output[0]), index),
+            B: common_vendor.o(($event) => downloadVideo(item.output[0]), index),
             C: "56f14cc7-15-" + i0 + "," + ("56f14cc7-7-" + i0),
             D: common_vendor.p({
               name: "delete",
               size: "36"
             }),
-            E: common_vendor.o(($event) => removeHistoryRecord(item._id), index)
+            E: common_vendor.o(($event) => item.output && item.output.length > 0 && downloadVideo(item.output[0]), index)
           } : {
             F: "56f14cc7-16-" + i0 + "," + ("56f14cc7-7-" + i0),
             G: common_vendor.p({
@@ -344,3 +356,4 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
 });
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-56f14cc7"]]);
 wx.createPage(MiniProgramPage);
+//# sourceMappingURL=../../../../.sourcemap/mp-weixin/pages/history/history_fui/history_fui.js.map

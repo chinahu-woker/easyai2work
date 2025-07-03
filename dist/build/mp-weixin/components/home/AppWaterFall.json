@@ -1,6 +1,0 @@
-{
-  "component": true,
-  "usingComponents": {
-    "tn-water-fall": "../../node-modules/@tuniao/tnui-vue3-uniapp/components/water-fall/src/water-fall"
-  }
-}

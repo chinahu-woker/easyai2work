@@ -1,1 +1,0 @@
-<up-tabs wx:if="{{b}}" bindclick="{{a}}" u-i="7228dc28-0" bind:__l="__l" u-p="{{b}}" class="{{[virtualHostClass]}}" virtualHostClass="{{[virtualHostClass]}}" style="{{virtualHostStyle}}" virtualHostStyle="{{virtualHostStyle}}" hidden="{{virtualHostHidden}}" virtualHostHidden="{{virtualHostHidden}}" id="{{virtualHostId}}" virtualHostId="{{virtualHostId}}"></up-tabs>

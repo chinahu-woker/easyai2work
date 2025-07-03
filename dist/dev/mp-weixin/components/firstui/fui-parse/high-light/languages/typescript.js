@@ -210,3 +210,4 @@ function typescript(hljs) {
   };
 }
 exports.typescript = typescript;
+//# sourceMappingURL=../../../../../../.sourcemap/mp-weixin/components/firstui/fui-parse/high-light/languages/typescript.js.map

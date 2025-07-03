@@ -1,1 +1,0 @@
-<view wx:if="{{a}}" class="data-v-079242f1"><slot name="username"></slot><label class="tag data-v-079242f1"><tn-icon wx:if="{{b}}" class="data-v-079242f1" virtualHostClass="data-v-079242f1" u-i="079242f1-0" bind:__l="__l" u-p="{{b}}"/>{{c}}</label></view><view wx:if="{{d}}" class="data-v-079242f1"><label class="tn-text-sm tn-gray_text data-v-079242f1">有效期{{e}}</label></view>

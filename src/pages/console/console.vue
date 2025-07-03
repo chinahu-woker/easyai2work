@@ -54,7 +54,7 @@
 	import {
 		onLoad,
 		onReady,
-		includes
+		
 	} from "@dcloudio/uni-app";
 
 	// const vtabs = []

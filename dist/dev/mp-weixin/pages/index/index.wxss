@@ -89,8 +89,8 @@ page.data-v-83a5a03c {
   font-weight: bold;
 }
 .fuiNavBar.data-v-83a5a03c {
-  margin-top: 10%;
-  margin-bottom: 10%;
+  margin-top: 5%;
+  margin-bottom: 2%;
 }
 .trans_back.data-v-83a5a03c {
   background-color: transparent;

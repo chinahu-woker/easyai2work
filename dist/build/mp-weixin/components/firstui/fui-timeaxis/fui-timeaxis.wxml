@@ -1,1 +1,0 @@
-<view style="{{'padding-top:' + a + ';' + ('padding-right:' + b) + ';' + ('padding-bottom:' + c) + ';' + ('padding-left:' + d) + ';' + ('background:' + e) + ';' + virtualHostStyle}}" class="{{['fui-timeaxis__wrap', 'data-v-6b1b3f8c', virtualHostClass]}}" hidden="{{virtualHostHidden}}" id="{{virtualHostId}}"><slot></slot></view>

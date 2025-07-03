@@ -5,3 +5,4 @@ const globalAppData = {
   }
 };
 exports.globalAppData = globalAppData;
+//# sourceMappingURL=../../../.sourcemap/mp-weixin/cofigs/data/globalAppData.js.map

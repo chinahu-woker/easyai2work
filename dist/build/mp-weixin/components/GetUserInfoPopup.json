@@ -1,8 +1,0 @@
-{
-  "component": true,
-  "usingComponents": {
-    "tn-update-user-info-popup": "../node-modules/tnuiv3p-tn-update-user-info-popup/index",
-    "tn-button": "../node-modules/@tuniao/tnui-vue3-uniapp/components/button/src/button",
-    "tn-icon": "../node-modules/@tuniao/tnui-vue3-uniapp/components/icon/src/icon"
-  }
-}

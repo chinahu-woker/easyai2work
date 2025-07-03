@@ -68,19 +68,19 @@
 
 
 	</view>
-	<view v-show="pageindex==2">
+	<!-- <view v-show="pageindex==2"> -->
 		<!-- <fui-background-image :src="backGroundImage">
 		</fui-background-image> -->
 
 
-		<view class="fui-wrap">
+		<!-- <view class="fui-wrap">
 
 			<scroll-view scroll-y="true" class="scroll-Y" scroll-with-animation :scroll-into-view="items">
 				<view class="fui-chat__box" ref="chatBox">
 					<view v-for="(item,index) in msgList" :key="index">
 						<view :id="`items-${index}`" class="fui-chat__item"
 							:class="[item.role=='user'?'fui-chat__right':'fui-chat__left']">
-							<!-- @tap="getCopyMsg(1,item?.msg,$event)" @longpress="getCopyMsg(2,item.content,$event)" -->
+						
 							<fui-avatar background="#f9f9f9"
 								:src="item.role=='system'?'https://wangbo0808.oss-cn-shanghai.aliyuncs.com/assets/gpt4.png':user.avatar_url">
 							</fui-avatar>
@@ -102,54 +102,56 @@
 				<view style="margin-left: 5%;"> 当前模型：{{ chooseModel || modelList[0] }}</view>
 				<view class="fui-chatbar__wrap">
 					<view class="AITool">
-						<view>
+						<view> -->
 							<!-- 切换模型 -->
-							<fui-icon name="message" color="#3b3ee9" @click="popupMth"></fui-icon>
+							<!-- <fui-icon name="message" color="#3b3ee9" @click="popupMth"></fui-icon>
 						</view>
-					</view>
+					</view> -->
 
-					<view class="fui-chatbar__input-box">
+					<!-- <view class="fui-chatbar__input-box"> -->
 						<!-- 输入框 -->
-						<textarea :enableNative="false" auto-height :show-count="false" fixed disable-default-padding
+						<!-- <textarea :enableNative="false" auto-height :show-count="false" fixed disable-default-padding
 							confirm-type="send" class="fui-chatbar__input" :maxlength="-1" v-model="content"
 							@confirm="msgSend">
 							</textarea>
 					</view>
 					<view class="fui-chatbar__icon-box fui-chatbar__send-box">
 
-						<view v-if="content.length == 0">
+						<view v-if="content.length == 0"> -->
 							<!-- 选择图片 -->
-							<fui-icon name="clear" color="#3b3ee9"></fui-icon>
-						</view>
+							<!-- <fui-icon name="clear" color="#3b3ee9"></fui-icon>
+						</view> -->
 						<!-- <view v-if="msgStatu == true ">
 							
 							<fui-icon name="play" color="#e9344f" ></fui-icon>
 						</view> -->
-						<view v-else>
+						<!-- <view v-else> -->
 							<!-- 发送按钮 -->
-							<image src="https://chinahu-ai-server.oss-cn-chengdu.aliyuncs.com/send.png" @tap="msgSend">
+							<!-- <image src="https://chinahu-ai-server.oss-cn-chengdu.aliyuncs.com/send.png" @tap="msgSend">
 							</image>
 						</view>
 					</view>
-				</view>
-				<fui-picker :options="modelList" :show="popup" @change="change" @cancel="cancel"></fui-picker>
+				</view> -->
+				<!-- <fui-picker :options="modelList" :show="popup" @change="change" @cancel="cancel"></fui-picker> -->
 				<!-- <fui-bottom-popup :show="popup" @close="closePopup">
 					<view class="fui-custom__wrap">
 						上传图片
 					</view>
 				</fui-bottom-popup> -->
-				<fui-safe-area background="#f8f8f8"></fui-safe-area>
-			</view>
-		</view>
+				<!-- <fui-safe-area background="#f8f8f8"></fui-safe-area> -->
+		<!-- 	</view>
+		</view> -->
 
 
 
 
-	</view>
-	<view v-show="pageindex==3">
-		<fui-background-image :src="backGroundImage">
-		</fui-background-image><template>
+	<!-- </view> -->
+	<view v-show="pageindex==2">
+		<!-- <fui-background-image :src="backGroundImage">
+		</fui-background-image> -->
+		<template>
 			<BaseLayout>
+				<!-- <image src='https://chinahu-ai-server.oss-cn-chengdu.aliyuncs.com/67873d6c232a3c5d52240dd6/upload/20250607111716210-jiayou.png'></image> -->
 				<view style="margin-top: -20%;">
 					<!-- <MyNavbar /> -->
 					<up-status-bar />
@@ -192,8 +194,8 @@
 						</up-cell-group>
 					</view> -->
 					<image @click="img2pay"
-						style="width: 675rpx; margin-bottom: -1%; height: 130rpx; background-color: transparent; display:inline-block; box-sizing:border-box; position:relative; margin-left:5%;"
-						mode="scaleToFill" src="https://chinahu-ai-server.oss-cn-chengdu.aliyuncs.com/会员模块.png">
+						style="width: 675rpx; margin-bottom: -1%; height: 160rpx; background-color: transparent; display:inline-block; box-sizing:border-box; position:relative; margin-left:5%;"
+						mode="scaleToFill" src="https://chinahu-ai-server.oss-cn-chengdu.aliyuncs.com/67873d6c232a3c5d52240dd6/upload/20250703230841666-banner.png">
 					</image>
 					<view class="u-m-t-20" style="border-color: transparent; margin-left: 5%; margin-right: 5%;">
 						<up-cell-group color='#fff' :border="false" class="trans_back">
@@ -290,11 +292,11 @@
 	import BaseLayout from '@/layouts/BaseLayout.vue'
 
 	import { onShareAppMessage, onShareTimeline } from '@dcloudio/uni-app'
-	import { globalAppData } from '@/cofigs'
+	import { globalAppData } from '@/cofigs/data/globalAppData.ts'
 
 
 	import TnIcon from '@tuniao/tnui-vue3-uniapp/components/icon/src/icon.vue'
-	import { onLoad, onReady, includes, onShow } from "@dcloudio/uni-app";
+	import { onLoad, onReady, onShow } from "@dcloudio/uni-app";
 
 	// import useWorkFlow from "@/composables/useWorkFlow.ts";
 	import useWorkFlow from "@/composables/useWorkFlow";
@@ -650,7 +652,7 @@ function goToEntire(id) {
 		socketInit()
 		on(EventType.PAY_SUCCESS, ({ order_id }) => handlePayMessage(order_id))
 		wode_loging()
-		chatAiGetToken()
+		// chatAiGetToken()
 		Kongzhitai()
 
 
@@ -692,7 +694,7 @@ function goToEntire(id) {
 	const changeHomePage = (index : number) => {
 		pageindex.value = index.index;
 		if (index.index == 2) {
-			chatAiGetToken()
+			// chatAiGetToken()
 		}
 		// console.log('index', pageindex.value);
 
@@ -721,11 +723,11 @@ function goToEntire(id) {
 			// to: '/pages/creative/creative',
 			onClick: tabbarIndex
 		},
-		{
-			name: 'AI助手',
-			// to: '/pages/creative/creative',
-			onClick: tabbarIndex
-		},
+		// {
+		// 	name: 'AI助手',
+		// 	// to: '/pages/creative/creative',
+		// 	onClick: tabbarIndex
+		// },
 		{
 			name: name_value,
 			onClick: tabbarIndex,
@@ -828,7 +830,7 @@ function goToEntire(id) {
 			saveLoginInfo(user)
 			uni.hideLoading()
 		}
-		chatAiGetToken()
+		// chatAiGetToken()
 		name_value.value = '我的'
 		Kongzhitai()
 		 uni.reLaunch({ url: '/pages/index/index' });
@@ -859,7 +861,7 @@ function goToEntire(id) {
 				})
 			}
 		})
-		chatAiGetToken()
+		// chatAiGetToken()
 
 	}
 	const { socketInit } = useWorkFlow()
@@ -994,8 +996,8 @@ function goToEntire(id) {
 
 
 		// text-align: center;
-		margin-top: 10%;
-		margin-bottom: 10%;
+		margin-top: 5%;
+		margin-bottom: 2%;
 	}
 
 	.trans_back {

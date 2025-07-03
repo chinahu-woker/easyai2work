@@ -1,8 +1,0 @@
-{
-  "component": true,
-  "usingComponents": {
-    "up-button": "../../node-modules/uview-plus/components/u-button/u-button",
-    "up-card": "../../node-modules/uview-plus/components/u-card/u-card",
-    "custom-slider": "../dynamic/CustomSlider"
-  }
-}

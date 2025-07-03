@@ -1,1 +1,0 @@
-<view ref="fui_vtabs__el" id="{{virtualHostId !== '' ? virtualHostId : a}}" class="{{['fui-vtabs-content__wrap', 'data-v-6ae371f3', virtualHostClass]}}" style="{{virtualHostStyle}}" hidden="{{virtualHostHidden}}"><slot></slot></view>

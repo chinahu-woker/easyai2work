@@ -1,1 +1,0 @@
-"use strict";const e=require("../../common/vendor.js");if(!Array){e.resolveComponent("up-navbar-mini")()}Math;const n=e.defineComponent({__name:"MyNavbar",setup:n=>(n,o)=>({a:e.p({autoBack:!0,homeUrl:"/pages/index/index"})})});wx.createComponent(n);

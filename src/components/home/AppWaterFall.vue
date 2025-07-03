@@ -47,7 +47,7 @@ const appStore=useAppStore()
 const handleNavigate = (item: IWorkFlow) => {
   appStore.tabbarIndex=null // 清除当前选中的标签栏索引
   // console.log("++++++++++++++++++++++++++++itemid++++++++++++++",item._id)
-  uni.navigateTo({url: '/pages/draw/draw_info/draw_info?id=' + item._id}); // 跳转到应用详情页面
+  uni.navigateTo({url: '/pages/draw/apps/apps?id=' + item._id});// 跳转到应用详情页面
 }
 </script>
 
