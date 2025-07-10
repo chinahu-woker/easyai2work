@@ -33,8 +33,5 @@ export default defineConfig(async () => {
         }
       },
     },
-	// define: {
-	// 	      'global': {} // 模拟 global 变量
-	// 	    }
   }
 });
