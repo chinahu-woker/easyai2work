@@ -40,8 +40,8 @@
 
 2. **环境配置**（修改 `.env` 文件）
    ```env
-   VITE_API_URL=https://edai.vip/api
-   VITE_WS_URL=wss://edai.vip/websocket
+   VITE_API_URL=https://你的域名/api
+   VITE_WS_URL=wss://你的域名/websocket
    ```
 
 3. **编译运行**
