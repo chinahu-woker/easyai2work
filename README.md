@@ -34,14 +34,14 @@
 1. **初始化项目**
    ```bash
    git clone https://github.com/chinahu-woker/easyai2work.git
-   cd myself-acgi-mpweixin
+   cd easyai2work
    npm install
    ```
 
 2. **环境配置**（修改 `.env` 文件）
    ```env
- VITE_API_URL=https://scschool.cc/api
- VITE_WS_URL=wss://scschool.cc/websocket
+   VITE_API_URL=https://edai.vip/api
+   VITE_WS_URL=wss://edai.vip/websocket
    ```
 
 3. **编译运行**
