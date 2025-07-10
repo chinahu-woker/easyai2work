@@ -40,8 +40,8 @@
 
 2. **环境配置**（修改 `.env` 文件）
    ```env
-   VITE_API_URL=https://yourdomain.com/api
-   VITE_CHAT_URL=https://your-oneapi.com
+ VITE_API_URL=https://scschool.cc/api
+ VITE_WS_URL=wss://scschool.cc/websocket
    ```
 
 3. **编译运行**
