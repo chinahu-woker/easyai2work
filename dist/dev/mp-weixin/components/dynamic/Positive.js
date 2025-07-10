@@ -5,7 +5,7 @@ if (!Math) {
 }
 const ParamCard = () => "../common/ParamCard.js";
 const MyTitle = () => "../common/MyTitle.js";
-const TnInput = () => "../../node-modules/@tuniao/tnui-vue3-uniapp/components/input/src/input.js";
+const TnInput = () => "../node-modules/@tuniao/tnui-vue3-uniapp/components/input/src/input.js";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "Positive",
   props: {
@@ -29,7 +29,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           clearable: true,
           placeholder: "请输入内容",
           modelValue: inputValue.value
-        })
+        }),
+        d: common_vendor.gei(_ctx, "")
       };
     };
   }

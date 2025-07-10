@@ -23,7 +23,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         b: common_vendor.n(common_vendor.unref(ns).e("tabs")),
         c: common_vendor.n(common_vendor.unref(ns).e("content")),
         d: common_vendor.n(common_vendor.unref(switchTabClass)),
-        e: common_vendor.s(common_vendor.unref(switchTabStyle))
+        e: common_vendor.s(common_vendor.unref(switchTabStyle)),
+        f: common_vendor.gei(_ctx, "")
       };
     };
   }

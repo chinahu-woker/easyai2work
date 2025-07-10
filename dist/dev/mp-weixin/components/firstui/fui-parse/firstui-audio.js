@@ -99,7 +99,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     g: `${$data.progress}%`,
     h: common_vendor.t($data.currentTimeStr),
     i: common_vendor.t($data.durationStr),
-    j: common_vendor.o((...args) => $options.handleControl && $options.handleControl(...args))
+    j: common_vendor.o((...args) => $options.handleControl && $options.handleControl(...args)),
+    k: common_vendor.gei(_ctx, "")
   });
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-330431b2"]]);

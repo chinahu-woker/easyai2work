@@ -1,5 +1,5 @@
 /*!
-  * shared v9.14.3
+  * shared v9.14.4
   * (c) 2025 kazuya kawaguchi
   * Released under the MIT License.
   */

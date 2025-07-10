@@ -30,10 +30,10 @@
 .video-controls.data-v-56f14cc7 {
   position: absolute;
   right: 20rpx;
-  bottom: 20rpx;
+  bottom: 14rpx;
   display: flex;
   gap: 20rpx;
-  z-index: 10;
+  z-index: 99;
 }
 .control-button.data-v-56f14cc7 {
   width: 60rpx;
@@ -79,8 +79,8 @@
 }
 .delete-button.data-v-56f14cc7 {
   position: absolute;
-  right: 20rpx;
-  bottom: 20rpx;
+  right: 80rpx;
+  bottom: 60rpx;
   width: 60rpx;
   height: 60rpx;
   background: rgba(255, 255, 255, 0.95);
@@ -179,7 +179,7 @@
   grid-gap: 15rpx;
 }
 .fui-custom__wrap.data-v-56f14cc7 {
-  margin-bottom: 5%;
+  margin-bottom: 10%;
   padding: 0rpx;
   box-sizing: border-box;
 }

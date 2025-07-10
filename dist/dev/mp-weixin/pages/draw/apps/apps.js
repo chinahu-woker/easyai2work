@@ -15,10 +15,11 @@ const _easycom_fui_nav_bar = () => "../../../components/firstui/fui-nav-bar/fui-
 const _easycom_up_status_bar = () => "../../../node-modules/uview-plus/components/u-status-bar/u-status-bar.js";
 const _easycom_up_button = () => "../../../node-modules/uview-plus/components/u-button/u-button.js";
 if (!Math) {
-  (_easycom_fui_icon + _easycom_fui_nav_bar + TaskProgress + _easycom_up_status_bar + Seed + AudioUpload + ImageUpload + Width + Height + Positive + ModeSelect + Picker + CustomNumberBox + ImageSelectPreview + MoreImageUpload + _easycom_up_button + TnIcon + DragButton2 + BaseLayout)();
+  (_easycom_fui_icon + _easycom_fui_nav_bar + TaskProgress + _easycom_up_status_bar + Seed + ImageUploadMore + MoreImageUpload + AudioUpload + ImageUpload + Width + Height + Positive + ModeSelect + Picker + CustomNumberBox + ImageSelectPreview + _easycom_up_button + TnIcon + DragButton2 + BaseLayout)();
 }
 const BaseLayout = () => "../../../layouts/BaseLayout.js";
 const ImageUpload = () => "../../../components/dynamic/ImageUpload.js";
+const ImageUploadMore = () => "../../../components/dynamic/ImageUploadMore.js";
 const MoreImageUpload = () => "../../../components/dynamic/MoreImageUpload.js";
 const AudioUpload = () => "../../../components/dynamic/AudioUpload.js";
 const Height = () => "../../../components/dynamic/Height.js";
@@ -45,23 +46,28 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       handleFindComponentName,
       handleSubmitTaskTask
     } = composables_useWorkFlow.useWorkFlow();
+    common_vendor.index.__f__("log", "at pages/draw/apps/apps.vue:73", "--------------------------", workFlowParamLists);
     const workflowId = common_vendor.ref("");
     common_vendor.onLoad(async () => {
       const currentPage = getCurrentPages().pop();
-      const query = currentPage == null ? void 0 : currentPage.options;
-      workflowId.value = query.id;
-      handleGetWorkFlwById(query.id).then(() => {
-        if (query.isRegenerate && query.regenerateParams) {
-          const params = JSON.parse(decodeURIComponent(query.regenerateParams));
-          bindParam.value = { ...params };
+      if (currentPage) {
+        const query = currentPage.options;
+        if (query) {
+          workflowId.value = query.id;
+          handleGetWorkFlwById(query.id).then(() => {
+            if (query.isRegenerate && query.regenerateParams) {
+              const params = JSON.parse(decodeURIComponent(query.regenerateParams));
+              bindParam.value = { ...params };
+            }
+          });
         }
-      });
+      }
     });
     const showPopup = common_vendor.ref(false);
     const FlotButton = common_vendor.ref("空闲");
     const currentSwiperIndex = common_vendor.ref(0);
     common_vendor.watch(currentSwiperIndex, () => {
-      common_vendor.index.__f__("log", "at pages/draw/apps/apps.vue:90", "currentSwiperIndex", currentSwiperIndex.value);
+      common_vendor.index.__f__("log", "at pages/draw/apps/apps.vue:100", "currentSwiperIndex", currentSwiperIndex.value);
     });
     const { localTasks } = common_vendor.storeToRefs(stores_appStore.useAppStore());
     const currentProgress = common_vendor.computed(() => {
@@ -141,13 +147,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const imageRegex = /\.(jpg|jpeg|png|gif|bmp)$/i;
       const videoRegex = /\.(mp3|wav|ogg)$/i;
       if (!input) {
-        common_vendor.index.__f__("log", "at pages/draw/apps/apps.vue:231", "==============", "是空值");
+        common_vendor.index.__f__("log", "at pages/draw/apps/apps.vue:241", "==============", "是空值");
         return 0;
       } else if (imageRegex.test(input)) {
-        common_vendor.index.__f__("log", "at pages/draw/apps/apps.vue:236", "==============", "是图片");
+        common_vendor.index.__f__("log", "at pages/draw/apps/apps.vue:246", "==============", "是图片");
         return 1;
       } else if (videoRegex.test(input)) {
-        common_vendor.index.__f__("log", "at pages/draw/apps/apps.vue:241", "==============", "是音频");
+        common_vendor.index.__f__("log", "at pages/draw/apps/apps.vue:251", "==============", "是音频");
         return 2;
       }
     }
@@ -183,17 +189,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               options: item.attributes,
               modelValue: common_vendor.unref(bindParam)[item.name]
             })
-          } : common_vendor.unref(handleFindComponentName)(item.name) === "ImageUpload" ? common_vendor.e({
-            g: checkFileType(item.param) == 2
-          }, checkFileType(item.param) == 2 ? {
-            h: "6cf62e12-6-" + i0 + ",6cf62e12-3",
-            i: common_vendor.o(($event) => common_vendor.unref(bindParam)[item.name] = $event),
-            j: common_vendor.p({
+          } : common_vendor.unref(handleFindComponentName)(item.name) === "ImageUploadMore" ? {
+            g: "6cf62e12-6-" + i0 + ",6cf62e12-3",
+            h: common_vendor.o(($event) => common_vendor.unref(bindParam)[item.name] = $event),
+            i: common_vendor.p({
               title: item.title,
               options: item.attributes,
               modelValue: common_vendor.unref(bindParam)[item.name]
             })
-          } : {
+          } : common_vendor.unref(handleFindComponentName)(item.name) === "MoreImageUpload" ? {
             k: "6cf62e12-7-" + i0 + ",6cf62e12-3",
             l: common_vendor.o(($event) => common_vendor.unref(bindParam)[item.name] = $event),
             m: common_vendor.p({
@@ -201,15 +205,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               options: item.attributes,
               modelValue: common_vendor.unref(bindParam)[item.name]
             })
-          }) : common_vendor.unref(handleFindComponentName)(item.name) === "Width" ? {
-            o: "6cf62e12-8-" + i0 + ",6cf62e12-3",
-            p: common_vendor.o(($event) => common_vendor.unref(bindParam)[item.name] = $event),
-            q: common_vendor.p({
+          } : common_vendor.unref(handleFindComponentName)(item.name) === "ImageUpload" ? common_vendor.e({
+            o: checkFileType(item.param) == 2
+          }, checkFileType(item.param) == 2 ? {
+            p: "6cf62e12-8-" + i0 + ",6cf62e12-3",
+            q: common_vendor.o(($event) => common_vendor.unref(bindParam)[item.name] = $event),
+            r: common_vendor.p({
               title: item.title,
               options: item.attributes,
               modelValue: common_vendor.unref(bindParam)[item.name]
             })
-          } : common_vendor.unref(handleFindComponentName)(item.name) === "Height" ? {
+          } : {
             s: "6cf62e12-9-" + i0 + ",6cf62e12-3",
             t: common_vendor.o(($event) => common_vendor.unref(bindParam)[item.name] = $event),
             v: common_vendor.p({
@@ -217,7 +223,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               options: item.attributes,
               modelValue: common_vendor.unref(bindParam)[item.name]
             })
-          } : common_vendor.unref(handleFindComponentName)(item.name) === "Positive" ? {
+          }) : common_vendor.unref(handleFindComponentName)(item.name) === "Width" ? {
             x: "6cf62e12-10-" + i0 + ",6cf62e12-3",
             y: common_vendor.o(($event) => common_vendor.unref(bindParam)[item.name] = $event),
             z: common_vendor.p({
@@ -225,16 +231,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               options: item.attributes,
               modelValue: common_vendor.unref(bindParam)[item.name]
             })
-          } : common_vendor.unref(handleFindComponentName)(item.name) === "ModeSelect" ? {
+          } : common_vendor.unref(handleFindComponentName)(item.name) === "Height" ? {
             B: "6cf62e12-11-" + i0 + ",6cf62e12-3",
             C: common_vendor.o(($event) => common_vendor.unref(bindParam)[item.name] = $event),
             D: common_vendor.p({
               title: item.title,
-              workflow_id: common_vendor.unref(workflow)._id,
               options: item.attributes,
               modelValue: common_vendor.unref(bindParam)[item.name]
             })
-          } : common_vendor.unref(handleFindComponentName)(item.name) === "Picker" ? {
+          } : common_vendor.unref(handleFindComponentName)(item.name) === "Positive" ? {
             F: "6cf62e12-12-" + i0 + ",6cf62e12-3",
             G: common_vendor.o(($event) => common_vendor.unref(bindParam)[item.name] = $event),
             H: common_vendor.p({
@@ -242,15 +247,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               options: item.attributes,
               modelValue: common_vendor.unref(bindParam)[item.name]
             })
-          } : common_vendor.unref(handleFindComponentName)(item.name) === "CustomNumberBox" ? {
+          } : common_vendor.unref(handleFindComponentName)(item.name) === "ModeSelect" ? {
             J: "6cf62e12-13-" + i0 + ",6cf62e12-3",
             K: common_vendor.o(($event) => common_vendor.unref(bindParam)[item.name] = $event),
             L: common_vendor.p({
               title: item.title,
+              workflow_id: common_vendor.unref(workflow)._id,
               options: item.attributes,
               modelValue: common_vendor.unref(bindParam)[item.name]
             })
-          } : common_vendor.unref(handleFindComponentName)(item.name) === "ImageSelectPreview" ? {
+          } : common_vendor.unref(handleFindComponentName)(item.name) === "Picker" ? {
             N: "6cf62e12-14-" + i0 + ",6cf62e12-3",
             O: common_vendor.o(($event) => common_vendor.unref(bindParam)[item.name] = $event),
             P: common_vendor.p({
@@ -258,9 +264,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               options: item.attributes,
               modelValue: common_vendor.unref(bindParam)[item.name]
             })
-          } : common_vendor.e({
-            Q: item.name == "custom_batch_image_path_origin"
-          }, item.name == "custom_batch_image_path_origin" ? {
+          } : common_vendor.unref(handleFindComponentName)(item.name) === "CustomNumberBox" ? {
             R: "6cf62e12-15-" + i0 + ",6cf62e12-3",
             S: common_vendor.o(($event) => common_vendor.unref(bindParam)[item.name] = $event),
             T: common_vendor.p({
@@ -268,15 +272,35 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               options: item.attributes,
               modelValue: common_vendor.unref(bindParam)[item.name]
             })
+          } : common_vendor.unref(handleFindComponentName)(item.name) === "ImageSelectPreview" ? {
+            V: "6cf62e12-16-" + i0 + ",6cf62e12-3",
+            W: common_vendor.o(($event) => common_vendor.unref(bindParam)[item.name] = $event),
+            X: common_vendor.p({
+              title: item.title,
+              options: item.attributes,
+              modelValue: common_vendor.unref(bindParam)[item.name]
+            })
+          } : common_vendor.e({
+            Y: item.name == "custom_batch_image_path_origin"
+          }, item.name == "custom_batch_image_path_origin" ? {
+            Z: "6cf62e12-17-" + i0 + ",6cf62e12-3",
+            aa: common_vendor.o(($event) => common_vendor.unref(bindParam)[item.name] = $event),
+            ab: common_vendor.p({
+              title: item.title,
+              options: item.attributes,
+              modelValue: common_vendor.unref(bindParam)[item.name]
+            })
           } : {}), {
-            f: common_vendor.unref(handleFindComponentName)(item.name) === "ImageUpload",
-            n: common_vendor.unref(handleFindComponentName)(item.name) === "Width",
-            r: common_vendor.unref(handleFindComponentName)(item.name) === "Height",
-            w: common_vendor.unref(handleFindComponentName)(item.name) === "Positive",
-            A: common_vendor.unref(handleFindComponentName)(item.name) === "ModeSelect",
-            E: common_vendor.unref(handleFindComponentName)(item.name) === "Picker",
-            I: common_vendor.unref(handleFindComponentName)(item.name) === "CustomNumberBox",
-            M: common_vendor.unref(handleFindComponentName)(item.name) === "ImageSelectPreview"
+            f: common_vendor.unref(handleFindComponentName)(item.name) === "ImageUploadMore",
+            j: common_vendor.unref(handleFindComponentName)(item.name) === "MoreImageUpload",
+            n: common_vendor.unref(handleFindComponentName)(item.name) === "ImageUpload",
+            w: common_vendor.unref(handleFindComponentName)(item.name) === "Width",
+            A: common_vendor.unref(handleFindComponentName)(item.name) === "Height",
+            E: common_vendor.unref(handleFindComponentName)(item.name) === "Positive",
+            I: common_vendor.unref(handleFindComponentName)(item.name) === "ModeSelect",
+            M: common_vendor.unref(handleFindComponentName)(item.name) === "Picker",
+            Q: common_vendor.unref(handleFindComponentName)(item.name) === "CustomNumberBox",
+            U: common_vendor.unref(handleFindComponentName)(item.name) === "ImageSelectPreview"
           });
         }),
         h: common_vendor.t(((_b = common_vendor.unref(workflow)) == null ? void 0 : _b.power) || 0),
@@ -288,7 +312,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         k: common_vendor.f(anims.value, (item, k0, i0) => {
           return {
-            a: "6cf62e12-17-" + i0 + ",6cf62e12-3",
+            a: "6cf62e12-19-" + i0 + ",6cf62e12-3",
             b: item.key,
             c: `${item.top}px`,
             d: `${item.left}px`,

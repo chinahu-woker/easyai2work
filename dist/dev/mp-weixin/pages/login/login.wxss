@@ -1,0 +1,227 @@
+
+.logoSty.data-v-cdfe2409 {
+		width: 520rpx;
+		height: 260rpx;
+		-o-object-fit: contain;
+		   object-fit: contain;
+		/* 保持图片比例 */
+		margin-bottom: -5%;
+}
+
+	/* 背景图全屏覆盖 */
+.bg-image.data-v-cdfe2409 {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100vw;
+		height: 100vh;
+		z-index: -1;
+		background-size: cover;
+		/* 覆盖全屏 */
+		background-position: center;
+		filter: brightness(0.95);
+		/* 轻微调暗背景，突出前景内容 */
+}
+.login-container.data-v-cdfe2409 {
+		padding: 30rpx 40rpx;
+		/* 增大边距，避免内容贴边 */
+		min-height: 100vh;
+		box-sizing: border-box;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		/* 整体内容居中 */
+}
+
+	/* 导航栏 */
+.nav-bar.data-v-cdfe2409 {
+		width: 100%;
+		margin-top: 20rpx;
+		padding-left: 10rpx;
+}
+
+	/* 欢迎标题区域 */
+.welcome-section.data-v-cdfe2409 {
+		margin: 120rpx 0 80rpx;
+		/* 调整顶部距离，更靠下 */
+		text-align: center;
+		width: 100%;
+}
+.welcome-title.data-v-cdfe2409 {
+		font-size: 52rpx;
+		/* 增大标题字号 */
+		font-weight: bold;
+		color: #333;
+		/* 深色标题更醒目 */
+		margin-bottom: 20rpx;
+		display: block;
+}
+.welcome-desc.data-v-cdfe2409 {
+		font-size: 28rpx;
+		color: #666;
+		/* 灰色描述文字 */
+		letter-spacing: 0.5rpx;
+}
+
+	/* 登录表单容器 */
+.login-form.data-v-cdfe2409 {
+		width: 100%;
+		max-width: 550rpx;
+		/* 限制最大宽度，避免大屏拉伸 */
+		display: flex;
+		flex-direction: column;
+		gap: 30rpx;
+}
+
+	/* 输入框容器 - 添加底部边框和聚焦效果 */
+.form-group.data-v-cdfe2409 {
+		display: flex;
+		flex-direction: column;
+		gap: 20rpx;
+		/* 维持输入框间距 */
+}
+
+	/* 输入框基础样式 */
+.data-v-cdfe2409 .fui-input {
+		height: 210rpx;
+		border-radius: 5rpx;
+		/* 增加圆角半径 */
+		background-color: rgba(255, 255, 255, 0.98);
+		/* 更通透的白色 */
+		padding: 0 30rpx;
+		/* 底部边框替代全边框，更简洁 */
+		border-bottom: 2rpx solid #E0E0E0;
+		/* 更新底边颜色 */
+		border-top: none !important;
+		border-left: none !important;
+		border-right: none !important;
+		box-shadow: none !important;
+		/* 去掉厚重阴影 */
+		font-size: 32rpx;
+		/* 适中字体大小 */
+		display: flex;
+		align-items: center;
+		/* 文字垂直居中 */
+}
+
+	/* 输入框聚焦效果 */
+.data-v-cdfe2409 .fui-input:focus {
+		border-bottom-color: #4A90E2 !important;
+		/* 使用更鲜明的颜色 */
+		/* 底部轻微发光效果，增强聚焦感 */
+		box-shadow: 0 2rpx 10rpx rgba(74, 144, 226, 0.3) !important;
+}
+
+	/* 输入框占位符样式 */
+.data-v-cdfe2409 .fui-input input::-moz-placeholder {
+		color: #B0B0B0;
+		font-size: 32rpx;
+		letter-spacing: 0.5rpx;
+		/* 轻微 letter-spacing 更精致 */
+}
+.data-v-cdfe2409 .fui-input input::placeholder {
+		color: #B0B0B0;
+		font-size: 32rpx;
+		letter-spacing: 0.5rpx;
+		/* 轻微 letter-spacing 更精致 */
+}
+
+	/* 输入框文字样式 */
+.data-v-cdfe2409 .fui-input input {
+		color: #333;
+		font-size: 32rpx;
+		line-height: 1.5;
+		/* 调整行高 */
+		width: 100%;
+}
+
+	/* 错误提示位置调整 - 与输入框对齐 */
+.error-text.data-v-cdfe2409 {
+		color: #FF5252;
+		font-size: 26rpx;
+		margin-top: 8rpx;
+		margin-left: 0;
+		/* 与输入框左对齐 */
+		padding-left: 30rpx;
+		/* 与输入框内边距一致 */
+}
+
+	/* 登录按钮 */
+.login-btn.data-v-cdfe2409 {
+		height: 108rpx;
+		/* 更高按钮 */
+		border-radius: 22rpx;
+		background-color: #6C5CE7;
+		color: #FFFFFF;
+		font-size: 34rpx;
+		/* 更大字体 */
+		font-weight: 600;
+		width: 100%;
+		margin-top: 20rpx;
+		box-shadow: 0 6rpx 16rpx rgba(108, 92, 231, 0.3);
+		/* 主色阴影 */
+}
+
+	/* 注册链接 */
+.switch-mode.data-v-cdfe2409 {
+		font-size: 30rpx;
+		color: #6C5CE7;
+		/* 主色链接 */
+		text-align: right;
+		margin-top: 10rpx;
+		cursor: pointer;
+		padding-right: 10rpx;
+}
+
+	/* 分割线 */
+.divider.data-v-cdfe2409 {
+		display: flex;
+		align-items: center;
+		width: 100%;
+		margin: 40rpx 0 20rpx;
+}
+.divider-line.data-v-cdfe2409 {
+		flex: 1;
+		height: 1rpx;
+		background-color: #EEEEEE;
+}
+.divider-text.data-v-cdfe2409 {
+		padding: 0 25rpx;
+		font-size: 28rpx;
+		color: #9E9E9E;
+}
+
+	/* 微信登录按钮 */
+.wechat-login.data-v-cdfe2409 {
+		display: flex;
+		justify-content: center;
+		margin-top: 10rpx;
+}
+.data-v-cdfe2409 .fui-button.wechat-btn {
+		width: 100%;
+		max-width: 300rpx;
+		height: 96rpx;
+		border-radius: 20rpx;
+		border: 2rpx solid #E0E0E0;
+		background-color: transparent;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0;
+}
+.wechat-button.data-v-cdfe2409 {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 15rpx;
+		/* 图标与文字间距 */
+}
+.wechat-button image.data-v-cdfe2409 {
+		width: 50rpx;
+		height: 50rpx;
+}
+.wechat-text.data-v-cdfe2409 {
+		font-size: 30rpx;
+		color: #333;
+		font-weight: 500;
+}

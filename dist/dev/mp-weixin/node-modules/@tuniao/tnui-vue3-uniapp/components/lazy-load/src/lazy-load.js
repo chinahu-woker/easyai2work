@@ -61,7 +61,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         q: common_vendor.n(common_vendor.unref(ns).e("error")),
         r: common_vendor.n(common_vendor.unref(ns).e("container"))
       } : {}, {
-        s: common_vendor.unref(componentId),
+        s: common_vendor.gei(_ctx, common_vendor.unref(componentId)),
         t: common_vendor.n(common_vendor.unref(ns).b()),
         v: common_vendor.n(common_vendor.unref(ns).is("show-image", common_vendor.unref(showImage) && common_vendor.unref(imageStatus) === "loaded")),
         w: common_vendor.s(common_vendor.unref(lazyLoadStyle))

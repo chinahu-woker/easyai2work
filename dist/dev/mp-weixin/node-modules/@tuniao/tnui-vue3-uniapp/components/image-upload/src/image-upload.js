@@ -10,8 +10,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   emits: common_vendor.imageUploadEmits,
   setup(__props, { expose: __expose }) {
     const props = __props;
-    const ns = common_vendor.useNamespace("image-upload");
-    const nsItem = common_vendor.useNamespace("image-upload-item");
+    const ns = common_vendor.useNamespace$1("image-upload");
+    const nsItem = common_vendor.useNamespace$1("image-upload-item");
     const {
       fileList,
       isExceedMaxCount,
@@ -99,7 +99,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           (...args) => common_vendor.unref(chooseFile) && common_vendor.unref(chooseFile)(...args)
         )
       } : {}, {
-        l: common_vendor.n(common_vendor.unref(ns).b())
+        l: common_vendor.n(common_vendor.unref(ns).b()),
+        m: common_vendor.gei(_ctx, "")
       });
     };
   }

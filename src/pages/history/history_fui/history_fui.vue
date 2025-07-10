@@ -244,18 +244,30 @@ const handleDeleteTouchEnd = () => {
 	}, 500)
 }
 
-
+const toHome = () => {
+  // uni.redirectTo({ url: `/pages/index/index?pageindex=2` });
+  uni.navigateBack({
+	  delta: 1,
+  })
+};
 </script>
 
 <template>
-	<MyNavbar />
+	<fui-nav-bar
+	  title=" " 
+	  @leftClick="toHome" 
+	  background="transparent"
+	  
+	>
+	  <fui-icon name="arrowleft" size="40" color="#333"></fui-icon>
+	</fui-nav-bar>
 	<fui-background-image src="@/src/static/Home2 (1).jpgHome2(1).jpg">
 	</fui-background-image>
 
 	<fui-sticky>
-		<fui-tabs style="margin-top: 15%; background-color: transparent;" :tabs="tabs" @change="QieHuan"></fui-tabs>
+		<fui-tabs style="margin-top: 0%; background-color: transparent;" :tabs="tabs" @change="QieHuan"></fui-tabs>
 	</fui-sticky>
-	<view style="margin-bottom: 15%; margin-left: 5%; margin-top: 10%; ">
+	<!-- <view style="margin-bottom: -20%; margin-left: 5%; margin-top: 10%; ">
 		<fui-section title="历史生图记录" margin-top="25" style="margin-bottom: 55%; " descrSize='32' descrColor='#000000'
 			descr="时间轴模式下长按图片可以将图片保存或分享给朋友">
 			<template v-slot:right>
@@ -263,7 +275,7 @@ const handleDeleteTouchEnd = () => {
 			</template>
 		</fui-section>
 
-	</view>
+	</view> -->
 	<view v-if="currentTabIndex == 0">
 		<fui-gallery :urls="GalleryPic" :show="show" @hide="hideGallery"></fui-gallery>
 		<fui-timeaxis :padding="['32rpx', '16rpx']">
@@ -308,7 +320,7 @@ const handleDeleteTouchEnd = () => {
 						<fui-section title="提示词" :descr="item.params?.positive" descrSize='32'
 							descrColor='#000000'></fui-section>
 						<view style="margin-top: 6%;">
-							<video style="width: 100%; height: 390px; background-color:transparent;" id="myVideo"
+							<video style="width: 100%; height: 390px; background-color:transparent; z-index: 5;" id="myVideo"
 								:src="item.output[0]" controls></video>
 						</view>
 						<!-- <view>
@@ -454,13 +466,14 @@ const handleDeleteTouchEnd = () => {
 .video-controls {
 	position: absolute;
 	right: 20rpx;
-	bottom: 20rpx;
+	bottom:14rpx;
 	display: flex;
 	gap: 20rpx;
-	z-index: 10;
+	z-index: 99;
 }
 
 .control-button {
+	
 	width: 60rpx;
 	height: 60rpx;
 	background: rgba(255, 255, 255, 0.95);
@@ -511,8 +524,8 @@ const handleDeleteTouchEnd = () => {
 
 .delete-button {
 	position: absolute;
-	right: 20rpx;
-	bottom: 20rpx;
+	right: 80rpx;
+	bottom: 60rpx;
 	width: 60rpx;
 	height: 60rpx;
 	background: rgba(255, 255, 255, 0.95);
@@ -642,7 +655,7 @@ const handleDeleteTouchEnd = () => {
 
 
 .fui-custom__wrap {
-	margin-bottom: 5%;
+	margin-bottom: 10%;
 	padding: 0rpx;
 	box-sizing: border-box;
 }

@@ -31,7 +31,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           title: _ctx.title,
           options: _ctx.options,
           modelValue: modelValue.value
-        })
+        }),
+        c: common_vendor.gei(_ctx, "")
       };
     };
   }

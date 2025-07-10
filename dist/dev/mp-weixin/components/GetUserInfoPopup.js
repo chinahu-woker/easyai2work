@@ -6,8 +6,8 @@ if (!Math) {
   (TnIcon + TnButton + TnUpdateUserInfoPopup)();
 }
 const TnUpdateUserInfoPopup = () => "../node-modules/tnuiv3p-tn-update-user-info-popup/index.js";
-const TnButton = () => "../node-modules/@tuniao/tnui-vue3-uniapp/components/button/src/button.js";
-const TnIcon = () => "../node-modules/@tuniao/tnui-vue3-uniapp/components/icon/src/icon.js";
+const TnButton = () => "./node-modules/@tuniao/tnui-vue3-uniapp/components/button/src/button.js";
+const TnIcon = () => "./node-modules/@tuniao/tnui-vue3-uniapp/components/icon/src/icon.js";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "GetUserInfoPopup",
   setup(__props) {

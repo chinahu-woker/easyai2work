@@ -37,7 +37,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         e: common_vendor.n(common_vendor.unref(ns).e("content")),
         f: common_vendor.n(common_vendor.unref(ns).b()),
         g: common_vendor.n(common_vendor.unref(ns).is("line", showLine.value)),
-        h: common_vendor.o(clickHandle)
+        h: common_vendor.o(clickHandle),
+        i: common_vendor.gei(_ctx, "")
       };
     };
   }

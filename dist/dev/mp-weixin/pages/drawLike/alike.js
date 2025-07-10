@@ -254,7 +254,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             h: common_vendor.o(handleVideoError, index),
             i: currentVideoIndex.value !== index
           }, currentVideoIndex.value !== index ? {
-            j: "c4d558ba-2-" + i0,
+            j: "3e4fd22d-2-" + i0,
             k: common_vendor.p({
               name: "play",
               color: "#fff",
@@ -296,7 +296,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         l: common_vendor.f(draw_data.value.data.comment, (comment, k0, i0) => {
           var _a2, _b2, _c2, _d2, _e2, _f2, _g2;
           return common_vendor.e({
-            a: "c4d558ba-4-" + i0,
+            a: "3e4fd22d-4-" + i0,
             b: common_vendor.p({
               size: "small",
               src: (_a2 = comment.author) == null ? void 0 : _a2.avatar_url
@@ -309,7 +309,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             g: common_vendor.f(comment.replies, (reply, k1, i1) => {
               var _a3, _b3, _c3;
               return {
-                a: "c4d558ba-5-" + i0 + "-" + i1,
+                a: "3e4fd22d-5-" + i0 + "-" + i1,
                 b: common_vendor.p({
                   size: "small",
                   src: (_a3 = reply.author) == null ? void 0 : _a3.avatar_url

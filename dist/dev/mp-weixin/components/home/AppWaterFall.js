@@ -5,7 +5,7 @@ const utils_common = require("../../utils/common.js");
 if (!Math) {
   TnWaterFall();
 }
-const TnWaterFall = () => "../../node-modules/@tuniao/tnui-vue3-uniapp/components/water-fall/src/water-fall.js";
+const TnWaterFall = () => "../node-modules/@tuniao/tnui-vue3-uniapp/components/water-fall/src/water-fall.js";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "AppWaterFall",
   setup(__props) {
@@ -37,7 +37,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const appStore = stores_appStore.useAppStore();
     const handleNavigate = (item) => {
       appStore.tabbarIndex = null;
-      common_vendor.index.navigateTo({ url: "/pages/draw/apps/apps?id=" + item._id });
+      common_vendor.index.navigateTo({ url: `/pages/draw/apps/apps?id=${item._id}` });
     };
     return (_ctx, _cache) => {
       return {
@@ -84,7 +84,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         d: common_vendor.p({
           data: showApps.value
-        })
+        }),
+        e: common_vendor.gei(_ctx, "")
       };
     };
   }

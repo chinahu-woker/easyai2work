@@ -18,8 +18,7 @@ if (!Array) {
   const _easycom_up_icon2 = common_vendor.resolveComponent("up-icon");
   const _easycom_up_cell2 = common_vendor.resolveComponent("up-cell");
   const _easycom_up_cell_group2 = common_vendor.resolveComponent("up-cell-group");
-  const _component_template = common_vendor.resolveComponent("template");
-  (_easycom_fui_tabs2 + _easycom_fui_nav_bar2 + _easycom_up_gap2 + _easycom_up_status_bar2 + _easycom_fui_footer2 + _easycom_up_avatar2 + _easycom_up_icon2 + _easycom_up_cell2 + _easycom_up_cell_group2 + _component_template)();
+  (_easycom_fui_tabs2 + _easycom_fui_nav_bar2 + _easycom_up_gap2 + _easycom_up_status_bar2 + _easycom_fui_footer2 + _easycom_up_avatar2 + _easycom_up_icon2 + _easycom_up_cell2 + _easycom_up_cell_group2)();
 }
 const _easycom_fui_tabs = () => "../../components/firstui/fui-tabs/fui-tabs.js";
 const _easycom_fui_nav_bar = () => "../../components/firstui/fui-nav-bar/fui-nav-bar.js";
@@ -46,8 +45,8 @@ const backGroundImage = "https://chinahu-ai-server.oss-cn-chengdu.aliyuncs.com/a
 const _sfc_defineComponent = common_vendor.defineComponent({
   __name: "index",
   setup(__props) {
-    global.TextEncoder = common_vendor.TextEncoder;
-    global.TextDecoder = common_vendor.TextDecoder;
+    global.TextEncoder = TextEncoder;
+    global.TextDecoder = TextDecoder;
     common_vendor.onLoad((options) => {
       if (options.pageindex) {
         pageindex.value = parseInt(options.pageindex);
@@ -80,7 +79,7 @@ const _sfc_defineComponent = common_vendor.defineComponent({
         return 0;
       } else {
         const UserInfor = common_vendor.index.getStorageSync("userInfo");
-        common_vendor.index.__f__("log", "at pages/index/index.vue:372", "361---userInfo---------------", roltList.includes(UserInfor.role[0]));
+        common_vendor.index.__f__("log", "at pages/index/index.vue:301", "361---userInfo---------------", roltList.includes(UserInfor.role[0]));
         role.value = roltList.includes(UserInfor.role[0]);
       }
     }
@@ -123,7 +122,7 @@ const _sfc_defineComponent = common_vendor.defineComponent({
       imageData.value = [];
     });
     function img2pay() {
-      common_vendor.index.__f__("log", "at pages/index/index.vue:675", "点击支付");
+      common_vendor.index.__f__("log", "at pages/index/index.vue:604", "点击支付");
       showPay.value = true;
     }
     common_vendor.ref("fuiNavBar");
@@ -133,6 +132,7 @@ const _sfc_defineComponent = common_vendor.defineComponent({
       pageindex.value = index.index;
       if (index.index == 2)
         ;
+      common_vendor.index.__f__("log", "at pages/index/index.vue:628", "index", pageindex.value);
     };
     const name_value = common_vendor.ref("我的");
     function wode_loging() {
@@ -182,7 +182,8 @@ const _sfc_defineComponent = common_vendor.defineComponent({
           id: item._id,
           avatar: ((_a = item.user_id) == null ? void 0 : _a.avatar_url) || "",
           username: ((_b = item.user_id) == null ? void 0 : _b.nickname) || ((_c = item.user_id) == null ? void 0 : _c.username),
-          title: (_d = item.options) == null ? void 0 : _d.workflow_title,
+          // 为 title 属性设置默认值
+          title: ((_d = item.options) == null ? void 0 : _d.workflow_title) || "默认标题",
           description: utils_common.formatDateTime(new Date(item.created_at)),
           tags: item.tags,
           content: ((_f = (_e = item.params) == null ? void 0 : _e.positive) == null ? void 0 : _f.slice(0, 120)) + "...",
@@ -216,51 +217,13 @@ const _sfc_defineComponent = common_vendor.defineComponent({
       });
     }
     const handleLogin = async () => {
-      if (composables_useCommon.isLogin.value) {
-        return;
-      }
-      common_vendor.index.showLoading({
-        title: "正在登录...",
-        mask: true
-      });
-      const { uniPlatform } = common_vendor.index.getSystemInfoSync();
-      if (uniPlatform !== "web") {
-        handleLoginByWechat();
-      } else {
-        const user2 = await composables_useCommon.loginByUsername({
-          username: "test456",
-          password: "123456"
-        });
-        composables_useCommon.saveLoginInfo(user2);
-        common_vendor.index.hideLoading();
-      }
-      name_value.value = "我的";
-      Kongzhitai();
-      common_vendor.index.reLaunch({ url: "/pages/index/index" });
-      common_vendor.index.showLoading({
-        title: "加载中"
-      });
-    };
-    const handleLoginByWechat = () => {
-      common_vendor.index.login({
-        success: async function({ code }) {
-          const result = await composables_useCommon.loginByWechatCode(code);
-          composables_useCommon.saveLoginInfo(result);
-          common_vendor.index.hideLoading();
-          common_vendor.index.__f__("log", "at pages/index/index.vue:852", "------------result--------", result);
-          common_vendor.index.setStorageSync("refreshToken", result.refresh_token);
-        },
-        fail: function(err) {
-          common_vendor.index.showToast({
-            title: "登录错误",
-            icon: "none"
-          });
-        }
+      common_vendor.index.navigateTo({
+        url: "/pages/login/login"
       });
     };
     const { socketInit } = composables_useWorkFlow.useWorkFlow();
     const handlePayMessage = async (order_id) => {
-      common_vendor.index.__f__("log", "at pages/index/index.vue:871", "收到支付成功消息", order_id);
+      common_vendor.index.__f__("log", "at pages/index/index.vue:801", "收到支付成功消息", order_id);
       const order = await composables_useCommon.getOrderInfoById(order_id);
       if (order[0] && order[0].order_status === 1) {
         common_vendor.index.showToast({
@@ -348,27 +311,27 @@ const _sfc_defineComponent = common_vendor.defineComponent({
         }),
         l: !common_vendor.unref(composables_useCommon.isLogin)
       }, !common_vendor.unref(composables_useCommon.isLogin) ? {} : {}, {
-        m: common_vendor.unref(composables_useCommon.isLogin)
+        m: common_vendor.o(handleLogin),
+        n: common_vendor.unref(composables_useCommon.isLogin)
       }, common_vendor.unref(composables_useCommon.isLogin) ? {
-        n: common_vendor.t(common_vendor.unref(user).nickname)
+        o: common_vendor.t(common_vendor.unref(user).nickname)
       } : {}, {
-        o: common_vendor.unref(composables_useCommon.isLogin)
+        p: common_vendor.unref(composables_useCommon.isLogin)
       }, common_vendor.unref(composables_useCommon.isLogin) ? {
-        p: common_vendor.t(common_vendor.unref(user).balance)
+        q: common_vendor.t(common_vendor.unref(user).balance)
       } : {}, {
-        q: common_vendor.p({
+        r: common_vendor.p({
           name: "scan",
           color: "#969799",
           size: "28"
         }),
-        r: common_vendor.o(toEmpty),
-        s: common_vendor.p({
+        s: common_vendor.o(toEmpty),
+        t: common_vendor.p({
           name: "arrow-right",
           color: "#969799",
           size: "28"
         }),
-        t: common_vendor.o(toEmpty),
-        v: common_vendor.o(handleLogin),
+        v: common_vendor.o(toEmpty),
         w: common_vendor.o(img2pay),
         x: common_vendor.unref(composables_useCommon.isLogin)
       }, common_vendor.unref(composables_useCommon.isLogin) ? {

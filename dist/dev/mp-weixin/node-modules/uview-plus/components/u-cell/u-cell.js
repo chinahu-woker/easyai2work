@@ -93,7 +93,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     B: common_vendor.n(_ctx.customClass),
     C: common_vendor.s($options.addStyle(_ctx.customStyle)),
     D: !_ctx.disabled && (_ctx.clickable || _ctx.isLink) ? "u-cell--clickable" : "",
-    E: common_vendor.o((...args) => $options.clickHandler && $options.clickHandler(...args))
+    E: common_vendor.o((...args) => $options.clickHandler && $options.clickHandler(...args)),
+    F: common_vendor.gei(_ctx, "")
   });
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-b4243719"]]);

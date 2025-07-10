@@ -16,7 +16,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         c: common_vendor.o(
           //@ts-ignore
           (...args) => common_vendor.unref(tagClickHandle) && common_vendor.unref(tagClickHandle)(...args)
-        )
+        ),
+        d: common_vendor.gei(_ctx, "")
       };
     };
   }

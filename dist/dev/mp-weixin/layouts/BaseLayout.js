@@ -14,7 +14,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     return (_ctx, _cache) => {
       return common_vendor.e({
         a: common_vendor.unref(showPay)
-      }, common_vendor.unref(showPay) ? {} : {});
+      }, common_vendor.unref(showPay) ? {} : {}, {
+        b: common_vendor.gei(_ctx, "")
+      });
     };
   }
 });

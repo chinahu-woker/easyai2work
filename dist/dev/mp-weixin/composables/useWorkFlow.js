@@ -32,6 +32,16 @@ function useWorkFlow() {
       param: "advance_select_image_preview",
       component: "ImageSelectPreview",
       title: "高级-图像预览选择"
+    },
+    {
+      param: "multi_image_path",
+      component: "ImageUploadMore",
+      title: "多图上传"
+    },
+    {
+      param: "advance_onlineEdit_origin",
+      component: "MoreImageUploadVue",
+      title: "在线编辑"
     }
   ];
   const bindParam = common_vendor.ref({});
@@ -94,13 +104,13 @@ function useWorkFlow() {
     if (!composables_useCommon.isLogin.value) {
       throw new Error("未登录状态，不允许初始化Websocket");
     }
-    common_vendor.index.__f__("log", "at composables/useWorkFlow.ts:152", "socket init execution，status", (_a = socketState.socket) == null ? void 0 : _a.readyState);
+    common_vendor.index.__f__("log", "at composables/useWorkFlow.ts:162", "socket init execution，status", (_a = socketState.socket) == null ? void 0 : _a.readyState);
     if ((socketState == null ? void 0 : socketState.isInitialized) && ((_c = (_b = socketState.options) == null ? void 0 : _b.params) == null ? void 0 : _c.type) === ((_d = options == null ? void 0 : options.params) == null ? void 0 : _d.type)) {
-      common_vendor.index.__f__("log", "at composables/useWorkFlow.ts:154", "WebSocket is already initialized");
+      common_vendor.index.__f__("log", "at composables/useWorkFlow.ts:164", "WebSocket is already initialized");
       return;
     }
     if ((socketState == null ? void 0 : socketState.isInitialized) && ((_f = (_e = socketState == null ? void 0 : socketState.options) == null ? void 0 : _e.params) == null ? void 0 : _f.type) !== ((_g = options == null ? void 0 : options.params) == null ? void 0 : _g.type)) {
-      common_vendor.index.__f__("log", "at composables/useWorkFlow.ts:159", "WebSocket is already initialized,but scene is different,reinitialize");
+      common_vendor.index.__f__("log", "at composables/useWorkFlow.ts:169", "WebSocket is already initialized,but scene is different,reinitialize");
       await closeSocketAsync();
       socketState.isInitialized = false;
     }
@@ -111,12 +121,12 @@ function useWorkFlow() {
     socketState.socket = common_vendor.index.connectSocket({
       url,
       complete: () => {
-        common_vendor.index.__f__("log", "at composables/useWorkFlow.ts:172", "WebSocket connect complete");
+        common_vendor.index.__f__("log", "at composables/useWorkFlow.ts:182", "WebSocket connect complete");
       }
     });
     socketState.isInitialized = true;
     common_vendor.index.onSocketOpen((result) => {
-      common_vendor.index.__f__("log", "at composables/useWorkFlow.ts:177", "WebSocket opened", result);
+      common_vendor.index.__f__("log", "at composables/useWorkFlow.ts:187", "WebSocket opened", result);
       socketState.options = options;
       if (options.onConnect) {
         options.onConnect();
@@ -129,7 +139,7 @@ function useWorkFlow() {
       handleSocketMessage(msg.data);
     });
     common_vendor.index.onSocketError((err) => {
-      common_vendor.index.__f__("error", "at composables/useWorkFlow.ts:191", "WebSocket onError", err);
+      common_vendor.index.__f__("error", "at composables/useWorkFlow.ts:201", "WebSocket onError", err);
       socketState.isInitialized = false;
       if (options.onConnectError) {
         options.onConnectError(err);
@@ -137,7 +147,7 @@ function useWorkFlow() {
     });
     common_vendor.index.onSocketClose(() => {
       socketState.isInitialized = false;
-      common_vendor.index.__f__("log", "at composables/useWorkFlow.ts:199", "WebSocket onClose");
+      common_vendor.index.__f__("log", "at composables/useWorkFlow.ts:209", "WebSocket onClose");
       if (options.onDisconnect) {
         options.onDisconnect();
       }
@@ -156,7 +166,7 @@ function useWorkFlow() {
       (_a = socketState.socket) == null ? void 0 : _a.send({
         data: "ping",
         success(result) {
-          common_vendor.index.__f__("log", "at composables/useWorkFlow.ts:219", result);
+          common_vendor.index.__f__("log", "at composables/useWorkFlow.ts:229", result);
           clearTimeout(timeoutID);
           resolve(true);
         }
@@ -165,10 +175,14 @@ function useWorkFlow() {
   };
   const handleSocketMessage = (msg, callback) => {
     var _a, _b;
-    common_vendor.index.__f__("log", "at composables/useWorkFlow.ts:228", "原始消息", msg);
-    const msgObj = utils_common.parseJSONToObject(
-      msg
-    );
+    common_vendor.index.__f__("log", "at composables/useWorkFlow.ts:284", "原始消息", msg);
+    let msgObj;
+    try {
+      msgObj = utils_common.parseJSONToObject(msg);
+    } catch (error) {
+      common_vendor.index.__f__("error", "at composables/useWorkFlow.ts:289", "解析WebSocket消息时出错，消息不是有效的JSON格式:", error);
+      return;
+    }
     if (!msgObj)
       return;
     const { queue_status } = msgObj;
@@ -241,7 +255,7 @@ function useWorkFlow() {
       await socketInit();
     }
     const newTask = await handleCreateTask();
-    common_vendor.index.__f__("log", "at composables/useWorkFlow.ts:314", "newTask", newTask);
+    common_vendor.index.__f__("log", "at composables/useWorkFlow.ts:381", "newTask", newTask);
     if (!newTask) {
       return;
     }

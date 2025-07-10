@@ -47,7 +47,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         a: common_vendor.o(handleTabClick),
         b: common_vendor.p({
           list: tabsData.value
-        })
+        }),
+        c: common_vendor.gei(_ctx, "")
       };
     };
   }

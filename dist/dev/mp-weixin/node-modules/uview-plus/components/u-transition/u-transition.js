@@ -51,7 +51,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     b: common_vendor.o((...args) => _ctx.clickHandler && _ctx.clickHandler(...args)),
     c: common_vendor.n($data.classes),
     d: common_vendor.s($options.mergeStyle),
-    e: common_vendor.o((...args) => _ctx.noop && _ctx.noop(...args))
+    e: common_vendor.o((...args) => _ctx.noop && _ctx.noop(...args)),
+    f: common_vendor.gei(_ctx, "")
   } : {});
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-0573594d"]]);

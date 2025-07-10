@@ -4,14 +4,18 @@ const stores_appStore = require("../../stores/appStore.js");
 if (!Math) {
   (TnCircleProgress + TnPopup)();
 }
-const TnPopup = () => "../../node-modules/@tuniao/tnui-vue3-uniapp/components/popup/src/popup.js";
-const TnCircleProgress = () => "../../node-modules/@tuniao/tnui-vue3-uniapp/components/circle-progress/src/circle-progress.js";
+const TnPopup = () => "../node-modules/@tuniao/tnui-vue3-uniapp/components/popup/src/popup.js";
+const TnCircleProgress = () => "../node-modules/@tuniao/tnui-vue3-uniapp/components/circle-progress/src/circle-progress.js";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "TaskExcuting",
   setup(__props) {
-    const { showExecuting } = common_vendor.storeToRefs(stores_appStore.useAppStore());
-    common_vendor.watch(showExecuting, () => {
-      common_vendor.index.__f__("log", "at components/common/TaskExcuting.vue:10", "showExcuting", showExecuting);
+    const store = stores_appStore.useAppStore();
+    const { showExecuting } = common_vendor.storeToRefs(store);
+    common_vendor.watch(showExecuting, (newVal) => {
+      common_vendor.index.__f__("log", "at components/common/TaskExcuting.vue:13", "showExecuting changed to:", newVal);
+    });
+    common_vendor.onMounted(() => {
+      common_vendor.index.__f__("log", "at components/common/TaskExcuting.vue:18", "store state:", store.$state);
     });
     const progressPercent = common_vendor.ref(30);
     return (_ctx, _cache) => {
@@ -29,10 +33,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           ["close-btn"]: true,
           ["overlay-closeable"]: false,
           modelValue: common_vendor.unref(showExecuting)
-        })
+        }),
+        f: common_vendor.gei(_ctx, "")
       } : {});
     };
   }
 });
-wx.createComponent(_sfc_main);
+const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-6bc70b73"]]);
+wx.createComponent(Component);
 //# sourceMappingURL=../../../.sourcemap/mp-weixin/components/common/TaskExcuting.js.map

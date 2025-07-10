@@ -79,7 +79,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         e: common_vendor.o(onChange),
         f: btnPositon.value.x,
         g: btnPositon.value.y,
-        h: _ctx.disabled
+        h: _ctx.disabled,
+        i: common_vendor.gei(_ctx, "")
       };
     };
   }

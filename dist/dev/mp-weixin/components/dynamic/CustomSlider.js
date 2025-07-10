@@ -42,7 +42,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           min: _ctx.options.min,
           max: _ctx.options.max,
           modelValue: sliderValue.value
-        })
+        }),
+        d: common_vendor.gei(_ctx, "")
       };
     };
   }

@@ -93,7 +93,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     h: $props.safeArea ? 1 : "",
     i: common_vendor.n($props.isFixed ? "fui-footer__fixed-bottom" : ""),
     j: $props.background,
-    k: $props.bottom + "rpx"
+    k: $props.bottom + "rpx",
+    l: common_vendor.gei(_ctx, "")
   });
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-946bd64a"]]);

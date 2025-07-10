@@ -19,7 +19,8 @@ const _sfc_defineComponent = common_vendor.defineComponent({
       return {
         a: common_vendor.p({
           ["scroll-top"]: scrollTop.value
-        })
+        }),
+        b: common_vendor.gei(_ctx, "")
       };
     };
   }

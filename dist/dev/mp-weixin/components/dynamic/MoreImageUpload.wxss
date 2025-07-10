@@ -29,3 +29,83 @@
   background-color: #f4f5f6;
   border-radius: 10rpx;
 }
+
+/* 遮罩模态框样式 */
+.mask-modal.data-v-96383370 {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #fff;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+}
+.mask-modal-header.data-v-96383370 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx 30rpx;
+  border-bottom: 1rpx solid #eee;
+}
+.mask-modal-title.data-v-96383370 {
+  font-size: 32rpx;
+  font-weight: bold;
+}
+.mask-modal-actions.data-v-96383370 {
+  display: flex;
+  gap: 20rpx;
+}
+.mask-btn.data-v-96383370 {
+  padding: 10rpx 20rpx;
+  border-radius: 8rpx;
+  background-color: #f4f5f6;
+  font-size: 28rpx;
+}
+.mask-canvas-container.data-v-96383370 {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.mask-image-wrap.data-v-96383370 {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f8f8f8;
+  overflow: hidden;
+}
+.mask-canvas.data-v-96383370 {
+  max-width: 100%;
+  max-height: 100%;
+}
+.mask-toolbar.data-v-96383370 {
+  padding: 20rpx;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15rpx;
+  background-color: #fff;
+  border-top: 1rpx solid #eee;
+}
+.mask-tool-btn.data-v-96383370 {
+  padding: 12rpx 24rpx;
+  border-radius: 8rpx;
+  background-color: #f4f5f6;
+  font-size: 28rpx;
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+.mask-tool-btn.active.data-v-96383370 {
+  background-color: #1677ff;
+  color: #fff;
+}
+.brush-width-slider.data-v-96383370 {
+  flex: 1;
+  min-width: 200rpx;
+  display: flex;
+  align-items: center;
+  gap: 15rpx;
+  padding: 0 15rpx;
+}

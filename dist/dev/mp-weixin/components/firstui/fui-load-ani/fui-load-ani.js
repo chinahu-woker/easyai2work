@@ -68,7 +68,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     E: $props.color
   } : {}, {
     F: $props.isFixed ? 1 : "",
-    G: $props.isFixed ? $props.maskColor : "transparent"
+    G: $props.isFixed ? $props.maskColor : "transparent",
+    H: common_vendor.gei(_ctx, "")
   });
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-ffc2d581"]]);

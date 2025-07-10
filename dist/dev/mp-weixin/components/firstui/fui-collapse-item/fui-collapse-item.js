@@ -192,7 +192,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     q: ($data.isOpen ? $data.height : 0) + "px",
     r: $props.contentBg,
     s: $props.marginTop + "rpx",
-    t: $props.marginBottom + "rpx"
+    t: $props.marginBottom + "rpx",
+    v: common_vendor.gei(_ctx, "")
   });
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-215c8d17"]]);

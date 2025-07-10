@@ -1,0 +1,10 @@
+{
+  "navigationBarTitleText": "",
+  "usingComponents": {
+    "fui-background-image": "../../components/firstui/fui-background-image/fui-background-image",
+    "fui-icon": "../../components/firstui/fui-icon/fui-icon",
+    "fui-nav-bar": "../../components/firstui/fui-nav-bar/fui-nav-bar",
+    "fui-input": "../../components/firstui/fui-input/fui-input",
+    "fui-button": "../../components/firstui/fui-button/fui-button"
+  }
+}

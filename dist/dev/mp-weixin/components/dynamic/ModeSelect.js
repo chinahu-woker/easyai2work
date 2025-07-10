@@ -37,7 +37,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           title: _ctx.title,
           options: modelList.value,
           modelValue: selectValue.value
-        })
+        }),
+        c: common_vendor.gei(_ctx, "")
       };
     };
   }

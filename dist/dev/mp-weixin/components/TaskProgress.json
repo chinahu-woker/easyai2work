@@ -7,6 +7,6 @@
     "fui-parse-group": "./firstui/fui-parse-group/fui-parse-group",
     "fui-fab": "./firstui/fui-fab/fui-fab",
     "my-popup": "./common/MyPopup",
-    "tn-icon": "../node-modules/@tuniao/tnui-vue3-uniapp/components/icon/src/icon"
+    "tn-icon": "./node-modules/@tuniao/tnui-vue3-uniapp/components/icon/src/icon"
   }
 }

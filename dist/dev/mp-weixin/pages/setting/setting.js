@@ -151,7 +151,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         q: common_vendor.p({
           icon: "setting",
           title: "退出登录"
-        })
+        }),
+        r: common_vendor.gei(_ctx, "")
       });
     };
   }

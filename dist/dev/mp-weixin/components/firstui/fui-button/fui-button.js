@@ -454,7 +454,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     ay: $options.getBackground,
     az: common_vendor.o((...args) => $options.handleStart && $options.handleStart(...args)),
     aA: common_vendor.o((...args) => $options.handleClick && $options.handleClick(...args)),
-    aB: common_vendor.o((...args) => $options.handleEnd && $options.handleEnd(...args))
+    aB: common_vendor.o((...args) => $options.handleEnd && $options.handleEnd(...args)),
+    aC: common_vendor.gei(_ctx, "")
   });
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-879fd338"]]);

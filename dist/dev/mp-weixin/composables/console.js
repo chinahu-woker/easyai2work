@@ -1,6 +1,6 @@
 "use strict";
 const common_vendor = require("../common/vendor.js");
-const getBaseURL = () => "https://scschool.cc/api";
+const getBaseURL = () => "https://edai.vip/api";
 const GetAllManagerInfor = (data) => {
   common_vendor.index.__f__("log", "at composables/console.ts:7", "data获取成功", data);
   return new Promise((resolve, reject) => {

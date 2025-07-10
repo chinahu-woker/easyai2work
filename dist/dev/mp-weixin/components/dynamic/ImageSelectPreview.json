@@ -3,6 +3,6 @@
   "usingComponents": {
     "param-card": "../common/ParamCard",
     "my-title": "../common/MyTitle",
-    "tn-icon": "../../node-modules/@tuniao/tnui-vue3-uniapp/components/icon/src/icon"
+    "tn-icon": "../node-modules/@tuniao/tnui-vue3-uniapp/components/icon/src/icon"
   }
 }

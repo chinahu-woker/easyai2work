@@ -6,11 +6,11 @@ const components_custom_MyGraphicCard_composables_useGraphicCard = require("./co
 if (!Math) {
   (TnAvatar + TnIcon + TnLazyLoad + TnPhotoAlbum + TnAvatarGroup)();
 }
-const TnIcon = () => "../../../node-modules/@tuniao/tnui-vue3-uniapp/components/icon/src/icon.js";
-const TnPhotoAlbum = () => "../../../node-modules/@tuniao/tnui-vue3-uniapp/components/photo-album/src/photo-album.js";
-const TnAvatar = () => "../../../node-modules/@tuniao/tnui-vue3-uniapp/components/avatar/src/avatar.js";
-const TnAvatarGroup = () => "../../../node-modules/@tuniao/tnui-vue3-uniapp/components/avatar/src/avatar-group.js";
-const TnLazyLoad = () => "../../../node-modules/@tuniao/tnui-vue3-uniapp/components/lazy-load/src/lazy-load.js";
+const TnIcon = () => "../../node-modules/@tuniao/tnui-vue3-uniapp/components/icon/src/icon.js";
+const TnPhotoAlbum = () => "../../node-modules/@tuniao/tnui-vue3-uniapp/components/photo-album/src/photo-album.js";
+const TnAvatar = () => "../../node-modules/@tuniao/tnui-vue3-uniapp/components/avatar/src/avatar.js";
+const TnAvatarGroup = () => "../../node-modules/@tuniao/tnui-vue3-uniapp/components/avatar/src/avatar-group.js";
+const TnLazyLoad = () => "../../node-modules/@tuniao/tnui-vue3-uniapp/components/lazy-load/src/lazy-load.js";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "MyGraphicCard",
   props: components_custom_MyGraphicCard_types.graphicCardProps,
@@ -254,7 +254,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         aO: common_vendor.o(
           //@ts-ignore
           (...args) => common_vendor.unref(cardClickEvent) && common_vendor.unref(cardClickEvent)(...args)
-        )
+        ),
+        aP: common_vendor.gei(_ctx, "")
       });
     };
   }

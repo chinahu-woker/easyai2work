@@ -141,7 +141,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     r: $props.padding + "px",
     s: $props.padding + "px",
     t: $props.zIndex,
-    v: common_vendor.s($options.getStyle)
+    v: common_vendor.s($options.getStyle),
+    w: common_vendor.gei(_ctx, "")
   });
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-d46cf250"]]);

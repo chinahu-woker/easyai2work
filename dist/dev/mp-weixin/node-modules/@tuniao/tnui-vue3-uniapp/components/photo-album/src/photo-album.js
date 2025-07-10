@@ -11,7 +11,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   setup(__props, { emit: __emit }) {
     const props = __props;
     const emits = __emit;
-    const ns = common_vendor.useNamespace("photo-album");
+    const ns = common_vendor.useNamespace$1("photo-album");
     const { imageData, imageClickEvent } = common_vendor.usePhotoAlbum(props, emits);
     const containerStyle = common_vendor.computed(() => {
       const style = {};
@@ -41,7 +41,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         c: common_vendor.n(common_vendor.unref(ns).e("item")),
         d: common_vendor.n(common_vendor.unref(ns).e("container")),
         e: common_vendor.s(containerStyle.value),
-        f: common_vendor.n(common_vendor.unref(ns).b())
+        f: common_vendor.n(common_vendor.unref(ns).b()),
+        g: common_vendor.gei(_ctx, "")
       };
     };
   }

@@ -1,0 +1,10 @@
+export declare const IS_TRUE: unique symbol;
+export declare const V_SHOW: unique symbol;
+export declare const RENDER_LIST: unique symbol;
+export declare const FRAGMENT: unique symbol;
+export declare const OPEN_BLOCK: unique symbol;
+export declare const RESOLVE_COMPONENT: unique symbol;
+export declare const RESOLVE_DIRECTIVE: unique symbol;
+export declare const RESOLVE_EASY_COMPONENT: unique symbol;
+export declare const RENDER_SLOT: unique symbol;
+export declare const TO_HANDLERS: unique symbol;

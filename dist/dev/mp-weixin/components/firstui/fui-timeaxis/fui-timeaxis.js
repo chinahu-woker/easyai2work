@@ -58,7 +58,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     b: $props.padding[1] || 0,
     c: $props.padding[2] || $props.padding[0] || 0,
     d: $props.padding[3] || $props.padding[1] || 0,
-    e: $props.background
+    e: $props.background,
+    f: common_vendor.gei(_ctx, "")
   };
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-bca5bcd5"]]);

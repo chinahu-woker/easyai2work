@@ -1,32 +1,33 @@
 "use strict";
 const common_vendor = require("../../../common/vendor.js");
-const common_assets = require("../../../common/assets.js");
 const utils_request = require("../../../utils/request.js");
 const utils_common = require("../../../utils/common.js");
 const composables_useCommon = require("../../../composables/useCommon.js");
 if (!Array) {
+  const _easycom_fui_icon2 = common_vendor.resolveComponent("fui-icon");
+  const _easycom_fui_nav_bar2 = common_vendor.resolveComponent("fui-nav-bar");
   const _easycom_fui_background_image2 = common_vendor.resolveComponent("fui-background-image");
   const _easycom_fui_tabs2 = common_vendor.resolveComponent("fui-tabs");
   const _easycom_fui_sticky2 = common_vendor.resolveComponent("fui-sticky");
-  const _easycom_fui_section2 = common_vendor.resolveComponent("fui-section");
   const _easycom_fui_gallery2 = common_vendor.resolveComponent("fui-gallery");
-  const _easycom_fui_icon2 = common_vendor.resolveComponent("fui-icon");
   const _easycom_fui_load_ani2 = common_vendor.resolveComponent("fui-load-ani");
+  const _easycom_fui_section2 = common_vendor.resolveComponent("fui-section");
   const _easycom_tn_icon2 = common_vendor.resolveComponent("tn-icon");
   const _easycom_fui_collapse_item2 = common_vendor.resolveComponent("fui-collapse-item");
   const _easycom_fui_timeaxis_node2 = common_vendor.resolveComponent("fui-timeaxis-node");
   const _easycom_fui_timeaxis2 = common_vendor.resolveComponent("fui-timeaxis");
   const _easycom_fui_waterfall_item2 = common_vendor.resolveComponent("fui-waterfall-item");
   const _easycom_fui_waterfall2 = common_vendor.resolveComponent("fui-waterfall");
-  (_easycom_fui_background_image2 + _easycom_fui_tabs2 + _easycom_fui_sticky2 + _easycom_fui_section2 + _easycom_fui_gallery2 + _easycom_fui_icon2 + _easycom_fui_load_ani2 + _easycom_tn_icon2 + _easycom_fui_collapse_item2 + _easycom_fui_timeaxis_node2 + _easycom_fui_timeaxis2 + _easycom_fui_waterfall_item2 + _easycom_fui_waterfall2)();
+  (_easycom_fui_icon2 + _easycom_fui_nav_bar2 + _easycom_fui_background_image2 + _easycom_fui_tabs2 + _easycom_fui_sticky2 + _easycom_fui_gallery2 + _easycom_fui_load_ani2 + _easycom_fui_section2 + _easycom_tn_icon2 + _easycom_fui_collapse_item2 + _easycom_fui_timeaxis_node2 + _easycom_fui_timeaxis2 + _easycom_fui_waterfall_item2 + _easycom_fui_waterfall2)();
 }
+const _easycom_fui_icon = () => "../../../components/firstui/fui-icon/fui-icon.js";
+const _easycom_fui_nav_bar = () => "../../../components/firstui/fui-nav-bar/fui-nav-bar.js";
 const _easycom_fui_background_image = () => "../../../components/firstui/fui-background-image/fui-background-image.js";
 const _easycom_fui_tabs = () => "../../../components/firstui/fui-tabs/fui-tabs.js";
 const _easycom_fui_sticky = () => "../../../components/firstui/fui-sticky/fui-sticky.js";
-const _easycom_fui_section = () => "../../../components/firstui/fui-section/fui-section.js";
 const _easycom_fui_gallery = () => "../../../components/firstui/fui-gallery/fui-gallery.js";
-const _easycom_fui_icon = () => "../../../components/firstui/fui-icon/fui-icon.js";
 const _easycom_fui_load_ani = () => "../../../components/firstui/fui-load-ani/fui-load-ani.js";
+const _easycom_fui_section = () => "../../../components/firstui/fui-section/fui-section.js";
 const _easycom_tn_icon = () => "../../../node-modules/@tuniao/tnui-vue3-uniapp/components/icon/src/icon.js";
 const _easycom_fui_collapse_item = () => "../../../components/firstui/fui-collapse-item/fui-collapse-item.js";
 const _easycom_fui_timeaxis_node = () => "../../../components/firstui/fui-timeaxis-node/fui-timeaxis-node.js";
@@ -34,9 +35,8 @@ const _easycom_fui_timeaxis = () => "../../../components/firstui/fui-timeaxis/fu
 const _easycom_fui_waterfall_item = () => "../../../components/firstui/fui-waterfall-item/fui-waterfall-item.js";
 const _easycom_fui_waterfall = () => "../../../components/firstui/fui-waterfall/fui-waterfall.js";
 if (!Math) {
-  (MyNavbar + _easycom_fui_background_image + _easycom_fui_tabs + _easycom_fui_sticky + _easycom_fui_section + _easycom_fui_gallery + _easycom_fui_icon + _easycom_fui_load_ani + _easycom_tn_icon + _easycom_fui_collapse_item + _easycom_fui_timeaxis_node + _easycom_fui_timeaxis + _easycom_fui_waterfall_item + _easycom_fui_waterfall)();
+  (_easycom_fui_icon + _easycom_fui_nav_bar + _easycom_fui_background_image + _easycom_fui_tabs + _easycom_fui_sticky + _easycom_fui_gallery + _easycom_fui_load_ani + _easycom_fui_section + _easycom_tn_icon + _easycom_fui_collapse_item + _easycom_fui_timeaxis_node + _easycom_fui_timeaxis + _easycom_fui_waterfall_item + _easycom_fui_waterfall)();
 }
-const MyNavbar = () => "../../../components/common/MyNavbar.js";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "history_fui",
   setup(__props) {
@@ -204,31 +204,38 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         isDeleting.value = false;
       }, 500);
     };
+    const toHome = () => {
+      common_vendor.index.navigateBack({
+        delta: 1
+      });
+    };
     return (_ctx, _cache) => {
       return common_vendor.e({
         a: common_vendor.p({
+          name: "arrowleft",
+          size: "40",
+          color: "#333"
+        }),
+        b: common_vendor.o(toHome),
+        c: common_vendor.p({
+          title: " ",
+          background: "transparent"
+        }),
+        d: common_vendor.p({
           src: "@/src/static/Home2 (1).jpgHome2(1).jpg"
         }),
-        b: common_vendor.o(QieHuan),
-        c: common_vendor.p({
+        e: common_vendor.o(QieHuan),
+        f: common_vendor.p({
           tabs: tabs.value
         }),
-        d: common_assets._imports_0,
-        e: common_vendor.p({
-          title: "历史生图记录",
-          ["margin-top"]: "25",
-          descrSize: "32",
-          descrColor: "#000000",
-          descr: "时间轴模式下长按图片可以将图片保存或分享给朋友"
-        }),
-        f: currentTabIndex.value == 0
+        g: currentTabIndex.value == 0
       }, currentTabIndex.value == 0 ? {
-        g: common_vendor.o(hideGallery),
-        h: common_vendor.p({
+        h: common_vendor.o(hideGallery),
+        i: common_vendor.p({
           urls: GalleryPic.value,
           show: show.value
         }),
-        i: common_vendor.f(historyData.value, (item, index, i0) => {
+        j: common_vendor.f(historyData.value, (item, index, i0) => {
           var _a, _b, _c, _d, _e;
           return common_vendor.e({
             a: item.status == 2
@@ -328,13 +335,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             Q: "56f14cc7-7-" + i0 + ",56f14cc7-6"
           });
         }),
-        j: common_vendor.p({
+        k: common_vendor.p({
           padding: ["32rpx", "16rpx"]
         })
       } : {}, {
-        k: currentTabIndex.value == 1
+        l: currentTabIndex.value == 1
       }, currentTabIndex.value == 1 ? {
-        l: common_vendor.f(historyData.value, (item, index, i0) => {
+        m: common_vendor.f(historyData.value, (item, index, i0) => {
           var _a, _b;
           return common_vendor.e({
             a: linkType(item.output[0]) == 0

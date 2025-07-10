@@ -32,6 +32,9 @@ export default defineConfig(async () => {
           // additionalData: '@import "@/styles/theme.scss";'
         }
       },
-    }
+    },
+	// define: {
+	// 	      'global': {} // 模拟 global 变量
+	// 	    }
   }
 });

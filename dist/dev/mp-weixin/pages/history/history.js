@@ -138,7 +138,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         f: common_vendor.p({
           tabs: tabs.value,
           modelValue: currentTabIndex.value
-        })
+        }),
+        g: common_vendor.gei(_ctx, "")
       });
     };
   }

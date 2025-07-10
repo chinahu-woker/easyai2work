@@ -38,7 +38,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       src: "/static/images/component/empty/img_data_3x.png",
       title: "暂无数据",
       descr: "功能开发中，敬请期待！"
-    })
+    }),
+    d: common_vendor.gei(_ctx, "")
   };
 }
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render]]);

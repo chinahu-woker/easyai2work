@@ -37,7 +37,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     a: common_vendor.t(_ctx.text),
     b: common_vendor.o((...args) => $options.openLink && $options.openLink(...args)),
     c: common_vendor.s($options.linkStyle),
-    d: common_vendor.s($options.addStyle(_ctx.customStyle))
+    d: common_vendor.s($options.addStyle(_ctx.customStyle)),
+    e: common_vendor.gei(_ctx, "")
   };
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-dedad317"]]);

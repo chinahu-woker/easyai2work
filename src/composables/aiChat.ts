@@ -245,3 +245,77 @@ export const allUserName = (data) => {
     });
   });
 }
+export const XieYiServer = ( ) => {
+  
+  return new Promise((resolve, reject) => {
+    uni.request({
+      url: `${getBaseURL()}/policy/service`,
+      method: "GET",
+      
+      success: (res) => {
+        if (res.statusCode === 200 && res.data) {
+          // ✅ 正确保存数组
+          uni.setStorageSync('XieYiServer', res.data);
+          resolve(res.data);
+        } else {
+          uni.showToast({ title: 'XieYiServer', icon: 'none' });
+          reject(res);
+        }
+      },
+      fail: (err) => {
+        console.error('请求失败:', err);
+        reject(err);
+      }
+    });
+  });
+}
+export const XieYiprivacy = ( ) => {
+  
+  return new Promise((resolve, reject) => {
+    uni.request({
+      url: `${getBaseURL()}/policy/privacy`,
+      method: "GET",
+      
+      success: (res) => {
+        if (res.statusCode === 200 && res.data) {
+       
+          uni.setStorageSync('XieYiprivacy', res.data);
+          resolve(res.data);
+        } else {
+          uni.showToast({ title: 'XieYiprivacy', icon: 'none' });
+          reject(res);
+        }
+      },
+      fail: (err) => {
+        console.error('请求失败:', err);
+        reject(err);
+      }
+    });
+  });
+}
+
+
+export const registerByUsername = (data) => {
+	// 获取用户Key值
+	
+	console.log("注册用户的值：", data)
+
+	return new Promise((resolve, reject) => {
+		const requestTask = uni.request({
+			url: `${getBaseURL()}/users/registerByUsername`, 
+			method: "POST",
+			
+			data:data,
+			success: (res) => {
+				console.log('注册请求已经完成：', res.data);
+				 resolve(res.data)
+				// uni.parseStreamData(res.data)
+			}, // 请求成功回调
+			fail: (err) => {
+				reject(err);
+				console.log('请求失败', err);
+			} // 请求失败回调
+		});
+		console.log('注册：requestTask：', requestTask)
+	});
+}

@@ -117,7 +117,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     c: common_vendor.s($options.getStyle),
     d: !$props.range ? 1 : "",
     e: common_vendor.s($options.getStyles),
-    f: $data.elId
+    f: common_vendor.gei(_ctx, $data.elId)
   };
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-1f0bba76"]]);

@@ -10,6 +10,7 @@
     "up-button": "../../../node-modules/uview-plus/components/u-button/u-button",
     "base-layout": "../../../layouts/BaseLayout",
     "image-upload": "../../../components/dynamic/ImageUpload",
+    "image-upload-more": "../../../components/dynamic/ImageUploadMore",
     "more-image-upload": "../../../components/dynamic/MoreImageUpload",
     "audio-upload": "../../../components/dynamic/AudioUpload",
     "height": "../../../components/dynamic/Height",

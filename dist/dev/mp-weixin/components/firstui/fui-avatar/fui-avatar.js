@@ -168,7 +168,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     n: common_vendor.n($props.width ? "" : "fui-avatar__size-" + $props.size),
     o: common_vendor.n($props.radius === -1 ? "fui-avatar__" + $props.shape : ""),
     p: common_vendor.s($options.wrapStyles),
-    q: common_vendor.o((...args) => $options.handleClick && $options.handleClick(...args))
+    q: common_vendor.o((...args) => $options.handleClick && $options.handleClick(...args)),
+    r: common_vendor.gei(_ctx, "")
   });
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-cde923ba"]]);

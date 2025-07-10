@@ -16,7 +16,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         a: common_vendor.p({
           autoBack: true,
           homeUrl: "/pages/index/index"
-        })
+        }),
+        b: common_vendor.gei(_ctx, "")
       };
     };
   }

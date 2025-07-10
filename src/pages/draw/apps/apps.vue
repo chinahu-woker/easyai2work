@@ -6,6 +6,7 @@ import { computed, inject, onMounted, ref, nextTick, watch } from "vue";
 import BaseLayout from "@/layouts/BaseLayout.vue";
 import useWorkFlow from "@/composables/useWorkFlow.ts";
 import ImageUpload from "@/components/dynamic/ImageUpload.vue";
+import ImageUploadMore from "@/components/dynamic/ImageUploadMore.vue";
 import MoreImageUpload from "@/components/dynamic/MoreImageUpload.vue";
 import AudioUpload from "@/components/dynamic/AudioUpload.vue";
 import CustomSlider from "@/components/dynamic/CustomSlider.vue";
@@ -36,6 +37,7 @@ import DragButton2 from "@/components/common/DragButton2.vue";
 /** 所有的组件 */
 const components = {
 	ImageUpload,
+	ImageUploadMore,
 	CustomSlider,
 	Height,
 	Positive,
@@ -44,7 +46,8 @@ const components = {
 	Width,
 	Seed,
 	ImageSelectPreview,
-	ModeSelect
+	ModeSelect,
+	MoreImageUpload 
 }
 
 /** 参数名称与组件名称的映射 */
@@ -67,21 +70,28 @@ const {
 
 	handleSubmitTaskTask
 } = useWorkFlow()
+console.log("--------------------------",workFlowParamLists)
 
+const workflowId = ref('');
 
-const workflowId = ref('')
 onLoad(async () => {
-	const currentPage = getCurrentPages().pop();
-	const query = currentPage?.options;
-	workflowId.value = query.id;
-	handleGetWorkFlwById(query.id).then(() => {
-		// 处理再生参数00
-		if (query.isRegenerate && query.regenerateParams) {
-			const params = JSON.parse(decodeURIComponent(query.regenerateParams));
-			bindParam.value = { ...params };
-		}
-	});
-})
+  const currentPage = getCurrentPages().pop();
+  // 检查 currentPage 是否存在
+  if (currentPage) {
+    const query = currentPage.options;
+    // 检查 query 是否存在
+    if (query) {
+      workflowId.value = query.id;
+      handleGetWorkFlwById(query.id).then(() => {
+        // 处理再生参数00
+        if (query.isRegenerate && query.regenerateParams) {
+          const params = JSON.parse(decodeURIComponent(query.regenerateParams));
+          bindParam.value = { ...params };
+        }
+      });
+    }
+  }
+});
 
 const showPopup = ref(false)
 const FlotButton = ref('空闲')
@@ -248,9 +258,9 @@ function checkFileType(input) {
 <template>
 	<fui-nav-bar :title="workflow?.title" @leftClick="leftClick">
 		<fui-icon name="arrowleft"></fui-icon>
-		<!-- <template v-slot:right>
+		<!-- <view v-slot:right>
 			<fui-icon name="plus"></fui-icon>
-		</template> -->
+		</view> -->
 	</fui-nav-bar>
 	<TaskProgress v-if="showPopup" v-model="showPopup" />
 	<view>
@@ -267,19 +277,35 @@ function checkFileType(input) {
 					<!-- <view style="margin-bottom: 0%; margin-left: 0%; margin-top: 5%; ">
 						<fui-section :title="workflow.title" margin-top="25" style="margin-bottom: 55%; " descrSize='32'
 							descrColor='#000000' descr=" ">
-							<template v-slot:right>
+							<view v-slot:right>
 								<image class="fui-vip__icon" src="/static/images/index/light/icon_member_3x.png">
 								</image>
-							</template>
+							</view>
 						</fui-section>
 
 					</view> -->
-					<template v-for="(item, index) in workFlowParamLists">
-						<template v-if="handleFindComponentName(item.name) === 'Seed'">
+					
+					<view v-for="(item, index) in workFlowParamLists">
+					
+						<view v-if="handleFindComponentName(item.name) === 'Seed'">
 							<Seed  ref="seedRef" :title="item.title" v-model="bindParam[item.name]"
 								:options="item.attributes" />
-						</template>
-						<template v-else-if="handleFindComponentName(item.name) === 'ImageUpload'">
+						</view>
+						<view v-else-if="handleFindComponentName(item.name) === 'ImageUploadMore'">
+
+								<ImageUploadMore :title="item.title" v-model="bindParam[item.name]"
+									:options="item.attributes" />
+							
+						</view>
+						<view v-else-if="handleFindComponentName(item.name) === 'MoreImageUpload'">
+						
+								<MoreImageUpload :title="item.title" v-model="bindParam[item.name]"
+									:options="item.attributes" />
+							
+						</view>
+						
+						
+						<view v-else-if="handleFindComponentName(item.name) === 'ImageUpload'">
 
 							<view v-if="checkFileType(item.param) == 2">
 								<AudioUpload :title="item.title" v-model="bindParam[item.name]"
@@ -290,32 +316,32 @@ function checkFileType(input) {
 								<ImageUpload :title="item.title" v-model="bindParam[item.name]"
 									:options="item.attributes" />
 							</view>
-						</template>
-						<template v-else-if="handleFindComponentName(item.name) === 'Width'">
+						</view>
+						<view v-else-if="handleFindComponentName(item.name) === 'Width'">
 							<Width :title="item.title" v-model="bindParam[item.name]" :options="item.attributes" />
-						</template>
-						<template v-else-if="handleFindComponentName(item.name) === 'Height'">
+						</view>
+						<view v-else-if="handleFindComponentName(item.name) === 'Height'">
 							<Height :title="item.title" v-model="bindParam[item.name]" :options="item.attributes" />
-						</template>
-						<template v-else-if="handleFindComponentName(item.name) === 'Positive'">
+						</view>
+						<view v-else-if="handleFindComponentName(item.name) === 'Positive'">
 							<Positive :title="item.title" v-model="bindParam[item.name]" :options="item.attributes" />
-						</template>
-						<template v-else-if="handleFindComponentName(item.name) === 'ModeSelect'">
+						</view>
+						<view v-else-if="handleFindComponentName(item.name) === 'ModeSelect'">
 							<ModeSelect :title="item.title" :workflow_id="workflow._id" v-model="bindParam[item.name]"
 								:options="item.attributes" />
-						</template>
-						<template v-else-if="handleFindComponentName(item.name) === 'Picker'">
+						</view>
+						<view v-else-if="handleFindComponentName(item.name) === 'Picker'">
 							<Picker :title="item.title" v-model="bindParam[item.name]" :options="item.attributes" />
-						</template>
-						<template v-else-if="handleFindComponentName(item.name) === 'CustomNumberBox'">
+						</view>
+						<view v-else-if="handleFindComponentName(item.name) === 'CustomNumberBox'">
 							<CustomNumberBox :title="item.title" v-model="bindParam[item.name]"
 								:options="item.attributes" />
-						</template>
-						<template v-else-if="handleFindComponentName(item.name) === 'ImageSelectPreview'">
+						</view>
+						<view v-else-if="handleFindComponentName(item.name) === 'ImageSelectPreview'">
 							<ImageSelectPreview :title="item.title" v-model="bindParam[item.name]"
 								:options="item.attributes" />
-						</template>
-						<template v-else>
+						</view>
+						<view v-else>
 
 
 							<view v-if="item.name == 'custom_batch_image_path_origin'">
@@ -325,10 +351,10 @@ function checkFileType(input) {
 
 
 							</view>
-						</template>
+						</view>
 
 
-					</template>
+					</view>
 
 
 					<!--        <ModeSelect :workflow_id="workflow._id"/>-->

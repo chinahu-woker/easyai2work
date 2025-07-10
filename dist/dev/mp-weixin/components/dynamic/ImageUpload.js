@@ -4,7 +4,7 @@ const utils_request = require("../../utils/request.js");
 if (!Math) {
   (MyTitle + TnImageUpload + ParamCard)();
 }
-const TnImageUpload = () => "../../node-modules/@tuniao/tnui-vue3-uniapp/components/image-upload/src/image-upload.js";
+const TnImageUpload = () => "../node-modules/@tuniao/tnui-vue3-uniapp/components/image-upload/src/image-upload.js";
 const MyTitle = () => "../common/MyTitle.js";
 const ParamCard = () => "../common/ParamCard.js";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
@@ -56,7 +56,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           limit: 1,
           ["custom-upload-handler"]: uploadFilePromise,
           modelValue: imageList.value
-        })
+        }),
+        e: common_vendor.gei(_ctx, "")
       };
     };
   }

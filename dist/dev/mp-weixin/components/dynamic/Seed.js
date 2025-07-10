@@ -4,10 +4,10 @@ const utils_common = require("../../utils/common.js");
 if (!Math) {
   (MyTitle + TnIcon + TnInput + ParamCard)();
 }
-const TnInput = () => "../../node-modules/@tuniao/tnui-vue3-uniapp/components/input/src/input.js";
+const TnInput = () => "../node-modules/@tuniao/tnui-vue3-uniapp/components/input/src/input.js";
 const ParamCard = () => "../common/ParamCard.js";
 const MyTitle = () => "../common/MyTitle.js";
-const TnIcon = () => "../../node-modules/@tuniao/tnui-vue3-uniapp/components/icon/src/icon.js";
+const TnIcon = () => "../node-modules/@tuniao/tnui-vue3-uniapp/components/icon/src/icon.js";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "Seed",
   props: /* @__PURE__ */ common_vendor.mergeModels({
@@ -54,7 +54,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           type: "number",
           placeholder: "请输入用户名",
           modelValue: inputValue.value
-        })
+        }),
+        f: common_vendor.gei(_ctx, "")
       };
     };
   }

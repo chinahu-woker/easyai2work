@@ -5,7 +5,7 @@ if (!Math) {
 }
 const ParamCard = () => "../common/ParamCard.js";
 const MyTitle = () => "../common/MyTitle.js";
-const TnIcon = () => "../../node-modules/@tuniao/tnui-vue3-uniapp/components/icon/src/icon.js";
+const TnIcon = () => "../node-modules/@tuniao/tnui-vue3-uniapp/components/icon/src/icon.js";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "ImageSelectPreview",
   props: /* @__PURE__ */ common_vendor.mergeModels({
@@ -68,7 +68,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             h: selectedIndex.value === index ? 1 : "",
             i: common_vendor.o(($event) => selectImage(index), index)
           });
-        })
+        }),
+        c: common_vendor.gei(_ctx, "")
       };
     };
   }

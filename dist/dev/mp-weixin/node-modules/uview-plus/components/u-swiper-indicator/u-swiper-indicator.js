@@ -48,7 +48,9 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         c: common_vendor.s($options.dotStyle(index))
       };
     })
-  } : {});
+  } : {}, {
+    h: common_vendor.gei(_ctx, "")
+  });
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-23112adb"]]);
 wx.createComponent(Component);

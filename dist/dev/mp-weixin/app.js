@@ -14,6 +14,8 @@ if (!Math) {
   "./pages/draw/draw_info/draw_info.js";
   "./pages/console/console.js";
   "./pages/drawLike/alike.js";
+  "./pages/login/login.js";
+  "./pages/login/register.js";
 }
 const _sfc_defineComponent = common_vendor.defineComponent({
   __name: "App",

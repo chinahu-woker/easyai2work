@@ -10,7 +10,9 @@
     "pages/history/history_fui/history_fui",
     "pages/draw/draw_info/draw_info",
     "pages/console/console",
-    "pages/drawLike/alike"
+    "pages/drawLike/alike",
+    "pages/login/login",
+    "pages/login/register"
   ],
   "window": {
     "navigationBarTextStyle": "black",

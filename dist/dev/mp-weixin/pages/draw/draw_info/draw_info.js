@@ -125,7 +125,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         n: common_vendor.p({
           width: "300",
           radius: "96rpx"
-        })
+        }),
+        o: common_vendor.gei(_ctx, "")
       });
     };
   }

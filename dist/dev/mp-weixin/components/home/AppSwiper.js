@@ -26,7 +26,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             b: common_vendor.t(item.title),
             c: index
           };
-        })
+        }),
+        b: common_vendor.gei(_ctx, "")
       };
     };
   }

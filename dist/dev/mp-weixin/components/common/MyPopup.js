@@ -3,7 +3,7 @@ const common_vendor = require("../../common/vendor.js");
 if (!Math) {
   TnPopup();
 }
-const TnPopup = () => "../../node-modules/@tuniao/tnui-vue3-uniapp/components/popup/src/popup.js";
+const TnPopup = () => "../node-modules/@tuniao/tnui-vue3-uniapp/components/popup/src/popup.js";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "MyPopup",
   props: {
@@ -22,7 +22,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           width: "100%",
           height: "100%",
           modelValue: showPopup.value
-        })
+        }),
+        c: common_vendor.gei(_ctx, "")
       };
     };
   }

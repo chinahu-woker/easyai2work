@@ -65,7 +65,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     h: $options.addUnit(_ctx.height),
     i: _ctx.bgColor,
     j: common_vendor.n(_ctx.fixed && "u-navbar-mini--fixed"),
-    k: common_vendor.n(_ctx.customClass)
+    k: common_vendor.n(_ctx.customClass),
+    l: common_vendor.gei(_ctx, "")
   });
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-128ec6da"]]);

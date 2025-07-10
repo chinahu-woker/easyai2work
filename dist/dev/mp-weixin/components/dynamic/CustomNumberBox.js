@@ -7,7 +7,7 @@ if (!Array) {
 if (!Math) {
   (MyTitle + TnNumberBox + ParamCard)();
 }
-const TnNumberBox = () => "../../node-modules/@tuniao/tnui-vue3-uniapp/components/number-box/src/number-box.js";
+const TnNumberBox = () => "../node-modules/@tuniao/tnui-vue3-uniapp/components/number-box/src/number-box.js";
 const ParamCard = () => "../common/ParamCard.js";
 const MyTitle = () => "../common/MyTitle.js";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
@@ -29,7 +29,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         b: common_vendor.o(($event) => numberValue.value = $event),
         c: common_vendor.p({
           modelValue: numberValue.value
-        })
+        }),
+        d: common_vendor.gei(_ctx, "")
       };
     };
   }

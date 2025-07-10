@@ -5,8 +5,8 @@ if (!Math) {
 }
 const ParamCard = () => "../common/ParamCard.js";
 const MyTitle = () => "../common/MyTitle.js";
-const TnInput = () => "../../node-modules/@tuniao/tnui-vue3-uniapp/components/input/src/input.js";
-const TnPicker = () => "../../node-modules/@tuniao/tnui-vue3-uniapp/components/picker/src/picker.js";
+const TnInput = () => "../node-modules/@tuniao/tnui-vue3-uniapp/components/input/src/input.js";
+const TnPicker = () => "../node-modules/@tuniao/tnui-vue3-uniapp/components/picker/src/picker.js";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "Picker",
   props: /* @__PURE__ */ common_vendor.mergeModels({
@@ -75,7 +75,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           data: pickerData.value,
           modelValue: selected.value,
           open: show.value
-        })
+        }),
+        j: common_vendor.gei(_ctx, "")
       };
     };
   }

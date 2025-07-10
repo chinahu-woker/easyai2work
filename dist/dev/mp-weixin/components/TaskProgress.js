@@ -18,7 +18,7 @@ if (!Math) {
   (_easycom_fui_background_image + _easycom_up_swiper + TnIcon + _easycom_fui_parse + _easycom_fui_parse_group + _easycom_fui_fab + TnIcon + MyPopup)();
 }
 const MyPopup = () => "./common/MyPopup.js";
-const TnIcon = () => "../node-modules/@tuniao/tnui-vue3-uniapp/components/icon/src/icon.js";
+const TnIcon = () => "./node-modules/@tuniao/tnui-vue3-uniapp/components/icon/src/icon.js";
 const loadingBackground = "https://chinahu-ai-server.oss-cn-chengdu.aliyuncs.com/aidraw/image/temps/onloading_bg.jpg";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "TaskProgress",

@@ -7,8 +7,8 @@ const TnOverlay = () => "../../overlay/src/overlay.js";
 const TnIcon = () => "../../icon/src/icon.js";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "popup",
-  props: common_vendor.popupProps,
-  emits: common_vendor.popupEmits,
+  props: common_vendor.popupProps$1,
+  emits: common_vendor.popupEmits$1,
   setup(__props) {
     const props = __props;
     const {
@@ -18,8 +18,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       visiblePopup,
       onClickCloseBtn,
       onClickOverlay
-    } = common_vendor.usePopup(props);
-    const { ns, overlayZIndex, zIndex, popupContentClass, popupContentStyle } = common_vendor.usePopupCustomStyle(props);
+    } = common_vendor.usePopup$1(props);
+    const { ns, overlayZIndex, zIndex, popupContentClass, popupContentStyle } = common_vendor.usePopupCustomStyle$1(props);
     return (_ctx, _cache) => {
       return common_vendor.e({
         a: !common_vendor.unref(iosDevice) || common_vendor.unref(iosDevice) && common_vendor.unref(visiblePopup)
@@ -47,7 +47,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         k: common_vendor.n(common_vendor.unref(ns).b()),
         l: common_vendor.n(common_vendor.unref(ns).is("show", common_vendor.unref(showPopup))),
         m: common_vendor.n(common_vendor.unref(ns).is("visible", common_vendor.unref(visiblePopup))),
-        n: common_vendor.unref(zIndex)
+        n: common_vendor.unref(zIndex),
+        o: common_vendor.gei(_ctx, "")
       }) : {});
     };
   }

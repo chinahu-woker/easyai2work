@@ -165,7 +165,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         p: common_vendor.p({
           ["margin-bottom"]: "24rpx"
-        })
+        }),
+        q: common_vendor.gei(_ctx, "")
       };
     };
   }

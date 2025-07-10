@@ -27,7 +27,6 @@ uni.getSystemInfo({
 
 <style lang="css">
 /*每个页面公共css */
-
 @import '@tuniao/tn-style/dist/uniapp/index.css';
 
 :root {

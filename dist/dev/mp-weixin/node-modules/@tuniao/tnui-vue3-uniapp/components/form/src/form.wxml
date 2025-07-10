@@ -1,1 +1,1 @@
-<view class="{{['data-v-b2b814ec', a, virtualHostClass]}}" style="{{virtualHostStyle}}" hidden="{{virtualHostHidden}}" id="{{virtualHostId}}"><slot/></view>
+<view class="{{['data-v-b2b814ec', a, virtualHostClass]}}" style="{{virtualHostStyle}}" hidden="{{virtualHostHidden || false}}" id="{{b}}"><slot/></view>

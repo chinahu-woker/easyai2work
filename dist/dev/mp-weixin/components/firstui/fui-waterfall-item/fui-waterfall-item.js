@@ -162,7 +162,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     k: $props.imgHeight != 0 ? 1 : "",
     l: common_vendor.s($options.getStyl)
   }) : {}, {
-    m: $data.elId,
+    m: common_vendor.gei(_ctx, $data.elId),
     n: $data.isShow ? 1 : "",
     o: $data.width + "px",
     p: $props.background,

@@ -68,7 +68,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           ["close-btn"]: true,
           ["safe-area-inset-bottom"]: false,
           modelValue: common_vendor.unref(showUpdatePopup)
-        })
+        }),
+        A: common_vendor.gei(_ctx, "")
       });
     };
   }

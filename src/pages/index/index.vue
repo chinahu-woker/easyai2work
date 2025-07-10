@@ -48,6 +48,7 @@
 				<up-status-bar />
 
 				<template v-for="(graphicData,KeyIndex) in graphicDatas" :key="KeyIndex">
+					
 
 					<view>
 					 <!--  -->
@@ -60,6 +61,7 @@
 					</view>
 				</template>
 			</view>
+			
 
 
 
@@ -68,91 +70,16 @@
 
 
 	</view>
-	<!-- <view v-show="pageindex==2"> -->
+
+	<view v-show="pageindex==2" >
+		
 		<!-- <fui-background-image :src="backGroundImage">
 		</fui-background-image> -->
-
-
-		<!-- <view class="fui-wrap">
-
-			<scroll-view scroll-y="true" class="scroll-Y" scroll-with-animation :scroll-into-view="items">
-				<view class="fui-chat__box" ref="chatBox">
-					<view v-for="(item,index) in msgList" :key="index">
-						<view :id="`items-${index}`" class="fui-chat__item"
-							:class="[item.role=='user'?'fui-chat__right':'fui-chat__left']">
-						
-							<fui-avatar background="#f9f9f9"
-								:src="item.role=='system'?'https://wangbo0808.oss-cn-shanghai.aliyuncs.com/assets/gpt4.png':user.avatar_url">
-							</fui-avatar>
-							<view class="fui-chat__content">
-								<text v-if="item.content.length >1 " @click="copyText(item.content)"
-									decode>{{item.content}}</text>
-								<view v-if=" item.content.length <1 ">
-									<fui-load-ani type='3' color=" #7f7d79"></fui-load-ani>
-								</view>
-							</view>
-						</view>
-
-
-
-					</view>
-				</view>
-			</scroll-view>
-			<view class="fui-chatbar__fixed">
-				<view style="margin-left: 5%;"> 当前模型：{{ chooseModel || modelList[0] }}</view>
-				<view class="fui-chatbar__wrap">
-					<view class="AITool">
-						<view> -->
-							<!-- 切换模型 -->
-							<!-- <fui-icon name="message" color="#3b3ee9" @click="popupMth"></fui-icon>
-						</view>
-					</view> -->
-
-					<!-- <view class="fui-chatbar__input-box"> -->
-						<!-- 输入框 -->
-						<!-- <textarea :enableNative="false" auto-height :show-count="false" fixed disable-default-padding
-							confirm-type="send" class="fui-chatbar__input" :maxlength="-1" v-model="content"
-							@confirm="msgSend">
-							</textarea>
-					</view>
-					<view class="fui-chatbar__icon-box fui-chatbar__send-box">
-
-						<view v-if="content.length == 0"> -->
-							<!-- 选择图片 -->
-							<!-- <fui-icon name="clear" color="#3b3ee9"></fui-icon>
-						</view> -->
-						<!-- <view v-if="msgStatu == true ">
-							
-							<fui-icon name="play" color="#e9344f" ></fui-icon>
-						</view> -->
-						<!-- <view v-else> -->
-							<!-- 发送按钮 -->
-							<!-- <image src="https://chinahu-ai-server.oss-cn-chengdu.aliyuncs.com/send.png" @tap="msgSend">
-							</image>
-						</view>
-					</view>
-				</view> -->
-				<!-- <fui-picker :options="modelList" :show="popup" @change="change" @cancel="cancel"></fui-picker> -->
-				<!-- <fui-bottom-popup :show="popup" @close="closePopup">
-					<view class="fui-custom__wrap">
-						上传图片
-					</view>
-				</fui-bottom-popup> -->
-				<!-- <fui-safe-area background="#f8f8f8"></fui-safe-area> -->
-		<!-- 	</view>
-		</view> -->
-
-
-
-
-	<!-- </view> -->
-	<view v-show="pageindex==2">
-		<!-- <fui-background-image :src="backGroundImage">
-		</fui-background-image> -->
-		<template>
+		
 			<BaseLayout>
+				
 				<!-- <image src='https://chinahu-ai-server.oss-cn-chengdu.aliyuncs.com/67873d6c232a3c5d52240dd6/upload/20250607111716210-jiayou.png'></image> -->
-				<view style="margin-top: -20%;">
+				<view style="margin-top: -15%;">
 					<!-- <MyNavbar /> -->
 					<up-status-bar />
 					<view class="u-flex u-row-right" style="width: 100%;">
@@ -160,8 +87,8 @@
 						</view>
 					</view>
 					<view class=" trans_back u-flex u-flex-y-center u-flex-around user-box u-p-l-30 u-p-r-20 u-p-b-30"
-						@click="handleLogin">
-						<view class="u-m-r-10">
+						>
+						<view class="u-m-r-10" @click="handleLogin">
 							<up-avatar :src="user.avatar_url" size="80">
 							</up-avatar>
 							<view v-if="!isLogin" class="tn-text-center tn-text-sm tn-gray-dark_text"
@@ -267,14 +194,14 @@
 
 				</view>
 			</BaseLayout>
-		</template>
+	
 	</view>
 <PaymentPopup/>
 </template>
 
 <script setup lang="ts">
 	import MyNavbar from "@/components/common/MyNavbar.vue";
-
+	
 	import GetUserInfoPopup from "@/components/GetUserInfoPopup.vue";
 	import {
 		creatOrder,
@@ -290,6 +217,8 @@
 		saveLoginInfo
 	} from "@/composables/useCommon.ts";
 	import BaseLayout from '@/layouts/BaseLayout.vue'
+	
+
 
 	import { onShareAppMessage, onShareTimeline } from '@dcloudio/uni-app'
 	import { globalAppData } from '@/cofigs/data/globalAppData.ts'
@@ -326,7 +255,7 @@
 	import fuiBackgroundImage from "@/components/firstui/fui-background-image/fui-background-image.vue";
 	import { getModelList, getUserKey, getUserToken, getUserInfo, ChatAPiUrl } from "@/composables/aiChat.ts";
 
-	import { TextEncoder, TextDecoder } from 'text-decoding'
+	// import { TextEncoder, TextDecoder } from 'text-decoding'
 	global.TextEncoder = TextEncoder
 	global.TextDecoder = TextDecoder
 	onLoad((options) => {
@@ -696,7 +625,7 @@ function goToEntire(id) {
 		if (index.index == 2) {
 			// chatAiGetToken()
 		}
-		// console.log('index', pageindex.value);
+		console.log('index', pageindex.value);
 
 
 	};
@@ -758,31 +687,31 @@ function goToEntire(id) {
 	const imageData = ref<IDrawHistoryItem[]>([])
 	/**图文卡片展示的数据 */
 	const graphicDatas = computed(() => {
-		return imageData.value.map(item => {
-			return {
-				id: item._id,
-				avatar: item.user_id?.avatar_url || '',
-				username: item.user_id?.nickname || item.user_id?.username,
-				title: item.options?.workflow_title,
-				description: formatDateTime(new Date(item.created_at)),
-				tags: item.tags,
-				content: item.params?.positive?.slice(0, 120) + "...",
-				images: (() => {
-					// 生成参数
-					const inputImages = []
-					for (const key in item.params) {
-						if (key.startsWith('image_path_') && item.params[key]) {
-							inputImages.push(item.params[key])
-						}
-					}
-					if (!item.output) {
-						return inputImages
-					}
-					return [...inputImages, ...item.output]
-				})(),
-				commentCount: item.comment?.length
-			}
-		})
+	    return imageData.value.map(item => {
+	        return {
+	            id: item._id,
+	            avatar: item.user_id?.avatar_url || '',
+	            username: item.user_id?.nickname || item.user_id?.username,
+	            // 为 title 属性设置默认值
+	            title: item.options?.workflow_title || '默认标题', 
+	            description: formatDateTime(new Date(item.created_at)),
+	            tags: item.tags,
+	            content: item.params?.positive?.slice(0, 120) + "...",
+	            images: (() => {
+	                const inputImages = []
+	                for (const key in item.params) {
+	                    if (key.startsWith('image_path_') && item.params[key]) {
+	                        inputImages.push(item.params[key])
+	                    }
+	                }
+	                if (!item.output) {
+	                    return inputImages
+	                }
+	                return [...inputImages, ...item.output]
+	            })(),
+	            commentCount: item.comment?.length
+	        }
+	    })
 	})
 
 
@@ -806,40 +735,41 @@ function goToEntire(id) {
 		})
 	}
 	const handleLogin = async () => {
-		if (isLogin.value) {
-			return
-		}
-		uni.showLoading({
-			title: '正在登录...',
-			mask: true
+		uni.navigateTo({
+			url:"/pages/login/login"
 		})
-		//获取平台信息
-		const { uniPlatform } = uni.getSystemInfoSync()
+	// 	if (isLogin.value) {
+	// 		return
+	// 	}
+	// 	uni.showLoading({
+	// 		title: '正在登录...',
+	// 		mask: true
+	// 	})
+	// 	//获取平台信息
+	// 	const { uniPlatform } = uni.getSystemInfoSync()
 
-		if (uniPlatform !== 'web') {
-			// 非开发者工具环境，执行登录操作
-			handleLoginByWechat()
+	// 	if (uniPlatform !== 'web') {
+	// 		// 非开发者工具环境，执行登录操作
+	// 		handleLoginByWechat()
 
-		} else {
-			// console.log('dev')
-			// 开发者工具环境，模拟登录 todo
-			const user = await loginByUsername({
-				username: 'test456',
-				password: '123456'
-			})
-			saveLoginInfo(user)
-			uni.hideLoading()
-		}
-		// chatAiGetToken()
-		name_value.value = '我的'
-		Kongzhitai()
-		 uni.reLaunch({ url: '/pages/index/index' });
-		 uni.showLoading({
-		 title: '加载中'
-		 });
-		// uni.reLaunch({
-		//   url: '/' + getCurrentPages()[getCurrentPages().length - 1].route
-		// });
+	// 	} else {
+	// 		// console.log('dev')
+	// 		// 开发者工具环境，模拟登录 todo
+	// 		const user = await loginByUsername({
+	// 			username: 'test456',
+	// 			password: '123456'
+	// 		})
+	// 		saveLoginInfo(user)
+	// 		uni.hideLoading()
+	// 	}
+	// 	// chatAiGetToken()
+	// 	name_value.value = '我的'
+	// 	Kongzhitai()
+	// 	 uni.reLaunch({ url: '/pages/index/index' });
+	// 	 uni.showLoading({
+	// 	 title: '加载中'
+	// 	 });
+	
 
 	}
 	/** 通过微信登录 */

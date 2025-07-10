@@ -16,9 +16,9 @@ const _easycom_up_button = () => "../../node-modules/uview-plus/components/u-but
 if (!Math) {
   (TnIcon + TnScrollList + _easycom_up_button + TnPopup)();
 }
-const TnPopup = () => "../../node-modules/@tuniao/tnui-vue3-uniapp/components/popup/src/popup.js";
-const TnScrollList = () => "../../node-modules/@tuniao/tnui-vue3-uniapp/components/scroll-list/src/scroll-list.js";
-const TnIcon = () => "../../node-modules/@tuniao/tnui-vue3-uniapp/components/icon/src/icon.js";
+const TnPopup = () => "../node-modules/@tuniao/tnui-vue3-uniapp/components/popup/src/popup.js";
+const TnScrollList = () => "../node-modules/@tuniao/tnui-vue3-uniapp/components/scroll-list/src/scroll-list.js";
+const TnIcon = () => "../node-modules/@tuniao/tnui-vue3-uniapp/components/icon/src/icon.js";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "PaymentPopup",
   props: {
@@ -131,7 +131,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           height: "66%",
           ["open-direction"]: "bottom",
           modelValue: showPopup.value
-        })
+        }),
+        g: common_vendor.gei(_ctx, "")
       };
     };
   }

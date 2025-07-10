@@ -29,7 +29,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, {
         e: common_vendor.n(common_vendor.unref(iconClass)),
         f: common_vendor.s(common_vendor.unref(iconStyle)),
-        g: common_vendor.o(handleClick)
+        g: common_vendor.o(handleClick),
+        h: common_vendor.gei(_ctx, "")
       });
     };
   }

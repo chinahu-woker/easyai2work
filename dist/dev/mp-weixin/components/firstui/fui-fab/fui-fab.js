@@ -335,7 +335,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     M: $data.resetNum,
     N: common_vendor.n($props.position === "left" ? "fui-fab__wrap-left" : "fui-fab__wrap-right"),
     O: common_vendor.s($options.getStyles),
-    P: common_vendor.o((...args) => $options.stop && $options.stop(...args))
+    P: common_vendor.o((...args) => $options.stop && $options.stop(...args)),
+    Q: common_vendor.gei(_ctx, "")
   });
 }
 if (typeof block0 === "function")

@@ -267,7 +267,8 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     Z: common_vendor.o((...args) => $options.changingHandler && $options.changingHandler(...args)),
     aa: common_vendor.o((...args) => $options.changeHandler && $options.changeHandler(...args))
   }, {
-    ab: common_vendor.s($options.addStyle(_ctx.customStyle))
+    ab: common_vendor.s($options.addStyle(_ctx.customStyle)),
+    ac: common_vendor.gei(_ctx, "")
   });
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-3ffc2d59"]]);

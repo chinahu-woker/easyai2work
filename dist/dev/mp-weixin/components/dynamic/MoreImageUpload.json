@@ -1,7 +1,7 @@
 {
   "component": true,
   "usingComponents": {
-    "tn-image-upload": "../../node-modules/@tuniao/tnui-vue3-uniapp/components/image-upload/src/image-upload",
+    "tn-image-upload": "../node-modules/@tuniao/tnui-vue3-uniapp/components/image-upload/src/image-upload",
     "my-title": "../common/MyTitle",
     "param-card": "../common/ParamCard"
   }

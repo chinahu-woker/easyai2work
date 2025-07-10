@@ -21,7 +21,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         b: common_vendor.p({
           title: "高度",
           modelValue: modelValue.value
-        })
+        }),
+        c: common_vendor.gei(_ctx, "")
       };
     };
   }

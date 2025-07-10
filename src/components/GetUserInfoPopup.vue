@@ -11,9 +11,9 @@ const showPopup = ref<boolean>(false)
 const nickname = ref<string>('')
 const avatar = ref<string>('')
 
-// 头像选择事件
+
 const avatarChooseHandle = async (url: string) => {
-  // 换成自己的上传接口
+
   const result=await uploadFile(url)
   //更新用户头像和昵称
   if(result){

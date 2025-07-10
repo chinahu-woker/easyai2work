@@ -128,14 +128,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           return common_vendor.e({
             a: item.id == 0
           }, item.id == 0 ? {
-            b: "0f4bde20-4-" + i0 + "," + ("0f4bde20-3-" + i0),
+            b: "6eef63a6-4-" + i0 + "," + ("6eef63a6-3-" + i0),
             c: common_vendor.o(($event) => managerData.value = $event, index),
             d: common_vendor.p({
               ["custom-upload-handler"]: uploadFilePromise,
               modelValue: managerData.value
             }),
             e: common_vendor.o(subMth, index),
-            f: "0f4bde20-5-" + i0 + "," + ("0f4bde20-3-" + i0),
+            f: "6eef63a6-5-" + i0 + "," + ("6eef63a6-3-" + i0),
             g: common_vendor.p({
               width: "300",
               radius: "96rpx"
@@ -143,13 +143,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           } : {}, {
             h: vtabs.length - 1 === index ? "800px" : "0",
             i: index,
-            j: "0f4bde20-3-" + i0 + ",0f4bde20-2",
+            j: "6eef63a6-3-" + i0 + ",6eef63a6-2",
             k: common_vendor.p({
               tabIndex: index
             })
           });
         }),
-        e: common_vendor.sr(vtabs, "0f4bde20-2", {
+        e: common_vendor.sr(vtabs, "6eef63a6-2", {
           "k": "vtabs"
         }),
         f: common_vendor.o(onTabClick),

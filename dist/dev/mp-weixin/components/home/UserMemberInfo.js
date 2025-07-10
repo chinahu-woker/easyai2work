@@ -7,7 +7,7 @@ const types_event_types = require("../../types/event.types.js");
 if (!Math) {
   TnIcon();
 }
-const TnIcon = () => "../../node-modules/@tuniao/tnui-vue3-uniapp/components/icon/src/icon.js";
+const TnIcon = () => "../node-modules/@tuniao/tnui-vue3-uniapp/components/icon/src/icon.js";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "UserMemberInfo",
   setup(__props) {

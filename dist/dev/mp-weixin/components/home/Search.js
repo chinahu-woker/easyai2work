@@ -18,7 +18,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         b: common_vendor.p({
           placeholder: "搜应用搜创意，一键直达",
           modelValue: searchValue.value
-        })
+        }),
+        c: common_vendor.gei(_ctx, "")
       };
     };
   }
