@@ -256,8 +256,8 @@
 	import { getModelList, getUserKey, getUserToken, getUserInfo, ChatAPiUrl } from "@/composables/aiChat.ts";
 
 	// import { TextEncoder, TextDecoder } from 'text-decoding'
-	global.TextEncoder = TextEncoder
-	global.TextDecoder = TextDecoder
+	// global.TextEncoder = TextEncoder
+	// global.TextDecoder = TextDecoder
 	onLoad((options) => {
 	if (options.pageindex) {
 		pageindex.value = parseInt(options.pageindex)

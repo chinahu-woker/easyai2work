@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "图片编辑",
+  "usingComponents": {
+    "chj-img-edit": "../../components/chj-imgEdit/chj-imgEdit"
+  }
+}

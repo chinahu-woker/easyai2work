@@ -23,6 +23,11 @@
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
+.mask_style.data-v-6cf62e12 {
+  width: 200rpx;
+  height: 200rpx;
+  margin: 0;
+}
 .fui-scroll__wrap.data-v-6cf62e12 {
   padding-top: 30rpx;
   position: relative;
@@ -82,7 +87,7 @@
   animation: moveAnimation 1s ease-in-out forwards;
 }
 .content-default.data-v-6cf62e12 {
-  z-index: 9999;
+  z-index: 2;
   position: fixed;
   /* 修改为 fixed 定位 */
   width: 100rpx;

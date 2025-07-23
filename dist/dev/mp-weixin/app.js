@@ -16,6 +16,7 @@ if (!Math) {
   "./pages/drawLike/alike.js";
   "./pages/login/login.js";
   "./pages/login/register.js";
+  "./pages/draw/image-editor.js";
 }
 const _sfc_defineComponent = common_vendor.defineComponent({
   __name: "App",

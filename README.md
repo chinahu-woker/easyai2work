@@ -28,42 +28,52 @@
 | 工具 | 版本要求 | 获取地址 |
 |------|----------|----------|
 | 微信开发者工具 | 最新版 | [官网下载](https://developers.weixin.qq.com/miniprogram/dev/devtools/download.html) |
-| HBuilderX | 3.0.10+ | [官方地址](https://www.dcloud.io/hbuilderx.html) |
+| HBuilderX | VsCode    | 任选其一 | [官方地址](https://www.dcloud.io/hbuilderx.html) |
+|需要安装npm环境 |
 
+   
 ### 部署步骤
 1. **初始化项目**
+
    ```bash
+   1.拉取项目或者下载zip文件
    git clone https://github.com/chinahu-woker/easyai2work.git
+   2.解压文件进入项目目录
    cd easyai2work
+   3.输入这个安装命令，如果你的报错可以使用'pnpm install'
    npm install
    ```
 
 2. **环境配置**（修改 `.env` 文件）
    ```env
+   1.完成以上操作以后，进入目录找到.env文件修改你的后端域名。在这之前你需要：
+		1）.在管理后台中配置好你小程序id和密钥（在微信公众平台中获取）
+		2）.如果使用域名请配置好反向代理，测试可以使用ip地址。但是要记得注释
+		3）.以上没有问题后进入下一步
    VITE_API_URL=https://你的域名/api
    VITE_WS_URL=wss://你的域名/websocket
    ```
 
 3. **编译运行**
    ```bash
-   # 本地调试
+   # 本地调试，在当前项目目录下执行该命令，
    npm run dev:mp-weixin
+   # 命令运行完成后打开微信小程序开发者工具，导入项目：
+   # ..../dist/dev/mp-weixin/
    
-   # 构建生产包
+   
+   # 发布的话用这个命令-构建生产包
+   # 然后也是用微信小程序开发者工具，导入项目->发布
    npm run build
    ```
 
+
 4. **部署注意事项**
-   - 需配置 HTTPS 服务
-   - WebSocket 需配置 Nginx 反向代理：
-   ```nginx
-   location /websocket {
-       proxy_pass http://backend_server;
-       proxy_http_version 1.1;
-       proxy_set_header Upgrade $http_upgrade;
-       proxy_set_header Connection "upgrade";
-   }
-   ```
+   - 到这里基本上已经完成了，如果中间出现了报错下面是一些常见的报错解决方案：
+   - 执行npm命令的时候报错——删掉 (node__modeules) 再次执行，若还是报错再次删掉 (node__modeules) 然后执行pnpm i
+   - 运行开发者工具中没有显示，毋庸置疑，极大可能是env配置不对或者后台没有正确配置。
+   - 其他：无法解决可以联系作者解决；为了感谢EasyAI官方对本人的支持，EasyAi的商业版用户可以提供1次免费小程序的安装技术指导。（计划是免费指导，人太多了真整不过来，你知道的我还要抽时间更新项目）
+   - 最后感谢长期以来氪金用户的支持，让项目能一直有动力前进。
 
 ---
 

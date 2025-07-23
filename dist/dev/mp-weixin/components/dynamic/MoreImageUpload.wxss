@@ -23,89 +23,127 @@
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
-.upload-new-btn.data-v-96383370 {
-  width: 100%;
-  height: 300rpx;
-  background-color: #f4f5f6;
-  border-radius: 10rpx;
+.frosted-glass-container.data-v-96383370 {
+  width: 80%;
+  max-width: 500rpx;
+  margin: 60rpx auto;
+  padding: 40rpx;
+  /* 关键：磨砂效果，兼容微信小程序（基础库 2.9.0+ 支持 backdrop-filter） */
+  backdrop-filter: blur(10rpx);
+  -webkit-backdrop-filter: blur(10rpx);
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 30rpx;
+  box-shadow: 0 8rpx 20rpx rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-/* 遮罩模态框样式 */
-.mask-modal.data-v-96383370 {
-  position: fixed;
-  top: 0;
-  left: 0;
+/* 模拟中间圆形及环形结构 */
+.icon-area.data-v-96383370 {
+  position: relative;
+  width: 160rpx;
+  height: 160rpx;
+  margin-bottom: 30rpx;
+}
+.circle.data-v-96383370 {
   width: 100%;
   height: 100%;
-  background-color: #fff;
-  z-index: 9999;
-  display: flex;
-  flex-direction: column;
+  border-radius: 50%;
+  background-color: #f2f3f5;
 }
-.mask-modal-header.data-v-96383370 {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20rpx 30rpx;
-  border-bottom: 1rpx solid #eee;
+.ring.data-v-96383370 {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80%;
+  height: 80%;
+  border-radius: 50%;
+  border: 10rpx solid #d9e0e9;
 }
-.mask-modal-title.data-v-96383370 {
-  font-size: 32rpx;
-  font-weight: bold;
+
+/* 模拟下方矩形条 */
+.rect.data-v-96383370 {
+  width: 60%;
+  height: 30rpx;
+  background-color: #f2f3f5;
+  border-radius: 15rpx;
+  margin-bottom: 20rpx;
 }
-.mask-modal-actions.data-v-96383370 {
-  display: flex;
-  gap: 20rpx;
+.rect-2.data-v-96383370 {
+  width: 40%;
 }
-.mask-btn.data-v-96383370 {
-  padding: 10rpx 20rpx;
-  border-radius: 8rpx;
-  background-color: #f4f5f6;
-  font-size: 28rpx;
-}
-.mask-canvas-container.data-v-96383370 {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-.mask-image-wrap.data-v-96383370 {
-  flex: 1;
+
+/* ============================== */
+.placeholder-upload.data-v-96383370 {
+  width: 150rpx; /* 可根据需求调整宽高 */
+  height: 150rpx;
+  background-color: #333; /* 深灰色背景，模拟你提供的效果，可按需修改 */
+  border-radius: 12rpx; /* 圆角，让外观更柔和，可调整 */
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #f8f8f8;
-  overflow: hidden;
 }
-.mask-canvas.data-v-96383370 {
-  max-width: 100%;
-  max-height: 100%;
+.plus-icon.data-v-96383370 {
+  width: 60rpx;
+  height: 60rpx;
 }
-.mask-toolbar.data-v-96383370 {
+.placeholder-upload.data-v-96383370 {
+  width: 150rpx; /* 可根据需求调整宽高 */
+  height: 150rpx;
+  background-color: #333; /* 深灰色背景，模拟你提供的效果，可按需修改 */
+  border-radius: 12rpx; /* 圆角，让外观更柔和，可调整 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.plus-icon.data-v-96383370 {
+  width: 60rpx;
+  height: 60rpx;
+}
+.image-editor-container.data-v-96383370 {
+  margin-top: 2%;
+  margin-bottom: 2%;
   padding: 20rpx;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 15rpx;
-  background-color: #fff;
-  border-top: 1rpx solid #eee;
 }
-.mask-tool-btn.data-v-96383370 {
-  padding: 12rpx 24rpx;
+
+/* 触发区域样式：无图时占位置，有图时承载图片 */
+.edit-trigger.data-v-96383370 {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f5f5f5; /* 浅灰底色 */
   border-radius: 8rpx;
-  background-color: #f4f5f6;
-  font-size: 28rpx;
-  display: flex;
-  align-items: center;
-  gap: 8rpx;
+  overflow: hidden; /* 防止图片溢出圆角 */
 }
-.mask-tool-btn.active.data-v-96383370 {
-  background-color: #1677ff;
-  color: #fff;
+
+/* 无图占位图样式 */
+.placeholder-img.data-v-96383370 {
+  width: 100%;
+  height: 100%;
+  -o-object-fit: contain;
+     object-fit: contain; /* 保持图标完整 */
 }
-.brush-width-slider.data-v-96383370 {
-  flex: 1;
-  min-width: 200rpx;
-  display: flex;
-  align-items: center;
-  gap: 15rpx;
-  padding: 0 15rpx;
+
+/* 已上传图片列表（单图场景也适用） */
+.uploaded-list.data-v-96383370 {
+  width: 100%;
+  height: 100%;
+}
+.uploaded-img.data-v-96383370 {
+  width: 200rpx;
+  height: 200rpx;
+  margin: 0;
+  -o-object-fit: cover;
+     object-fit: cover; /* 覆盖填充，按需求可改contain */
+}
+
+/* 编辑弹窗容器 */
+.editor-wrapper.data-v-96383370 {
+  margin-top: 20rpx;
+  width: 100%;
+  min-height: 500rpx;
 }

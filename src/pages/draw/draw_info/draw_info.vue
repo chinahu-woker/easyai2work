@@ -20,10 +20,10 @@
 	import ImageSelectPreview from "@/components/dynamic/ImageSelectPreview.vue";
 	import type { IComfyUIProperties, IImageSelectItem } from "@/types";
 	import ModeSelect from "@/components/dynamic/ModeSelect.vue";
-	import MyPopup from "@/components/common/MyPopup.vue";
-	import TaskProgress from "@/components/TaskProgress.vue";
-	import TnIcon from '@tuniao/tnui-vue3-uniapp/components/icon/src/icon.vue'
-	import TnSuspendButton from 'tnuiv3p-tn-suspend-button/index.vue'
+	// import MyPopup from "@/components/common/MyPopup.vue";
+	// import TaskProgress from "@/components/TaskProgress.vue";
+	// import TnIcon from '@tuniao/tnui-vue3-uniapp/components/icon/src/icon.vue'
+	// import TnSuspendButton from 'tnuiv3p-tn-suspend-button/index.vue'
 	import { storeToRefs } from "pinia";
 	import { useAppStore } from "@/stores/appStore.ts";
 	import { randomId } from "@/utils/common.ts";

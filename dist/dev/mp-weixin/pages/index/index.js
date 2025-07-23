@@ -45,8 +45,6 @@ const backGroundImage = "https://chinahu-ai-server.oss-cn-chengdu.aliyuncs.com/a
 const _sfc_defineComponent = common_vendor.defineComponent({
   __name: "index",
   setup(__props) {
-    global.TextEncoder = TextEncoder;
-    global.TextDecoder = TextDecoder;
     common_vendor.onLoad((options) => {
       if (options.pageindex) {
         pageindex.value = parseInt(options.pageindex);

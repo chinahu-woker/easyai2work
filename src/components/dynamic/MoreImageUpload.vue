@@ -1,507 +1,347 @@
-<script setup lang="ts">
-
-import TnImageUpload from "@tuniao/tnui-vue3-uniapp/components/image-upload/src/image-upload.vue";
-import { ref, watch, computed, onMounted, nextTick } from "vue";
-import { uploadFile } from "@/utils/request.ts";
-import MyTitle from "@/components/common/MyTitle.vue";
-import ParamCard from "@/components/common/ParamCard.vue";
-import { onLoad, onReady } from "@dcloudio/uni-app";
-import type { IDynamicOptions } from "@/types";
-
-// 导入 Canvas 相关类型
-import type { CanvasRenderingContext2D } from 'canvas';
-
-// 定义 ImageUploadFile 类型
-interface ImageUploadFile {
-  url?: string;
-  name?: string;
-  size?: number;
-  path: string;
-  maskedUrl?: string;
-}
-
-// 定义 ImageUploadCustomFunction 类型
-type ImageUploadCustomFunction = (file: ImageUploadFile) => Promise<ImageUploadFile>;
-
-interface Props {
-  title?: string
-  options?: IDynamicOptions
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  title: "上传",
-})
-
-// 修改为 ImageUploadFile[] 类型
-const modelValue = defineModel<string[]>({
-  default: () => []
-})
-
-// 修改为 ImageUploadFile[] 类型
-const imageList = ref<ImageUploadFile[]>([])
-
-// 遮罩相关状态
-const isMaskModalVisible = ref(false);
-const currentImage = ref<ImageUploadFile | null>(null);
-const canvasWidth = ref(0);
-const canvasHeight = ref(0);
-const ctx = ref<CanvasRenderingContext2D | null>(null);
-const drawMode = ref<'brush' | 'box'>('brush'); // 绘制模式：画笔或框选
-const brushWidth = ref(10); // 画笔粗细
-const drawList = ref<any[]>([]); // 绘制历史
-const tempDraw = ref<any>(null); // 临时绘制
-const maskComplete = ref<(file: ImageUploadFile) => void | null>(null);
-
-onReady(() => {
-  // 延迟执行滚动列表初始化
-  setTimeout(() => {
-    // 调用 TnScrollList 的方法
-    initScrollList();
-  }, 100);
-});
-watch(imageList, (newVal) => {
-  console.log("imageList 更新:", newVal);
-  modelValue.value = [...newVal];
-}, { deep: true });
-
-const uploadFilePromise: ImageUploadCustomFunction = async (file: ImageUploadFile) => {
-  const url = (file as UniApp.ChooseImageSuccessCallbackResultFile).path;
-  return new Promise(async (resolve, reject) => {
-    try {
-      // 先显示遮罩绘制模态框
-      currentImage.value = file;
-      isMaskModalVisible.value = true;
-
-      // 等待遮罩绘制完成（通过自定义事件触发）
-      await new Promise((innerResolve) => {
-        maskComplete.value = (completedFile) => {
-          innerResolve(completedFile);
-        };
-      });
-
-      // 上传带遮罩的图片
-      const uploadResult = await uploadFile<string>(file.maskedUrl || url);
-
-      console.log("uploadResult", uploadResult);
-      if (uploadResult) {
-        // ✅ 正确格式应直接返回URL字符串
-        // ❌ 原代码返回复杂对象导致组件无法识别
-        resolve(uploadResult); // 修改此处
-      } else {
-        reject(new Error('上传失败'));
-      }
-    } catch (error) {
-      console.error('上传错误', error);
-      reject(error);
-    }
-  });
-};
-
-const imageUploadRef = ref<TnImageUploadInstance>()
-const chooseFile = () => {
-  imageUploadRef.value?.chooseFile()
-}
-
-// 遮罩相关方法
-
-// 初始化画布
-const initCanvas = () => {
-  if (!currentImage.value) return;
-
-  const query = uni.createSelectorQuery();
-  query.select('#maskCanvas')
-    .fields({ node: true, size: true })
-    .exec((res) => {
-      if (!res[0]) return;
-
-      const canvas = res[0].node as unknown as HTMLCanvasElement;
-      ctx.value = canvas.getContext('2d');
-
-      // 设置画布尺寸
-      canvasWidth.value = res[0].width;
-      canvasHeight.value = res[0].height;
-
-      // 加载图片
-      const img = new Image();
-      img.src = currentImage.value.path;
-      img.onload = () => {
-        // 清空画布
-        clearCanvas();
-
-        // 在画布上绘制图片作为背景
-        ctx.value?.drawImage(img, 0, 0, canvasWidth.value, canvasHeight.value);
-
-        // 重绘所有已保存的绘制
-        redrawCanvas();
-      };
-    });
-};
-
-// 清空画布
-const clearCanvas = () => {
-  if (ctx.value) {
-    ctx.value.clearRect(0, 0, canvasWidth.value, canvasHeight.value);
-  }
-};
-
-// 重绘画布
-const redrawCanvas = () => {
-  if (!ctx.value) return;
-
-  // 先绘制图片背景
-  const img = new Image();
-  img.src = currentImage.value?.path || '';
-  img.onload = () => {
-    ctx.value?.drawImage(img, 0, 0, canvasWidth.value, canvasHeight.value);
-
-    // 绘制所有已保存的遮罩
-    drawList.value.forEach(item => {
-      if (item.type === 'brush') {
-        drawBrushPath(item.points);
-      } else if (item.type === 'box') {
-        drawBox(item);
-      }
-    });
-
-    // 绘制临时绘制
-    if (tempDraw.value) {
-      if (tempDraw.value.type === 'brush') {
-        drawBrushPath(tempDraw.value.points);
-      } else if (tempDraw.value.type === 'box') {
-        drawBox(tempDraw.value);
-      }
-    }
-  };
-};
-
-// 绘制画笔路径
-const drawBrushPath = (points: { x: number, y: number }[]) => {
-  if (!ctx.value || points.length < 2) return;
-
-  ctx.value.beginPath();
-  ctx.value.moveTo(points[0].x, points[0].y);
-
-  for (let i = 1; i < points.length; i++) {
-    ctx.value.lineTo(points[i].x, points[i].y);
-  }
-
-  ctx.value.lineWidth = brushWidth.value;
-  ctx.value.strokeStyle = 'rgba(0, 0, 0, 0.7)';
-  ctx.value.stroke();
-};
-
-// 绘制矩形框
-const drawBox = (box: { x1: number, y1: number, x2: number, y2: number }) => {
-  if (!ctx.value) return;
-
-  const width = box.x2 - box.x1;
-  const height = box.y2 - box.y1;
-
-  ctx.value.fillStyle = 'rgba(0, 0, 0, 0.7)';
-  ctx.value.fillRect(box.x1, box.y1, width, height);
-};
-
-// 触摸事件处理
-let isDrawing = false;
-let startX = 0;
-let startY = 0;
-
-const handleTouchStart = (e: any) => {
-  if (!ctx.value || !currentImage.value) return;
-
-  isDrawing = true;
-  const touch = e.touches[0];
-  startX = touch.x;
-  startY = touch.y;
-
-  if (drawMode.value === 'brush') {
-    tempDraw.value = {
-      type: 'brush',
-      points: [{ x: startX, y: startY }]
-    };
-  } else if (drawMode.value === 'box') {
-    tempDraw.value = {
-      type: 'box',
-      x1: startX,
-      y1: startY,
-      x2: startX,
-      y2: startY
-    };
-  }
-};
-
-const handleTouchMove = (e: any) => {
-  if (!isDrawing || !ctx.value) return;
-
-  const touch = e.touches[0];
-  const currentX = touch.x;
-  const currentY = touch.y;
-
-  if (drawMode.value === 'brush') {
-    tempDraw.value.points.push({ x: currentX, y: currentY });
-  } else if (drawMode.value === 'box') {
-    tempDraw.value.x2 = currentX;
-    tempDraw.value.y2 = currentY;
-  }
-
-  redrawCanvas();
-};
-
-const handleTouchEnd = () => {
-  if (!isDrawing || !ctx.value || !tempDraw.value) return;
-
-  isDrawing = false;
-
-  // 将临时绘制添加到历史记录
-  drawList.value.push(tempDraw.value);
-  tempDraw.value = null;
-
-  redrawCanvas();
-};
-
-// 切换绘制模式
-const switchDrawMode = (mode: 'brush' | 'box') => {
-  drawMode.value = mode;
-};
-
-// 撤销上一步
-const undoLastDraw = () => {
-  if (drawList.value.length > 0) {
-    drawList.value.pop();
-    redrawCanvas();
-  }
-};
-
-// 保存遮罩图片
-const saveMaskImage = () => {
-  if (!ctx.value || !currentImage.value) return;
-
-  uni.canvasToTempFilePath({
-    canvasId: 'maskCanvas',
-    success: (res) => {
-      console.log('遮罩图片保存成功:', res.tempFilePath);
-
-      // 将遮罩后的图片路径保存到当前图片对象
-      if (currentImage.value) {
-        currentImage.value.maskedUrl = res.tempFilePath;
-      }
-
-      // 关闭模态框
-      isMaskModalVisible.value = false;
-
-      // 重置遮罩状态
-      resetMaskState();
-
-      // ✅ 触发遮罩绘制完成事件（确保在此处调用）
-      if (maskComplete.value) {
-        maskComplete.value(currentImage.value);
-        maskComplete.value = null; // 及时清理
-      }
-    },
-    fail: (err) => {
-      console.error('遮罩图片保存失败:', err);
-      uni.showToast({
-        title: '保存失败，请重试',
-        icon: 'none'
-      });
-      // ❌ 原代码未处理失败情况，会导致Promise挂起
-      if (maskComplete.value) {
-        reject(err); // 添加错误处理
-        maskComplete.value = null;
-      }
-    }
-  });
-};
-
-// 重置遮罩状态
-const resetMaskState = () => {
-  currentImage.value = null;
-  drawList.value = [];
-  tempDraw.value = null;
-  drawMode.value = 'brush';
-};
-
-// 取消遮罩编辑
-const cancelMaskEdit = () => {
-  isMaskModalVisible.value = false;
-  resetMaskState();
-};
-
-// 监听遮罩模态框显示状态
-watch(isMaskModalVisible, (val) => {
-  if (val && currentImage.value) {
-    // 当模态框显示时，初始化画布
-    nextTick(() => {
-      initCanvas();
-    });
-  }
-});
-
-</script>
-
 <template>
-  <ParamCard>
-    <template #title>
-      <MyTitle :title="title"/>
-    </template>
-    <template #body>
-      <TnImageUpload 
-        ref="imageUploadRef" 
-        v-model="imageList" 
-        :limit="6" 
-        :custom-upload-handler="uploadFilePromise"
-        :multiple="true"   
-        
-      >
-      </TnImageUpload>
-    </template>
-  </ParamCard>
-  
-  <!-- 遮罩绘制模态框 -->
-  <view class="mask-modal" v-if="isMaskModalVisible">
-    <view class="mask-modal-header">
-      <text class="mask-modal-title">图片遮罩编辑</text>
-      <view class="mask-modal-actions">
-        <button class="mask-btn" @click="cancelMaskEdit">取消</button>
-        <button class="mask-btn" @click="saveMaskImage">保存</button>
+	<template #title>
+	  <MyTitle :title="title"></MyTitle>
+	</template>
+  <view class="image-editor-container" @click="onClick">
+	   
+    <!-- 点击触发选择图片 -->
+	 <view class="frosted-glass-container" v-if="!imageList_mask || imageList_mask.length === 0" >
+	    <!-- 这里可根据实际需求填充内容，比如模拟的图标、文字等 -->
+	    <view class="icon-area">
+	      <view class="circle"></view>
+	      <view class="ring"></view>
+	    </view>
+	    <view class="rect rect-1"></view>
+	    <view class="rect rect-2"></view>
+	  </view>
+	 
+    
+    <view v-else  class="edit-trigger">
+      <!-- 有图时循环渲染已上传图片（如果是单图可简化，这里保留原数组逻辑） -->
+      <view  v-for="(image, index) in imageList_mask" :key="index" class="uploaded-list">
+        <image 
+         
+          :src="image" 
+          class="uploaded-img"
+        />
       </view>
     </view>
-    
-    <view class="mask-canvas-container">
-      <!-- 图片和画布容器 -->
-      <view class="mask-image-wrap" style="position: relative;">
-        <canvas 
-          canvas-id="maskCanvas" 
-          class="mask-canvas"
-          @touchstart="handleTouchStart"
-          @touchmove="handleTouchMove"
-          @touchend="handleTouchEnd"
-        ></canvas>
-      </view>
-      
-      <!-- 工具栏 -->
-      <view class="mask-toolbar">
-        <button class="mask-tool-btn" :class="{ active: drawMode === 'brush' }" @click="switchDrawMode('brush')">
-          <text class="iconfont icon-brush"></text> 画笔
-        </button>
-        <button class="mask-tool-btn" :class="{ active: drawMode === 'box' }" @click="switchDrawMode('box')">
-          <text class="iconfont icon-square"></text> 框选
-        </button>
-        
-        <view class="brush-width-slider">
-          <text>画笔粗细:</text>
-          <slider 
-            :min="1" 
-            :max="50" 
-            :value="brushWidth" 
-            @change="brushWidth = $event.detail.value"
-          ></slider>
-        </view>
-        
-        <button class="mask-tool-btn" @click="undoLastDraw">
-          <text class="iconfont icon-undo"></text> 撤销
-        </button>
-      </view>
+
+    <!-- 图片编辑弹窗，v-show 控制显隐 -->
+    <view v-show="show" class="editor-wrapper">
+      <fui-backdrop :show="show" closable @click="zehzhao">
+        <chj-imgEdit 
+          :isAllCanvas="false" 
+          :image-path="imagePath" 
+          ref="chjImgEditRef"
+          @getLineLength="getLineLength" 
+          @getRectPosition="getRectPosition" 
+          @confirm="confirm"
+          @cancel="cancel" 
+        />
+      </fui-backdrop>
     </view>
   </view>
 </template>
 
+<script setup lang="ts">
+import { ref, defineEmits, nextTick, watch } from 'vue';
+import chjImgEdit from "@/components/chj-imgEdit/chj-imgEdit.vue";
+import MyTitle from "@/components/common/MyTitle.vue";
+import type {ImageUploadCustomFunction, ImageUploadFile,TnImageUploadInstance} from "@tuniao/tnui-vue3-uniapp";
+import { uploadFile} from "@/utils/request.ts";
+// 自定义事件
+const emit = defineEmits(['update:modelValue']);
+
+// 状态管理
+const show = ref(false);
+const imagePath = ref('');
+const chjImgEditRef = ref(null);
+const isComponentReady = ref(false); 
+      // 存储已上传图片，改用数组更通用
+const placeholderImg = ref('/static/placeholder.png'); // 无图占位图，需自行放置资源
+const ediIcon = '/static/graffiti.png';
+
+interface Props{
+  title?:string;
+  workflow_id:string
+  options?:IDynamicOptions
+};
+const props = withDefaults(defineProps<Props>(),{
+  title:' ',
+})
+// 监听组件挂载
+watch(
+  () => chjImgEditRef.value,
+  (newVal) => {
+    if (newVal) {
+      isComponentReady.value = true;
+      console.log('chj-imgEdit组件已挂载');
+    }
+  }
+);
+
+// 选择图片逻辑
+const onClick = async () => {
+  try {
+    const res = await uni.chooseImage({
+      count: 1,
+      sizeType: ['original', 'compressed'],
+      sourceType: ['album', 'camera']
+    });
+
+    if (res.tempFilePaths && res.tempFilePaths.length > 0) {
+      imagePath.value = res.tempFilePaths[0];
+      show.value = true;
+      await waitForComponentReady();
+
+      if (chjImgEditRef.value && typeof chjImgEditRef.value.open === 'function') {
+        chjImgEditRef.value.open({
+          path: res.tempFilePaths[0],
+          isCancelToast: true,
+          cancelText: '确定真的退出吗?',
+          isConfirmToast: true,
+          confirmText: '决定好了吗?',
+          iconPath: {
+            goForward_active: '/static/goForward.png',
+            goForward_inactive: '/static/goForward_inactive.png',
+            retreat_active: '/static/retreat.png',
+            retreat_inactive: '/static/retreat_inactive.png',
+            reset: '/static/reset.png',
+            close: '/static/close.png',
+            confirm: '/static/determine.png',
+            pen: '/static/graffiti.png',
+            rubber: '/static/rubber.png'
+          },
+          iconPathGraffiti: {
+            0: '/static/iconPathGraffiti-1.png',
+            1: '/static/iconPathGraffiti-2.png',
+            2: '/static/iconPathGraffiti-3.png'
+          }
+        });
+      } else {
+        console.error('chj-imgEdit组件异常');
+        show.value = false;
+      }
+    }
+  } catch (error) {
+    console.error('选择图片失败:', error);
+  }
+};
+
+// 遮罩点击
+const zehzhao = () => {
+  console.log("用户点击了遮罩")
+};
+
+// 等待组件就绪
+const waitForComponentReady = async () => {
+  const maxRetries = 10; 
+  const delay = 100; 
+  let retries = 0;
+
+  while (retries < maxRetries && (!isComponentReady.value || !chjImgEditRef.value)) {
+    await nextTick();
+    await new Promise(resolve => setTimeout(resolve, delay));
+    retries++;
+  }
+
+  if (retries >= maxRetries) {
+    console.warn('等待组件超时');
+  }
+};
+const  imageList_mask = ref([])
+
+// 确认回调
+// const confirm = async (path) => {
+//   console.log('编辑确认，路径:', path);
+//   emit('update:modelValue', path);
+//   imageList_mask.value = path; // 单图存入数组
+  
+  
+//   imageList_mask(path)
+//   show.value = false;
+// };
+
+const confirm = async (emtData) => {
+  console.log('编辑确认，路径:', emtData.Sync);
+  
+  // let paths  =  emtData.paths
+  // const emitData = { paths:[this.path, tempFilePath],tuya:this.tuyaPath}
+  try {
+    // 确保paths是数组格式
+  
+    const params = {
+      advance_onlineEdit_origin: ' ',
+      advance_onlineEdit_mask: ''
+    };
+    const imagePaths = Array.isArray(emtData.paths) ? emtData.paths : [emtData.paths];
+    console.log('imagePaths:', imagePaths);
+    // return  0
+    // 并行上传所有图片
+    const uploadPromises = imagePaths.map(path => 
+        uploadFile<string>(path, {
+        formData: params  
+      }, '/file/upload')
+    );
+    
+    // 等待所有上传完成
+    const uploadResults = await Promise.all(uploadPromises);
+    
+    // 存储上传结果并通知父组件
+    imageList_mask.value = [emtData.Sync]
+    emit('update:modelValue', uploadResults);
+    
+    console.log('所有图片上传成功:', uploadResults);
+  } catch (error) {
+    console.error('图片上传失败:', error);
+    uni.showToast({ title: '上传失败', icon: 'error' });
+  }
+  show.value = false;
+};
+
+
+// 取消回调
+const cancel = () => {
+  console.log('编辑取消');
+  show.value = false;
+};
+
+// 获取线条长度
+const getLineLength = (length) => {
+  console.log('线条长度:', length + 'px');
+};
+
+// 获取矩形位置
+const getRectPosition = (obj) => {
+  console.log('矩形位置:', obj);
+};
+</script>
+
 <style scoped lang="scss">
-.upload-new-btn{
-  width: 100%;
-  height: 300rpx;
-  background-color: #f4f5f6;
-  border-radius: 10rpx;
+	
+	
+	.frosted-glass-container {
+  width: 80%;
+  max-width: 500rpx;
+  margin: 60rpx auto;
+  padding: 40rpx;
+  /* 关键：磨砂效果，兼容微信小程序（基础库 2.9.0+ 支持 backdrop-filter） */
+  backdrop-filter: blur(10rpx); 
+  -webkit-backdrop-filter: blur(10rpx); 
+  background-color: rgba(255, 255, 255, 0.3); 
+  border-radius: 30rpx;
+  box-shadow: 0 8rpx 20rpx rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-/* 遮罩模态框样式 */
-.mask-modal {
-  position: fixed;
-  top: 0;
-  left: 0;
+/* 模拟中间圆形及环形结构 */
+.icon-area {
+  position: relative;
+  width: 160rpx;
+  height: 160rpx;
+  margin-bottom: 30rpx;
+}
+.circle {
   width: 100%;
   height: 100%;
-  background-color: #fff;
-  z-index: 9999;
-  display: flex;
-  flex-direction: column;
+  border-radius: 50%;
+  background-color: #f2f3f5; 
+}
+.ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80%;
+  height: 80%;
+  border-radius: 50%;
+  border: 10rpx solid #d9e0e9; 
 }
 
-.mask-modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20rpx 30rpx;
-  border-bottom: 1rpx solid #eee;
+/* 模拟下方矩形条 */
+.rect {
+  width: 60%;
+  height: 30rpx;
+  background-color: #f2f3f5; 
+  border-radius: 15rpx;
+  margin-bottom: 20rpx;
 }
-
-.mask-modal-title {
-  font-size: 32rpx;
-  font-weight: bold;
+.rect-2 {
+  width: 40%;
 }
-
-.mask-modal-actions {
-  display: flex;
-  gap: 20rpx;
-}
-
-.mask-btn {
-  padding: 10rpx 20rpx;
-  border-radius: 8rpx;
-  background-color: #f4f5f6;
-  font-size: 28rpx;
-}
-
-.mask-canvas-container {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.mask-image-wrap {
-  flex: 1;
+	/* ============================== */
+	.placeholder-upload {
+  width: 150rpx; /* 可根据需求调整宽高 */
+  height: 150rpx;
+  background-color: #333; /* 深灰色背景，模拟你提供的效果，可按需修改 */
+  border-radius: 12rpx; /* 圆角，让外观更柔和，可调整 */
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #f8f8f8;
-  overflow: hidden;
 }
 
-.mask-canvas {
-  max-width: 100%;
-  max-height: 100%;
+.plus-icon {
+  width: 60rpx;
+  height: 60rpx;
 }
-
-.mask-toolbar {
+	.placeholder-upload {
+	  width: 150rpx; /* 可根据需求调整宽高 */
+	  height: 150rpx;
+	  background-color: #333; /* 深灰色背景，模拟你提供的效果，可按需修改 */
+	  border-radius: 12rpx; /* 圆角，让外观更柔和，可调整 */
+	  display: flex;
+	  justify-content: center;
+	  align-items: center;
+	}
+	
+	.plus-icon {
+	  width: 60rpx;
+	  height: 60rpx;
+	}
+.image-editor-container {
+	margin-top: 2%;
+	margin-bottom: 2%;
   padding: 20rpx;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 15rpx;
-  background-color: #fff;
-  border-top: 1rpx solid #eee;
 }
 
-.mask-tool-btn {
-  padding: 12rpx 24rpx;
+/* 触发区域样式：无图时占位置，有图时承载图片 */
+.edit-trigger {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f5f5f5; /* 浅灰底色 */
   border-radius: 8rpx;
-  background-color: #f4f5f6;
-  font-size: 28rpx;
-  display: flex;
-  align-items: center;
-  gap: 8rpx;
+  overflow: hidden; /* 防止图片溢出圆角 */
 }
 
-.mask-tool-btn.active {
-  background-color: #1677ff;
-  color: #fff;
+/* 无图占位图样式 */
+.placeholder-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* 保持图标完整 */
 }
 
-.brush-width-slider {
-  flex: 1;
-  min-width: 200rpx;
-  display: flex;
-  align-items: center;
-  gap: 15rpx;
-  padding: 0 15rpx;
+/* 已上传图片列表（单图场景也适用） */
+.uploaded-list {
+  width: 100%;
+  height: 100%;
+}
+.uploaded-img {
+  width: 200rpx;
+  height:200rpx;
+  margin: 0;
+  object-fit: cover; /* 覆盖填充，按需求可改contain */
+}
+
+/* 编辑弹窗容器 */
+.editor-wrapper {
+  margin-top: 20rpx;
+  width: 100%;
+  min-height: 500rpx;
 }
 </style>

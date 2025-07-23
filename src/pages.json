@@ -108,7 +108,12 @@
 			{
 				"navigationBarTitleText" : ""
 			}
-		}
+		},{
+      "path": "pages/draw/image-editor",
+      "style": {
+        "navigationBarTitleText": "图片编辑"
+      }
+    }
 	],
 	
 	"globalStyle": {

@@ -51,7 +51,7 @@
                 "oauth" : {
                     "univerify" : {},
                     "weixin" : {
-                        "appid" : "wx60ad6ca1891c4258",
+                        "appid" : "",
                         "UniversalLinks" : ""
                     }
                 },

@@ -8,6 +8,7 @@ import useWorkFlow from "@/composables/useWorkFlow.ts";
 import ImageUpload from "@/components/dynamic/ImageUpload.vue";
 import ImageUploadMore from "@/components/dynamic/ImageUploadMore.vue";
 import MoreImageUpload from "@/components/dynamic/MoreImageUpload.vue";
+
 import AudioUpload from "@/components/dynamic/AudioUpload.vue";
 import CustomSlider from "@/components/dynamic/CustomSlider.vue";
 import Height from "@/components/dynamic/Height.vue";
@@ -47,7 +48,8 @@ const components = {
 	Seed,
 	ImageSelectPreview,
 	ModeSelect,
-	MoreImageUpload 
+	MoreImageUpload,
+	// chjImgEdit
 }
 
 /** 参数名称与组件名称的映射 */
@@ -70,29 +72,33 @@ const {
 
 	handleSubmitTaskTask
 } = useWorkFlow()
-console.log("--------------------------",workFlowParamLists)
+console.log("--------------------------", workFlowParamLists)
 
 const workflowId = ref('');
 
 onLoad(async () => {
-  const currentPage = getCurrentPages().pop();
-  // 检查 currentPage 是否存在
-  if (currentPage) {
-    const query = currentPage.options;
-    // 检查 query 是否存在
-    if (query) {
-      workflowId.value = query.id;
-      handleGetWorkFlwById(query.id).then(() => {
-        // 处理再生参数00
-        if (query.isRegenerate && query.regenerateParams) {
-          const params = JSON.parse(decodeURIComponent(query.regenerateParams));
-          bindParam.value = { ...params };
-        }
-      });
-    }
-  }
+	const currentPage = getCurrentPages().pop();
+	// 检查 currentPage 是否存在
+	if (currentPage) {
+		const query = currentPage.options;
+		// 检查 query 是否存在
+		if (query) {
+			workflowId.value = query.id;
+			handleGetWorkFlwById(query.id).then(() => {
+				// 处理再生参数00
+				if (query.isRegenerate && query.regenerateParams) {
+					const params = JSON.parse(decodeURIComponent(query.regenerateParams));
+					bindParam.value = { ...params };
+				}
+			});
+		}
+	}
 });
-
+const toTest = () => {
+	uni.navigateTo({
+		url: "/pages/draw/test-image"
+	})
+}
 const showPopup = ref(false)
 const FlotButton = ref('空闲')
 const currentSwiperIndex = ref(0)
@@ -253,6 +259,13 @@ function checkFileType(input) {
 	}
 
 }
+
+function handleUploadComplete(result) {
+	console.log('图片上传完成:', result);
+	// 可以在这里处理上传完成后的逻辑
+}
+
+const imageList_mask = ref()
 </script>
 
 <template>
@@ -264,7 +277,7 @@ function checkFileType(input) {
 	</fui-nav-bar>
 	<TaskProgress v-if="showPopup" v-model="showPopup" />
 	<view>
-
+		<!-- <fui-icon name="arrowleft" @click="toTest"></fui-icon> -->
 		<BaseLayout>
 			<!-- <MyNavbar /> -->
 
@@ -284,27 +297,19 @@ function checkFileType(input) {
 						</fui-section>
 
 					</view> -->
-					
-					<view v-for="(item, index) in workFlowParamLists">
-					
+
+					<view v-for="(item, index) in workFlowParamLists" :key='index'>
+
 						<view v-if="handleFindComponentName(item.name) === 'Seed'">
-							<Seed  ref="seedRef" :title="item.title" v-model="bindParam[item.name]"
+							<Seed ref="seedRef" :title="item.title" v-model="bindParam[item.name]"
 								:options="item.attributes" />
 						</view>
 						<view v-else-if="handleFindComponentName(item.name) === 'ImageUploadMore'">
 
-								<ImageUploadMore :title="item.title" v-model="bindParam[item.name]"
-									:options="item.attributes" />
-							
+							<ImageUploadMore :title="item.title" v-model="bindParam[item.name]"
+								:options="item.attributes" />
+
 						</view>
-						<view v-else-if="handleFindComponentName(item.name) === 'MoreImageUpload'">
-						
-								<MoreImageUpload :title="item.title" v-model="bindParam[item.name]"
-									:options="item.attributes" />
-							
-						</view>
-						
-						
 						<view v-else-if="handleFindComponentName(item.name) === 'ImageUpload'">
 
 							<view v-if="checkFileType(item.param) == 2">
@@ -341,16 +346,10 @@ function checkFileType(input) {
 							<ImageSelectPreview :title="item.title" v-model="bindParam[item.name]"
 								:options="item.attributes" />
 						</view>
-						<view v-else>
 
-
-							<view v-if="item.name == 'custom_batch_image_path_origin'">
-								<!-- 自定义节点多任务上传 -->
-								<MoreImageUpload :title="item.title" v-model="bindParam[item.name]"
-									:options="item.attributes" />
-
-
-							</view>
+						<view v-else-if="handleFindComponentName(item.name) === 'MoreImageUpload'">
+								<MoreImageUpload :title="item.title"  v-model="imageList_mask" />
+							
 						</view>
 
 
@@ -402,6 +401,11 @@ function checkFileType(input) {
 </template>
 
 <style scoped lang="scss">
+.mask_style{
+	width: 200rpx;
+	height: 200rpx;
+	margin: 0;
+}
 .fui-scroll__wrap {
 	padding-top: 30rpx;
 	position: relative;
@@ -470,7 +474,7 @@ function checkFileType(input) {
 }
 
 .content-default {
-	z-index: 9999;
+	z-index: 2;
 	position: fixed;
 	/* 修改为 fixed 定位 */
 	width: 100rpx;

@@ -161,8 +161,8 @@ const uploadFile = (filePath, options = {}, apiUrl = "/file/upload") => {
     });
   });
 };
-const getBaseURL = () => "https://edai.vip/api";
-const getBaseWsURL = () => "wss://edai.vip/websocket";
+const getBaseURL = () => "https://huiwanai.cn/api";
+const getBaseWsURL = () => "wss://huiwanai.cn/websocket";
 const getToken = () => composables_useCommon.getLoginInfo().token;
 const getRefreshToken = () => composables_useCommon.getLoginInfo().refresh_token;
 exports.getBaseWsURL = getBaseWsURL;

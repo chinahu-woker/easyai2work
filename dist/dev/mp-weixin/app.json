@@ -12,7 +12,8 @@
     "pages/console/console",
     "pages/drawLike/alike",
     "pages/login/login",
-    "pages/login/register"
+    "pages/login/register",
+    "pages/draw/image-editor"
   ],
   "window": {
     "navigationBarTextStyle": "black",

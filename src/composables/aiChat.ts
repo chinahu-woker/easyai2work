@@ -1,21 +1,33 @@
-export const getBaseURL =()=>import.meta.env.VITE_API_URL
+export const getBaseURL = () => import.meta.env.VITE_API_URL
 
-export const getOneAPiURL =()=>import.meta.env.VITE_CHAT_URL
+export const getOneAPiURL = () => import.meta.env.VITE_CHAT_URL
 
-export const ChatAPiUrl =()=> `${getOneAPiURL()}/v1/chat/completions`
+export const ChatAPiUrl = () => `${getOneAPiURL()}/v1/chat/completions`
 
-
+// export const PostMask = (token, mask) => {
+// 	return requestTask = uni.request({
+// 		url: `${getBaseURL()}/file/merge/mask`, // 请求地址
+// 		method: "POST",
+// 		data: {
+// 			"refreshToken": refreshToken,
+// 		},
+// 		header: {
+// 			'Authorization': 'Bearer ' + token,
+			
+// 		},
+// 	})
+// }
 export const getUserToken = () => {
 	// 获取用户信息
 	const refreshToken = uni.getStorageSync('refreshToken')
-	
+
 	// console.log("refreshToken获取成功", refreshToken)
 	return new Promise((resolve, reject) => {
 		const requestTask = uni.request({
 			url: `${getBaseURL()}/auth/refreshTokens`, // 请求地址
 			method: "POST",
 			data: {
-				"refreshToken":refreshToken,
+				"refreshToken": refreshToken,
 			},
 			enableChunked: false, // 开启流传输
 			success: (res) => {
@@ -41,7 +53,7 @@ export const getUserToken = () => {
 
 export const getModelList = (data) => {
 	// 模型列表
-	
+
 	const token = data
 	// console.log("aichat获取token成功", token)
 	return new Promise((resolve, reject) => {
@@ -71,7 +83,7 @@ export const getModelList = (data) => {
 }
 
 
-export const getUserKey = (data,Rtoken_value) => {
+export const getUserKey = (data, Rtoken_value) => {
 	// 获取用户Key值
 	const usedata = {
 		"user_id": data.id,
@@ -120,7 +132,7 @@ export const getUserInfo = (data) => {
 			method: "POST",
 			header: {
 				'Authorization': 'Bearer ' + restoken,
-				
+
 			},
 			data: data,
 			enableChunked: false, // 开启流传输
@@ -141,7 +153,7 @@ export const getUserInfo = (data) => {
 }
 
 
-export const getdetail = (data,id) => {
+export const getdetail = (data, id) => {
 	// 获取用户Key值
 	const restoken = data.refresh_token
 	// console.log("获取用户restoken值", restoken)
@@ -152,7 +164,7 @@ export const getdetail = (data,id) => {
 			method: "GET",
 			header: {
 				'Authorization': 'Bearer ' + restoken,
-				
+
 			},
 			success: (res) => {
 				resolve(res);
@@ -191,20 +203,20 @@ export const delComment = (data, id) => {
 		// console.log('requestTask', requestTask)
 	});
 };
-export const Comment = (data,content) => {
+export const Comment = (data, content) => {
 	// 获取用户Key值
 	const restoken = data.refresh_token
 	// console.log("获取用户restoken值", restoken)
 
 	return new Promise((resolve, reject) => {
 		const requestTask = uni.request({
-			url: `${getBaseURL()}/comment`, 
+			url: `${getBaseURL()}/comment`,
 			method: "POST",
 			header: {
 				'Authorization': 'Bearer ' + restoken,
-				
+
 			},
-			data:content,
+			data: content,
 			success: (res) => {
 				resolve(res);
 				// console.log('getUserInfo请求成功', res.data);
@@ -219,96 +231,96 @@ export const Comment = (data,content) => {
 	});
 }
 export const allUserName = (data) => {
-  const restoken = data.refresh_token;
+	const restoken = data.refresh_token;
 
-  return new Promise((resolve, reject) => {
-    uni.request({
-      url: `${getBaseURL()}/users/allUserName`,
-      method: "GET",
-      header: {
-        'Authorization': 'Bearer ' + restoken,
-      },
-      success: (res) => {
-        if (res.statusCode === 200 && res.data) {
-          // ✅ 正确保存数组
-          uni.setStorageSync('allUserNames', res.data);
-          resolve(res.data);
-        } else {
-          uni.showToast({ title: '获取用户列表失败', icon: 'none' });
-          reject(res);
-        }
-      },
-      fail: (err) => {
-        console.error('请求失败:', err);
-        reject(err);
-      }
-    });
-  });
+	return new Promise((resolve, reject) => {
+		uni.request({
+			url: `${getBaseURL()}/users/allUserName`,
+			method: "GET",
+			header: {
+				'Authorization': 'Bearer ' + restoken,
+			},
+			success: (res) => {
+				if (res.statusCode === 200 && res.data) {
+					// ✅ 正确保存数组
+					uni.setStorageSync('allUserNames', res.data);
+					resolve(res.data);
+				} else {
+					uni.showToast({ title: '获取用户列表失败', icon: 'none' });
+					reject(res);
+				}
+			},
+			fail: (err) => {
+				console.error('请求失败:', err);
+				reject(err);
+			}
+		});
+	});
 }
-export const XieYiServer = ( ) => {
-  
-  return new Promise((resolve, reject) => {
-    uni.request({
-      url: `${getBaseURL()}/policy/service`,
-      method: "GET",
-      
-      success: (res) => {
-        if (res.statusCode === 200 && res.data) {
-          // ✅ 正确保存数组
-          uni.setStorageSync('XieYiServer', res.data);
-          resolve(res.data);
-        } else {
-          uni.showToast({ title: 'XieYiServer', icon: 'none' });
-          reject(res);
-        }
-      },
-      fail: (err) => {
-        console.error('请求失败:', err);
-        reject(err);
-      }
-    });
-  });
+export const XieYiServer = () => {
+
+	return new Promise((resolve, reject) => {
+		uni.request({
+			url: `${getBaseURL()}/policy/service`,
+			method: "GET",
+
+			success: (res) => {
+				if (res.statusCode === 200 && res.data) {
+					// ✅ 正确保存数组
+					uni.setStorageSync('XieYiServer', res.data);
+					resolve(res.data);
+				} else {
+					uni.showToast({ title: 'XieYiServer', icon: 'none' });
+					reject(res);
+				}
+			},
+			fail: (err) => {
+				console.error('请求失败:', err);
+				reject(err);
+			}
+		});
+	});
 }
-export const XieYiprivacy = ( ) => {
-  
-  return new Promise((resolve, reject) => {
-    uni.request({
-      url: `${getBaseURL()}/policy/privacy`,
-      method: "GET",
-      
-      success: (res) => {
-        if (res.statusCode === 200 && res.data) {
-       
-          uni.setStorageSync('XieYiprivacy', res.data);
-          resolve(res.data);
-        } else {
-          uni.showToast({ title: 'XieYiprivacy', icon: 'none' });
-          reject(res);
-        }
-      },
-      fail: (err) => {
-        console.error('请求失败:', err);
-        reject(err);
-      }
-    });
-  });
+export const XieYiprivacy = () => {
+
+	return new Promise((resolve, reject) => {
+		uni.request({
+			url: `${getBaseURL()}/policy/privacy`,
+			method: "GET",
+
+			success: (res) => {
+				if (res.statusCode === 200 && res.data) {
+
+					uni.setStorageSync('XieYiprivacy', res.data);
+					resolve(res.data);
+				} else {
+					uni.showToast({ title: 'XieYiprivacy', icon: 'none' });
+					reject(res);
+				}
+			},
+			fail: (err) => {
+				console.error('请求失败:', err);
+				reject(err);
+			}
+		});
+	});
 }
 
 
 export const registerByUsername = (data) => {
 	// 获取用户Key值
-	
+
 	console.log("注册用户的值：", data)
 
 	return new Promise((resolve, reject) => {
 		const requestTask = uni.request({
-			url: `${getBaseURL()}/users/registerByUsername`, 
+			url: `${getBaseURL()}/users/registerByUsername`,
 			method: "POST",
-			
-			data:data,
+
+			data: data,
 			success: (res) => {
 				console.log('注册请求已经完成：', res.data);
-				 resolve(res.data)
+				resolve(res.data)
 				// uni.parseStreamData(res.data)
 			}, // 请求成功回调
 			fail: (err) => {
