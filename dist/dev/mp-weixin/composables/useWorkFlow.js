@@ -30,8 +30,8 @@ function useWorkFlow() {
     { param: "image_path", component: "ImageUpload", title: "参考上传" },
     { param: "advance_select_image_preview", component: "ImageSelectPreview", title: "高级-图像预览选择" },
     { param: "multi_image_path", component: "ImageUploadMore", title: "多图上传" },
-    { param: "advance_onlineEdit_origin", component: "MoreImageUpload", title: "遮罩上传-原图" }
-    // {param: 'advance_onlineEdit_mask',component: 'MoreImageUpload',title: '遮罩上传-遮罩'}
+    // {param: 'advance_onlineEdit_origin',component: 'MoreImageUpload',title: '遮罩上传-原图'},
+    { param: "advance_onlineEdit_mask", component: "MoreImageUpload", title: "遮罩上传-遮罩" }
   ];
   const bindParam = common_vendor.ref({});
   const handleGetWorkFlwById = async (id) => {

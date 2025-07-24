@@ -59,13 +59,13 @@
             },
             "icons" : {
                 "ios" : {
-                    "appstore" : "C:/Users/35577/Downloads/画板 2.png"
+                    "appstore" : " "
                 }
             },
             "splashscreen" : {
                 "androidStyle" : "default",
                 "android" : {
-                    "xxhdpi" : "C:/Users/35577/Downloads/bg.png"
+                    "xxhdpi" : " "
                 }
             }
         }
@@ -74,7 +74,7 @@
     "quickapp" : {},
     /* 小程序特有相关 */
     "mp-weixin" : {
-        "appid" : "wx60ad6ca1891c4258",
+        "appid" : " ",
         "setting" : {
             "urlCheck" : false,
             "es6" : true,

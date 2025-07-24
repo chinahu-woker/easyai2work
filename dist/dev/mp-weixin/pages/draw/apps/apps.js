@@ -157,7 +157,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         return 2;
       }
     }
-    const imageList_mask = common_vendor.ref();
+    common_vendor.ref();
     return (_ctx, _cache) => {
       var _a, _b;
       return common_vendor.e({
@@ -275,10 +275,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             })
           } : common_vendor.unref(handleFindComponentName)(item.name) === "MoreImageUpload" ? {
             V: "6cf62e12-16-" + i0 + ",6cf62e12-3",
-            W: common_vendor.o(($event) => imageList_mask.value = $event, index),
+            W: common_vendor.o(($event) => common_vendor.unref(bindParam)[item.name] = $event, index),
             X: common_vendor.p({
               title: item.title,
-              modelValue: imageList_mask.value
+              modelValue: common_vendor.unref(bindParam)[item.name]
             })
           } : {}, {
             f: common_vendor.unref(handleFindComponentName)(item.name) === "ImageUploadMore",

@@ -1,6 +1,6 @@
 "use strict";
 const common_vendor = require("../common/vendor.js");
-const getBaseURL = () => "https://huiwanai.cn/api";
+const getBaseURL = () => "http://8.156.65.78:3001";
 const getUserToken = () => {
   const refreshToken = common_vendor.index.getStorageSync("refreshToken");
   return new Promise((resolve, reject) => {

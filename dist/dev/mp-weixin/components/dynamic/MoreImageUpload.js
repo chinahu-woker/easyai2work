@@ -13,28 +13,28 @@ const chjImgEdit = () => "../chj-imgEdit/chj-imgEdit.js";
 const MyTitle = () => "../common/MyTitle.js";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "MoreImageUpload",
-  props: {
+  props: /* @__PURE__ */ common_vendor.mergeModels({
     title: { default: " " },
     workflow_id: {},
     options: {}
-  },
-  emits: ["update:modelValue"],
+  }, {
+    "modelValue": { default: [] },
+    "modelModifiers": {}
+  }),
+  emits: /* @__PURE__ */ common_vendor.mergeModels(["update:modelValue"], ["update:modelValue"]),
   setup(__props, { emit: __emit }) {
-    const emit = __emit;
     const show = common_vendor.ref(false);
     const imagePath = common_vendor.ref("");
     const chjImgEditRef = common_vendor.ref(null);
     const isComponentReady = common_vendor.ref(false);
     common_vendor.ref("/static/placeholder.png");
-    common_vendor.watch(
-      () => chjImgEditRef.value,
-      (newVal) => {
-        if (newVal) {
-          isComponentReady.value = true;
-          common_vendor.index.__f__("log", "at components/dynamic/MoreImageUpload.vue:79", "chj-imgEdit组件已挂载");
-        }
-      }
-    );
+    const modelValue = common_vendor.useModel(__props, "modelValue");
+    common_vendor.onMounted(() => {
+      imageList_mask.value = modelValue.value || [];
+    });
+    common_vendor.watch(imageList_mask, (newVal) => {
+      modelValue.value = newVal;
+    }, { deep: true });
     const onClick = async () => {
       try {
         const res = await common_vendor.index.chooseImage({
@@ -71,16 +71,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               }
             });
           } else {
-            common_vendor.index.__f__("error", "at components/dynamic/MoreImageUpload.vue:123", "chj-imgEdit组件异常");
+            common_vendor.index.__f__("error", "at components/dynamic/MoreImageUpload.vue:122", "chj-imgEdit组件异常");
             show.value = false;
           }
         }
       } catch (error) {
-        common_vendor.index.__f__("error", "at components/dynamic/MoreImageUpload.vue:128", "选择图片失败:", error);
+        common_vendor.index.__f__("error", "at components/dynamic/MoreImageUpload.vue:127", "选择图片失败:", error);
       }
     };
     const zehzhao = () => {
-      common_vendor.index.__f__("log", "at components/dynamic/MoreImageUpload.vue:134", "用户点击了遮罩");
+      common_vendor.index.__f__("log", "at components/dynamic/MoreImageUpload.vue:133", "用户点击了遮罩");
     };
     const waitForComponentReady = async () => {
       const maxRetries = 10;
@@ -92,43 +92,37 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         retries++;
       }
       if (retries >= maxRetries) {
-        common_vendor.index.__f__("warn", "at components/dynamic/MoreImageUpload.vue:150", "等待组件超时");
+        common_vendor.index.__f__("warn", "at components/dynamic/MoreImageUpload.vue:149", "等待组件超时");
       }
     };
     const imageList_mask = common_vendor.ref([]);
     const confirm = async (emtData) => {
-      common_vendor.index.__f__("log", "at components/dynamic/MoreImageUpload.vue:167", "编辑确认，路径:", emtData.Sync);
+      common_vendor.index.__f__("log", "at components/dynamic/MoreImageUpload.vue:156", "编辑确认，路径:", emtData.Sync);
       try {
-        const params = {
-          advance_onlineEdit_origin: " ",
-          advance_onlineEdit_mask: ""
-        };
         const imagePaths = Array.isArray(emtData.paths) ? emtData.paths : [emtData.paths];
-        common_vendor.index.__f__("log", "at components/dynamic/MoreImageUpload.vue:179", "imagePaths:", imagePaths);
+        common_vendor.index.__f__("log", "at components/dynamic/MoreImageUpload.vue:159", "imagePaths:", imagePaths);
         const uploadPromises = imagePaths.map(
-          (path) => utils_request.uploadFile(path, {
-            formData: params
-          }, "/file/upload")
+          (path) => utils_request.uploadFile(path, "/file/upload")
         );
         const uploadResults = await Promise.all(uploadPromises);
-        imageList_mask.value = [emtData.Sync];
-        emit("update:modelValue", uploadResults);
-        common_vendor.index.__f__("log", "at components/dynamic/MoreImageUpload.vue:195", "所有图片上传成功:", uploadResults);
+        imageList_mask.value = uploadResults[1];
+        modelValue.value = uploadResults[1];
+        common_vendor.index.__f__("log", "at components/dynamic/MoreImageUpload.vue:172", "所有图片上传成功:", uploadResults);
       } catch (error) {
-        common_vendor.index.__f__("error", "at components/dynamic/MoreImageUpload.vue:197", "图片上传失败:", error);
+        common_vendor.index.__f__("error", "at components/dynamic/MoreImageUpload.vue:174", "图片上传失败:", error);
         common_vendor.index.showToast({ title: "上传失败", icon: "error" });
       }
       show.value = false;
     };
     const cancel = () => {
-      common_vendor.index.__f__("log", "at components/dynamic/MoreImageUpload.vue:206", "编辑取消");
+      common_vendor.index.__f__("log", "at components/dynamic/MoreImageUpload.vue:183", "编辑取消");
       show.value = false;
     };
     const getLineLength = (length) => {
-      common_vendor.index.__f__("log", "at components/dynamic/MoreImageUpload.vue:212", "线条长度:", length + "px");
+      common_vendor.index.__f__("log", "at components/dynamic/MoreImageUpload.vue:189", "线条长度:", length + "px");
     };
     const getRectPosition = (obj) => {
-      common_vendor.index.__f__("log", "at components/dynamic/MoreImageUpload.vue:217", "矩形位置:", obj);
+      common_vendor.index.__f__("log", "at components/dynamic/MoreImageUpload.vue:194", "矩形位置:", obj);
     };
     return (_ctx, _cache) => {
       return common_vendor.e({
@@ -137,7 +131,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         b: !imageList_mask.value || imageList_mask.value.length === 0
       }, !imageList_mask.value || imageList_mask.value.length === 0 ? {} : {
-        c: common_vendor.f(imageList_mask.value, (image, index, i0) => {
+        c: common_vendor.f([imageList_mask.value], (image, index, i0) => {
           return {
             a: image,
             b: index

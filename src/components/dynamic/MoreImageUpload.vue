@@ -18,7 +18,7 @@
     
     <view v-else  class="edit-trigger">
       <!-- 有图时循环渲染已上传图片（如果是单图可简化，这里保留原数组逻辑） -->
-      <view  v-for="(image, index) in imageList_mask" :key="index" class="uploaded-list">
+      <view  v-for="(image, index) in [imageList_mask]" :key="index" class="uploaded-list">
         <image 
          
           :src="image" 
@@ -45,7 +45,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineEmits, nextTick, watch } from 'vue';
+import { ref, defineEmits, nextTick, watch ,onMounted} from 'vue';
 import chjImgEdit from "@/components/chj-imgEdit/chj-imgEdit.vue";
 import MyTitle from "@/components/common/MyTitle.vue";
 import type {ImageUploadCustomFunction, ImageUploadFile,TnImageUploadInstance} from "@tuniao/tnui-vue3-uniapp";
@@ -61,7 +61,7 @@ const isComponentReady = ref(false);
       // 存储已上传图片，改用数组更通用
 const placeholderImg = ref('/static/placeholder.png'); // 无图占位图，需自行放置资源
 const ediIcon = '/static/graffiti.png';
-
+const modelValue = defineModel({ default: [] as string[] })
 interface Props{
   title?:string;
   workflow_id:string
@@ -71,15 +71,14 @@ const props = withDefaults(defineProps<Props>(),{
   title:' ',
 })
 // 监听组件挂载
-watch(
-  () => chjImgEditRef.value,
-  (newVal) => {
-    if (newVal) {
-      isComponentReady.value = true;
-      console.log('chj-imgEdit组件已挂载');
-    }
-  }
-);
+onMounted(() => {
+  imageList_mask.value = modelValue.value || []
+})
+
+// 监听本地数据变化同步到父组件
+watch(imageList_mask, (newVal) => {
+  modelValue.value = newVal
+}, { deep: true })
 
 // 选择图片逻辑
 const onClick = async () => {
@@ -152,46 +151,24 @@ const waitForComponentReady = async () => {
 };
 const  imageList_mask = ref([])
 
-// 确认回调
-// const confirm = async (path) => {
-//   console.log('编辑确认，路径:', path);
-//   emit('update:modelValue', path);
-//   imageList_mask.value = path; // 单图存入数组
-  
-  
-//   imageList_mask(path)
-//   show.value = false;
-// };
 
 const confirm = async (emtData) => {
   console.log('编辑确认，路径:', emtData.Sync);
-  
-  // let paths  =  emtData.paths
-  // const emitData = { paths:[this.path, tempFilePath],tuya:this.tuyaPath}
   try {
-    // 确保paths是数组格式
-  
-    const params = {
-      advance_onlineEdit_origin: ' ',
-      advance_onlineEdit_mask: ''
-    };
     const imagePaths = Array.isArray(emtData.paths) ? emtData.paths : [emtData.paths];
     console.log('imagePaths:', imagePaths);
-    // return  0
-    // 并行上传所有图片
+
+    // 优化：使用与 ImageUpload.vue 一致的上传逻辑
     const uploadPromises = imagePaths.map(path => 
-        uploadFile<string>(path, {
-        formData: params  
-      }, '/file/upload')
+      uploadFile<string>(url:path, action:'/file/upload')
     );
-    
-    // 等待所有上传完成
     const uploadResults = await Promise.all(uploadPromises);
-    
-    // 存储上传结果并通知父组件
-    imageList_mask.value = [emtData.Sync]
-    emit('update:modelValue', uploadResults);
-    
+
+    // 优化：遵循 ImageUpload.vue 的数组存储规范
+    imageList_mask.value = uploadResults[1];
+    // 保持与 apps.vue 中参数绑定一致（单值/数组自动适配）
+    modelValue.value = uploadResults[1];
+
     console.log('所有图片上传成功:', uploadResults);
   } catch (error) {
     console.error('图片上传失败:', error);

@@ -348,7 +348,7 @@ const imageList_mask = ref()
 						</view>
 
 						<view v-else-if="handleFindComponentName(item.name) === 'MoreImageUpload'">
-								<MoreImageUpload :title="item.title"  v-model="imageList_mask" />
+								<MoreImageUpload :title="item.title" v-model="bindParam[item.name]"  />
 							
 						</view>
 
