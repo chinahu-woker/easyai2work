@@ -314,19 +314,82 @@ const _sfc_main = {
           await this.drawImageToCenter(this.ctx_save, "#chj_imgEdit_canvas_bg", tuyaPath);
           const textPath = await this.canvasGetImagePath("chj_imgEdit_canvas_text");
           await this.drawImageToCenter(this.ctx_save, "#chj_imgEdit_canvas_bg", textPath);
-          let tempFilePath;
           if (this.isAllCanvas) {
-            tempFilePath = await this.canvasGetImagePath("chj_imgEdit_canvas_save");
+            await this.canvasGetImagePath("chj_imgEdit_canvas_save");
           } else {
-            tempFilePath = await this.canvasGetImagePath("chj_imgEdit_canvas_save", this.bgPosition);
+            await this.canvasGetImagePath("chj_imgEdit_canvas_save", this.bgPosition);
           }
-          const maskFilePath = await this.canvasGetImagePath("chj_imgEdit_canvas");
-          const emitData = { paths: [this.path, maskFilePath], Sync: tempFilePath };
+          const maskFilePath = await this.createTransparentMask();
+          const emitData = {
+            originPath: this.path,
+            // 原图路径
+            maskPath: maskFilePath
+            // 遮罩图路径（绘制路径透明，其余部分纯色）
+          };
           this.$emit("confirm", emitData);
           this.show = false;
           common_vendor.index.hideLoading();
         });
       }
+    },
+    // 创建透明遮罩（绘制路径为透明，其余部分为纯色）
+    async createTransparentMask() {
+      return new Promise((resolve, reject) => {
+        const query = common_vendor.index.createSelectorQuery().in(this);
+        query.select("#chj_imgEdit_canvas").boundingClientRect((data) => {
+          if (!data) {
+            reject("未找到画布元素");
+            return;
+          }
+          const { width, height } = data;
+          common_vendor.index.canvasToTempFilePath({
+            canvasId: "chj_imgEdit_canvas",
+            width,
+            height,
+            destWidth: width,
+            destHeight: height,
+            success: (res) => {
+              const maskCtx = common_vendor.index.createCanvasContext("mask_process_canvas", this);
+              maskCtx.setFillStyle("#FFFFFF");
+              maskCtx.fillRect(0, 0, width, height);
+              maskCtx.globalCompositeOperation = "destination-out";
+              maskCtx.drawImage(res.tempFilePath, 0, 0, width, height);
+              maskCtx.draw(false, () => {
+                common_vendor.index.canvasToTempFilePath({
+                  canvasId: "mask_process_canvas",
+                  width,
+                  height,
+                  destWidth: width,
+                  destHeight: height,
+                  success: (maskRes) => resolve(maskRes.tempFilePath),
+                  fail: () => resolve(res.tempFilePath)
+                }, this);
+              });
+            },
+            fail: (err) => reject("导出遮罩失败：" + err.errMsg)
+          }, this);
+        }).exec();
+      });
+    },
+    // 创建遮罩的备选方案
+    createMaskFallback(tempFilePath, width, height, resolve) {
+      const maskCtx = common_vendor.index.createCanvasContext("mask_process_canvas", this);
+      maskCtx.clearRect(0, 0, width, height);
+      maskCtx.draw();
+      setTimeout(() => {
+        maskCtx.drawImage(tempFilePath, 0, 0, width, height);
+        maskCtx.draw(false, () => {
+          common_vendor.index.canvasToTempFilePath({
+            canvasId: "mask_process_canvas",
+            success: (maskRes) => {
+              resolve(maskRes.tempFilePath);
+            },
+            fail: () => {
+              resolve(tempFilePath);
+            }
+          }, this);
+        });
+      }, 100);
     },
     // 取消
     async cancel() {
@@ -356,16 +419,18 @@ const _sfc_main = {
       this.ctx_text.clearRect(0, 0, 1e4, 1e4);
       this.ctx_save.clearRect(0, 0, 1e4, 1e4);
       this.ctx_cj.clearRect(0, 0, 1e4, 1e4);
-      this.ctx.draw();
+      this.ctx_bg.setFillStyle("#FFFFFF");
+      this.ctx_bg.fillRect(0, 0, 1e4, 1e4);
       this.ctx_bg.draw();
+      this.ctx.draw();
       this.ctx_hx.draw();
       this.ctx_text.draw();
       this.ctx_save.draw();
       this.ctx_cj.draw();
       this.tx_list_activate = "画笔";
       this.tx_type_activate = "笔";
-      this.pan_color = "#000";
-      this.pen_size = 10;
+      this.pan_color = "#000000";
+      this.pen_size = 50;
       this.active_color_id = "1";
       this.history_list = [];
       this.history_index = -1;
@@ -626,11 +691,20 @@ const _sfc_main = {
         return;
       if (this.tx_type_activate != "橡皮") {
         this.setCanvasStyle();
-        this.ctx.lineTo(x, y);
-        this.ctx.stroke();
+        this.ctx.beginPath();
+        this.ctx.arc(x, y, this.pen_size / 2, 0, 2 * Math.PI);
+        this.ctx.fill();
         this.ctx.draw(true);
-        this.ctx.moveTo(x, y);
       }
+    },
+    drawLineHX({ x, y }) {
+      if (this.tx_list_activate != "画笔" || this.tx_type_activate == "橡皮")
+        return;
+      this.setCanvasStyle();
+      this.ctx_hx.beginPath();
+      this.ctx_hx.arc(x, y, this.pen_size / 2, 0, 2 * Math.PI);
+      this.ctx_hx.fill();
+      this.ctx_hx.draw(true);
     },
     // 画矩形
     drawRect({ x, y }) {
@@ -1053,10 +1127,19 @@ const _sfc_main = {
       this.setTextSize(this.pen_size);
     },
     // 设置canvas画图所有的样式
+    // 设置canvas画图所有的样式
     setCanvasStyle() {
-      this.setStrokeStyle();
-      this.sliderChange();
-      this.changeType();
+      this.ctx.setFillStyle(this.pan_color);
+      this.ctx.setStrokeStyle(this.pan_color);
+      this.ctx.setLineWidth(this.pen_size);
+      this.ctx.setLineJoin("round");
+      this.ctx.setLineCap("round");
+      this.ctx_hx.setFillStyle(this.pan_color);
+      this.ctx_hx.setStrokeStyle(this.pan_color);
+      this.ctx_hx.setLineWidth(this.pen_size);
+      this.ctx_hx.setLineJoin("round");
+      this.ctx_hx.setLineCap("round");
+      this.setTextSize(this.pen_size);
     },
     // 获取图片的参数
     imgInfo(src) {
@@ -1317,4 +1400,3 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-9a4b8c37"]]);
 wx.createComponent(Component);
-//# sourceMappingURL=../../../.sourcemap/mp-weixin/components/chj-imgEdit/chj-imgEdit.js.map

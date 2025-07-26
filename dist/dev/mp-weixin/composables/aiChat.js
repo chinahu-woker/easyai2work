@@ -19,7 +19,7 @@ const getUserToken = () => {
       // 请求成功回调
       fail: (err) => {
         reject(err);
-        common_vendor.index.__f__("log", "at composables/aiChat.ts:42", "请求失败", err);
+        console.log("请求失败", err);
       }
       // 请求失败回调
     });
@@ -41,7 +41,7 @@ const getdetail = (data, id) => {
       // 请求成功回调
       fail: (err) => {
         reject(err);
-        common_vendor.index.__f__("log", "at composables/aiChat.ts:176", "请求失败", err);
+        console.log("请求失败", err);
       }
       // 请求失败回调
     });
@@ -62,7 +62,7 @@ const delComment = (data, id) => {
       },
       fail: (err) => {
         reject(err);
-        common_vendor.index.__f__("log", "at composables/aiChat.ts:200", "请求失败", err);
+        console.log("请求失败", err);
       }
     });
   });
@@ -83,31 +83,31 @@ const Comment = (data, content) => {
       // 请求成功回调
       fail: (err) => {
         reject(err);
-        common_vendor.index.__f__("log", "at composables/aiChat.ts:227", "请求失败", err);
+        console.log("请求失败", err);
       }
       // 请求失败回调
     });
   });
 };
 const registerByUsername = (data) => {
-  common_vendor.index.__f__("log", "at composables/aiChat.ts:313", "注册用户的值：", data);
+  console.log("注册用户的值：", data);
   return new Promise((resolve, reject) => {
     const requestTask = common_vendor.index.request({
       url: `${getBaseURL()}/users/registerByUsername`,
       method: "POST",
       data,
       success: (res) => {
-        common_vendor.index.__f__("log", "at composables/aiChat.ts:322", "注册请求已经完成：", res.data);
+        console.log("注册请求已经完成：", res.data);
         resolve(res.data);
       },
       // 请求成功回调
       fail: (err) => {
         reject(err);
-        common_vendor.index.__f__("log", "at composables/aiChat.ts:328", "请求失败", err);
+        console.log("请求失败", err);
       }
       // 请求失败回调
     });
-    common_vendor.index.__f__("log", "at composables/aiChat.ts:331", "注册：requestTask：", requestTask);
+    console.log("注册：requestTask：", requestTask);
   });
 };
 exports.Comment = Comment;
@@ -115,4 +115,3 @@ exports.delComment = delComment;
 exports.getUserToken = getUserToken;
 exports.getdetail = getdetail;
 exports.registerByUsername = registerByUsername;
-//# sourceMappingURL=../../.sourcemap/mp-weixin/composables/aiChat.js.map

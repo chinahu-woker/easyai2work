@@ -42,7 +42,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       audioList.value = modelValue.value ? [modelValue.value] : [];
     });
     common_vendor.watch(audioList, () => {
-      common_vendor.index.__f__("log", "at components/dynamic/AudioUpload.vue:37", "audioList", audioList.value[0]);
+      console.log("audioList", audioList.value[0]);
       modelValue.value = audioList.value[0];
       if (audioList.value[0]) {
         audioSrc.value = audioList.value[0];
@@ -54,7 +54,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const url = file.path;
       return new Promise(async (resolve, reject) => {
         const uploadResult = await utils_request.uploadFile(url);
-        common_vendor.index.__f__("log", "at components/dynamic/AudioUpload.vue:50", "uploadResult", uploadResult);
+        console.log("uploadResult", uploadResult);
         if (uploadResult) {
           resolve(uploadResult);
         }
@@ -68,11 +68,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       innerAudioContext.autoplay = false;
       innerAudioContext.src = audioSrc.value;
       innerAudioContext.onPlay(() => {
-        common_vendor.index.__f__("log", "at components/dynamic/AudioUpload.vue:65", "开始播放");
+        console.log("开始播放");
       });
       innerAudioContext.onError((res) => {
-        common_vendor.index.__f__("log", "at components/dynamic/AudioUpload.vue:68", res.errMsg);
-        common_vendor.index.__f__("log", "at components/dynamic/AudioUpload.vue:69", res.errCode);
+        console.log(res.errMsg);
+        console.log(res.errCode);
       });
       innerAudioContext.onTimeUpdate(() => {
         currentTime.value = (innerAudioContext == null ? void 0 : innerAudioContext.currentTime) || 0;
@@ -91,7 +91,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           uploadAudioFile(audioFile);
         },
         fail(err) {
-          common_vendor.index.__f__("error", "at components/dynamic/AudioUpload.vue:88", "选择文件失败", err);
+          console.error("选择文件失败", err);
         }
       });
     };
@@ -102,10 +102,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           audioSrc.value = uploadResult;
           audioName.value = file.name;
           audioList.value = [uploadResult];
-          common_vendor.index.__f__("log", "at components/dynamic/AudioUpload.vue:100", "上传成功", uploadResult);
+          console.log("上传成功", uploadResult);
         }
       } catch (error) {
-        common_vendor.index.__f__("error", "at components/dynamic/AudioUpload.vue:103", "上传失败", error);
+        console.error("上传失败", error);
       }
     };
     const buttonShow = common_vendor.ref(false);
@@ -119,7 +119,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const pauseAudio = () => {
       if (innerAudioContext) {
         innerAudioContext.pause();
-        common_vendor.index.__f__("log", "at components/dynamic/AudioUpload.vue:119", "暂停播放");
+        console.log("暂停播放");
         buttonShow.value = false;
       }
     };
@@ -173,4 +173,3 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
 });
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-b4cf6b1f"]]);
 wx.createComponent(Component);
-//# sourceMappingURL=../../../.sourcemap/mp-weixin/components/dynamic/AudioUpload.js.map

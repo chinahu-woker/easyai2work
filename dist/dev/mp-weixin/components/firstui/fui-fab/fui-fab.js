@@ -343,4 +343,3 @@ if (typeof block0 === "function")
   block0(_sfc_main);
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-2c25f223"]]);
 wx.createComponent(Component);
-//# sourceMappingURL=../../../../.sourcemap/mp-weixin/components/firstui/fui-fab/fui-fab.js.map

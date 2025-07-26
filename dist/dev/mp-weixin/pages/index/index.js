@@ -77,7 +77,7 @@ const _sfc_defineComponent = common_vendor.defineComponent({
         return 0;
       } else {
         const UserInfor = common_vendor.index.getStorageSync("userInfo");
-        common_vendor.index.__f__("log", "at pages/index/index.vue:301", "361---userInfo---------------", roltList.includes(UserInfor.role[0]));
+        console.log("361---userInfo---------------", roltList.includes(UserInfor.role[0]));
         role.value = roltList.includes(UserInfor.role[0]);
       }
     }
@@ -120,7 +120,7 @@ const _sfc_defineComponent = common_vendor.defineComponent({
       imageData.value = [];
     });
     function img2pay() {
-      common_vendor.index.__f__("log", "at pages/index/index.vue:604", "点击支付");
+      console.log("点击支付");
       showPay.value = true;
     }
     common_vendor.ref("fuiNavBar");
@@ -130,7 +130,7 @@ const _sfc_defineComponent = common_vendor.defineComponent({
       pageindex.value = index.index;
       if (index.index == 2)
         ;
-      common_vendor.index.__f__("log", "at pages/index/index.vue:628", "index", pageindex.value);
+      console.log("index", pageindex.value);
     };
     const name_value = common_vendor.ref("我的");
     function wode_loging() {
@@ -221,7 +221,7 @@ const _sfc_defineComponent = common_vendor.defineComponent({
     };
     const { socketInit } = composables_useWorkFlow.useWorkFlow();
     const handlePayMessage = async (order_id) => {
-      common_vendor.index.__f__("log", "at pages/index/index.vue:801", "收到支付成功消息", order_id);
+      console.log("收到支付成功消息", order_id);
       const order = await composables_useCommon.getOrderInfoById(order_id);
       if (order[0] && order[0].order_status === 1) {
         common_vendor.index.showToast({
@@ -383,4 +383,3 @@ const _sfc_defineComponent = common_vendor.defineComponent({
 _sfc_defineComponent.__runtimeHooks = 6;
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_defineComponent, [["__scopeId", "data-v-83a5a03c"]]);
 wx.createPage(MiniProgramPage);
-//# sourceMappingURL=../../../.sourcemap/mp-weixin/pages/index/index.js.map

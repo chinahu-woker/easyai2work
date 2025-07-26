@@ -16,4 +16,3 @@ components_firstui_fuiParse_highLight_highlight_code._hljs.registerLanguage("typ
 components_firstui_fuiParse_highLight_highlight_code._hljs.registerLanguage("markdown", components_firstui_fuiParse_highLight_languages_markdown.markdown);
 components_firstui_fuiParse_highLight_highlight_code._hljs.registerLanguage("c++", components_firstui_fuiParse_highLight_languages_cpp.cpp);
 components_firstui_fuiParse_highLight_highlight_code._hljs.registerLanguage("c", components_firstui_fuiParse_highLight_languages_c.c);
-//# sourceMappingURL=../../../../../.sourcemap/mp-weixin/components/firstui/fui-parse/high-light/index.js.map

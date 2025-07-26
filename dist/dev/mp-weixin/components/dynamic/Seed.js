@@ -26,13 +26,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       inputValue.value = utils_common.generateRandomNumber(15);
     };
     common_vendor.onLoad(() => {
-      common_vendor.index.__f__("log", "at components/dynamic/Seed.vue:28", "Seed page onLoad");
+      console.log("Seed page onLoad");
       if (!inputValue.value || inputValue.value === 0) {
         getSeed();
       }
     });
     common_vendor.onReady(() => {
-      common_vendor.index.__f__("log", "at components/dynamic/Seed.vue:35", "Seed page onReady");
+      console.log("Seed page onReady");
       if (!inputValue.value || inputValue.value === 0) {
         getSeed();
       }
@@ -61,4 +61,3 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   }
 });
 wx.createComponent(_sfc_main);
-//# sourceMappingURL=../../../.sourcemap/mp-weixin/components/dynamic/Seed.js.map

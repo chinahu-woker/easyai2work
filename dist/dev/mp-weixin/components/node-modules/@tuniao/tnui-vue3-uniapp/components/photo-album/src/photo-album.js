@@ -49,4 +49,3 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
 });
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-1eed39db"]]);
 wx.createComponent(Component);
-//# sourceMappingURL=../../../../../../../../.sourcemap/mp-weixin/components/node-modules/@tuniao/tnui-vue3-uniapp/components/photo-album/src/photo-album.js.map

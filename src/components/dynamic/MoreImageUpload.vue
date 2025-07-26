@@ -1,6 +1,6 @@
 <template>
 	<template #title>
-	  <MyTitle :title="title"></MyTitle>
+	  <MyTitle :title="title "></MyTitle>
 	</template>
   <view class="image-editor-container" @click="onClick">
 	   
@@ -18,7 +18,7 @@
     
     <view v-else  class="edit-trigger">
       <!-- 有图时循环渲染已上传图片（如果是单图可简化，这里保留原数组逻辑） -->
-      <view  v-for="(image, index) in [imageList_mask]" :key="index" class="uploaded-list">
+      <view  v-for="(image, index) in imageList_mask" :key="index" class="uploaded-list">
         <image 
          
           :src="image" 
@@ -61,25 +61,34 @@ const isComponentReady = ref(false);
       // 存储已上传图片，改用数组更通用
 const placeholderImg = ref('/static/placeholder.png'); // 无图占位图，需自行放置资源
 const ediIcon = '/static/graffiti.png';
-const modelValue = defineModel({ default: [] as string[] })
+const modelValue = defineModel({
+  default: () => ({
+    "advance_onlineEdit_origin": '',
+    "advance_onlineEdit_mask": ''
+  })
+})
 interface Props{
   title?:string;
   workflow_id:string
   options?:IDynamicOptions
 };
 const props = withDefaults(defineProps<Props>(),{
-  title:' ',
+  title:'遮罩绘制',
 })
 // 监听组件挂载
 onMounted(() => {
-  imageList_mask.value = modelValue.value || []
+  // 初始化时将对象转换为适合本地展示的格式
+  if (modelValue.value['advance_onlineEdit_mask']) {
+    imageList_mask.value = [modelValue.value['advance_onlineEdit_mask'],modelValue.value['advance_onlineEdit_origin']];
+  }
 })
 
 // 监听本地数据变化同步到父组件
-watch(imageList_mask, (newVal) => {
-  modelValue.value = newVal
+watch(modelValue, (newVal) => {
+  if (newVal['advance_onlineEdit_mask']) {
+    imageList_mask.value = [newVal['advance_onlineEdit_mask'],newVal['advance_onlineEdit_origin']];
+  }
 }, { deep: true })
-
 // 选择图片逻辑
 const onClick = async () => {
   try {
@@ -152,33 +161,71 @@ const waitForComponentReady = async () => {
 const  imageList_mask = ref([])
 
 
+// const confirm = async (emtData) => {
+//   console.log('编辑确认，路径:', emtData.Sync);
+//   try {
+//     const imagePaths = Array.isArray(emtData.paths) ? emtData.paths : [emtData.paths];
+//     console.log('imagePaths:', imagePaths);
+
+//     // 优化：使用与 ImageUpload.vue 一致的上传逻辑
+//     const uploadPromises = imagePaths.map(path => 
+//       uploadFile<string>(url:path, action:'/file/upload')
+//     );
+//     const uploadResults = await Promise.all(uploadPromises);
+
+//     // 优化：遵循 ImageUpload.vue 的数组存储规范
+//     imageList_mask.value = uploadResults[1];
+//     // 保持与 apps.vue 中参数绑定一致（单值/数组自动适配）
+//     modelValue.value = uploadResults[1];
+
+//     console.log('所有图片上传成功:', uploadResults);
+//   } catch (error) {
+//     console.error('图片上传失败:', error);
+//     uni.showToast({ title: '上传失败', icon: 'error' });
+//   }
+//   show.value = false;
+// };
+
+
+// 取消回调
+
 const confirm = async (emtData) => {
-  console.log('编辑确认，路径:', emtData.Sync);
+  console.log('编辑确认，返回数据:', emtData);
   try {
-    const imagePaths = Array.isArray(emtData.paths) ? emtData.paths : [emtData.paths];
-    console.log('imagePaths:', imagePaths);
+    // 假设chj-imgEdit返回包含原图和遮罩图路径的对象
+    // 实际属性名可能需要根据chj-imgEdit组件调整
+    const { originPath, maskPath } = emtData;
+    if (!originPath || !maskPath) {
+      throw new Error('缺少原图或遮罩图路径');
+    }
 
-    // 优化：使用与 ImageUpload.vue 一致的上传逻辑
-    const uploadPromises = imagePaths.map(path => 
-      uploadFile<string>(url:path, action:'/file/upload')
-    );
-    const uploadResults = await Promise.all(uploadPromises);
+    // 分别上传原图和遮罩图，使用与ImageUpload.vue一致的上传逻辑
+    const [originResult, maskResult] = await Promise.all([
+      uploadFile(originPath, '/file/upload' ),
+      uploadFile( maskPath,'/file/upload' )
+    ]);
+    const uploadResults = await Promise.all([originResult, maskResult]);
+    console.log("uploadResults", uploadResults);
 
-    // 优化：遵循 ImageUpload.vue 的数组存储规范
-    imageList_mask.value = uploadResults[1];
-    // 保持与 apps.vue 中参数绑定一致（单值/数组自动适配）
-    modelValue.value = uploadResults[1];
+    // 构建符合要求的对象结构
+    // 关键修改：使用工作流参数定义的name作为键名
+    const result = {
+      // 替换为工作流中定义的参数name（示例：originUrl和maskUrl）
+      "advance_onlineEdit_origin": originResult,
+      "advance_onlineEdit_mask": maskResult
+    };
 
-    console.log('所有图片上传成功:', uploadResults);
+    // 更新modelValue为对象类型（需同步修改modelValue定义）
+    modelValue.value = result;
+    console.log('上传成功，结果:', result);
+    uni.showToast({ title: '上传成功', icon: 'success' });
   } catch (error) {
     console.error('图片上传失败:', error);
-    uni.showToast({ title: '上传失败', icon: 'error' });
+    uni.showToast({ title: '上传失败: ' + error.message, icon: 'error' });
   }
   show.value = false;
 };
 
-
-// 取消回调
 const cancel = () => {
   console.log('编辑取消');
   show.value = false;

@@ -60,7 +60,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     };
     const selectedIndex = common_vendor.ref(0);
     common_vendor.watch(selectedIndex, () => {
-      common_vendor.index.__f__("log", "at components/home/PaymentPopup.vue:70", selectedIndex.value);
+      console.log(selectedIndex.value);
     });
     const { socketInit } = composables_useWorkFlow.useWorkFlow();
     common_vendor.onReady(() => {
@@ -70,7 +70,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           type: types_index.IWebsocketSceneType.payStatusPush
         },
         onMessage: (msg) => {
-          common_vendor.index.__f__("log", "at components/home/PaymentPopup.vue:83", "handle pay success message");
+          console.log("handle pay success message");
           const msgObj = utils_common.parseJSONToObject(msg);
           const { type } = msgObj;
           if (type === "pay_success") {
@@ -139,4 +139,3 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
 });
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-b88e62c2"]]);
 wx.createComponent(Component);
-//# sourceMappingURL=../../../.sourcemap/mp-weixin/components/home/PaymentPopup.js.map

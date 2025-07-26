@@ -59,26 +59,26 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const getHistoryData = async (pageNumber) => {
       const { items } = await utils_request.request(`/draw/history/${pageNumber}`);
       historyData.value = items;
-      common_vendor.index.__f__("log", "at pages/history/history_fui/history_fui.vue:57", "pageNumber", pageNumber);
-      common_vendor.index.__f__("log", "at pages/history/history_fui/history_fui.vue:58", "historyData", historyData.value);
+      console.log("pageNumber", pageNumber);
+      console.log("historyData", historyData.value);
     };
     const removeHistoryRecord = async (id) => {
       try {
-        common_vendor.index.__f__("log", "at pages/history/history_fui/history_fui.vue:63", "Attempting to remove history record with id:", id);
+        console.log("Attempting to remove history record with id:", id);
         const response = await utils_request.request(`/draw/history/${id}`, {
           method: "DELETE"
         });
-        common_vendor.index.__f__("log", "at pages/history/history_fui/history_fui.vue:68", "Response status:", response.status);
-        common_vendor.index.__f__("log", "at pages/history/history_fui/history_fui.vue:78", "History record removed:", id);
+        console.log("Response status:", response.status);
+        console.log("History record removed:", id);
         historyData.value = historyData.value.filter((item) => item._id !== id);
-        common_vendor.index.__f__("log", "at pages/history/history_fui/history_fui.vue:80", "Updated historyData:", historyData.value);
+        console.log("Updated historyData:", historyData.value);
         common_vendor.index.showToast({
           title: "删除成功",
           icon: "success",
           duration: 2e3
         });
       } catch (err) {
-        common_vendor.index.__f__("error", "at pages/history/history_fui/history_fui.vue:87", "Failed to remove history record:", err);
+        console.error("Failed to remove history record:", err);
       }
     };
     common_vendor.computed(() => {
@@ -96,7 +96,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           });
         }
       });
-      common_vendor.index.__f__("log", "at pages/history/history_fui/history_fui.vue:110", "tempTimeLineData:", tempTimeLineData);
+      console.log("tempTimeLineData:", tempTimeLineData);
       return tempTimeLineData.sort((a, b) => {
         return new Date(b.day).getTime() - new Date(a.day).getTime();
       });
@@ -114,7 +114,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const currentTabIndex = common_vendor.ref(0);
     const tabs = common_vendor.ref(["时间轴模式", "相册模式"]);
     function QieHuan(e) {
-      common_vendor.index.__f__("log", "at pages/history/history_fui/history_fui.vue:134", "-----------------------------------", e);
+      console.log("-----------------------------------", e);
       currentTabIndex.value = e.index;
     }
     const show = common_vendor.ref(false);
@@ -123,7 +123,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     function showGallery(data) {
       show.value = true;
       GalleryPic.value = data;
-      common_vendor.index.__f__("log", "at pages/history/history_fui/history_fui.vue:145", GalleryPic.value);
+      console.log(GalleryPic.value);
     }
     function hideGallery() {
       show.value = false;
@@ -146,10 +146,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         showToast: true,
         // 是否显示提示，默认为true
         success: function() {
-          common_vendor.index.__f__("log", "at pages/history/history_fui/history_fui.vue:179", "复制成功");
+          console.log("复制成功");
         },
         fail: function(err) {
-          common_vendor.index.__f__("error", "at pages/history/history_fui/history_fui.vue:182", "复制失败", err);
+          console.error("复制失败", err);
         }
       });
     }
@@ -161,7 +161,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       try {
         const downloadResult = await common_vendor.index.downloadFile({ url });
         if (downloadResult.statusCode !== 200) {
-          common_vendor.index.__f__("error", "at pages/history/history_fui/history_fui.vue:198", "下载失败，状态码:", downloadResult.statusCode);
+          console.error("下载失败，状态码:", downloadResult.statusCode);
           common_vendor.index.showToast({ title: "下载失败", icon: "none" });
           return;
         }
@@ -171,7 +171,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           });
           common_vendor.index.showToast({ title: "保存到相册成功", icon: "success" });
         } catch (saveErr) {
-          common_vendor.index.__f__("error", "at pages/history/history_fui/history_fui.vue:211", "保存到相册失败:", saveErr);
+          console.error("保存到相册失败:", saveErr);
           if (saveErr.errMsg.includes("auth deny")) {
             common_vendor.index.showModal({
               title: "权限不足",
@@ -180,7 +180,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                 if (res.confirm) {
                   common_vendor.index.openSetting({
                     success: (settingRes) => {
-                      common_vendor.index.__f__("log", "at pages/history/history_fui/history_fui.vue:221", "相册权限设置:", settingRes.authSetting);
+                      console.log("相册权限设置:", settingRes.authSetting);
                     }
                   });
                 }
@@ -191,7 +191,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }
         }
       } catch (downloadErr) {
-        common_vendor.index.__f__("error", "at pages/history/history_fui/history_fui.vue:232", "下载过程出错:", downloadErr);
+        console.error("下载过程出错:", downloadErr);
         common_vendor.index.showToast({ title: "下载失败", icon: "none" });
       }
     }
@@ -363,4 +363,3 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
 });
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-56f14cc7"]]);
 wx.createPage(MiniProgramPage);
-//# sourceMappingURL=../../../../.sourcemap/mp-weixin/pages/history/history_fui/history_fui.js.map

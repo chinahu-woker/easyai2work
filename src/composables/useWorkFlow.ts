@@ -19,32 +19,32 @@ import { useAppStore } from '@/stores'
 import { getLoginInfo, isLogin, refreshUserInfo } from '@/composables'
 
 export interface SocketInitOptions {
-	params : IWebSocketParams
+	params: IWebSocketParams
 	// params?: IWebSocketParams
-	forceReConnect ?: boolean
-	onConnect ?: () => void
-	onReconnect ?: (attemptNumber : number) => void
-	onReconnectFailed ?: () => void
-	onDisconnect ?: (reason ?: string) => void
-	onConnectError ?: (error : any) => void
-	onConnectTimeout ?: () => void
-	onMessage ?: (msg : any) => void
-	onPayMessage ?: (msg : any) => void
+	forceReConnect?: boolean
+	onConnect?: () => void
+	onReconnect?: (attemptNumber: number) => void
+	onReconnectFailed?: () => void
+	onDisconnect?: (reason?: string) => void
+	onConnectError?: (error: any) => void
+	onConnectTimeout?: () => void
+	onMessage?: (msg: any) => void
+	onPayMessage?: (msg: any) => void
 }
 
 /** 提交自定义工作流 */
-export const submitCustomWorkflow = (data : IComfyUIRequestParams) =>
+export const submitCustomWorkflow = (data: IComfyUIRequestParams) =>
 	request<IDrawResponse>('/draw/customWorkflow', {
 		method: 'POST',
 		data,
 	})
 
 /** 根据工作流的ID获取大模型清单 **/
-export const getModelListByWorkflowId = (workflow_id : string) =>
+export const getModelListByWorkflowId = (workflow_id: string) =>
 	request<string[]>(`/draw/getModelListById/${workflow_id}`)
 /** 创建任务 **/
 
-export const creatDrawHistoryTask = (data : IDrawHistoryItem) =>
+export const creatDrawHistoryTask = (data: IDrawHistoryItem) =>
 	request<IDrawHistoryItem>('/draw/history', {
 		method: 'POST',
 		data,
@@ -68,14 +68,15 @@ export default function useWorkFlow() {
 		{ param: 'image_path_face', component: 'ImageUpload', title: '参考上传' },
 		{ param: 'image_path_style', component: 'ImageUpload', title: '参考上传' },
 		{ param: 'image_path', component: 'ImageUpload', title: '参考上传' },
-		{param: 'advance_select_image_preview',component: 'ImageSelectPreview',title: '高级-图像预览选择'},
-		{param: 'multi_image_path',component: 'ImageUploadMore',title: '多图上传'},
-		// {param: 'advance_onlineEdit_origin',component: 'MoreImageUpload',title: '遮罩上传-原图'},
-		{param: 'advance_onlineEdit_mask',component: 'MoreImageUpload',title: '遮罩上传-遮罩'}
+		{ param: 'advance_select_image_preview', component: 'ImageSelectPreview', title: '高级-图像预览选择' },
+		{ param: 'multi_image_path', component: 'ImageUploadMore', title: '多图上传' },
+		// { param: 'advance_onlineEdit_mask', component: 'MoreImageUpload', title: '遮罩上传' },
+		{ param: 'advance_onlineEdit_origin', component: 'MoreImageUpload', title: '遮罩上传' },
+		// { param: 'advance_onlineEdit', component: 'MoreImageUpload', title: '遮罩上传' }
 	] as ParamToComponentMapping[]
 	/** 绘图参数 */
 	const bindParam = ref<IComfyUIProperties>({})
-	const handleGetWorkFlwById = async (id : string) => {
+	const handleGetWorkFlwById = async (id: string) => {
 		workflow.value = await request<IWorkFlow>(`/workflow/${id}`)
 		handleWorkFlowParamsToBindParam()
 	}
@@ -99,7 +100,7 @@ export default function useWorkFlow() {
 	})
 
 	/** 根据参数名称找组件名称  */
-	const handleFindComponentName = (param : keyof IComfyUIProperties) => {
+	const handleFindComponentName = (param: keyof IComfyUIProperties) => {
 		const component = params_component_list.find(item => param === item.param);
 		return component?.component;
 		// const component = params_component_list.find(item => param.startsWith(item.param))
@@ -137,7 +138,7 @@ export default function useWorkFlow() {
 	}
 
 	const socketInit = async (
-		options : SocketInitOptions = {
+		options: SocketInitOptions = {
 			params: {
 				type: IWebsocketSceneType.drawProcessPush,
 				data: { scene_str: '' },
@@ -269,11 +270,15 @@ export default function useWorkFlow() {
 	//   }
 	// }
 	/** 处理Websocket消息 */
-	const handleSocketMessage = (msg : string, callback ?: (messageObj : { type : any; data : any; queue_status : IDrawTaskStatus }) => void) => {
+	const handleSocketMessage = (msg: string, callback?: (messageObj: { type: any; data: any; queue_status: IDrawTaskStatus }) => void) => {
 		console.log('原始消息', msg);
+		if (typeof msg !== 'string' || (!msg.startsWith('{') && !msg.startsWith('['))) {
+        // 非JSON消息（如心跳pong），直接忽略
+        return;
+    }
 		let msgObj;
 		try {
-			msgObj = parseJSONToObject<{ type : any; data : any; queue_status : IDrawTaskStatus }>(msg);
+			msgObj = parseJSONToObject<{ type: any; data: any; queue_status: IDrawTaskStatus }>(msg);
 		} catch (error) {
 			console.error('解析WebSocket消息时出错，消息不是有效的JSON格式:', error);
 			return;
@@ -294,13 +299,20 @@ export default function useWorkFlow() {
 
 		// 从websocket消息中获取output
 		const index = localTasks.value.findIndex(item => item._id === queue_status.task_id);
+		// if (index !== -1) {
+		// 	if (queue_status.progress) localTasks.value[index].progress = queue_status.progress;
+		// 	if (queue_status.queue) localTasks.value[index].queue = queue_status.queue;
+		// 	if (queue_status.time_remained !== undefined)
+		// 		localTasks.value[index].time_remained = queue_status.time_remained;
+		// 	if (queue_status.message) localTasks.value[index].message = queue_status.message;
+		// }
 		if (index !== -1) {
-			if (queue_status.progress) localTasks.value[index].progress = queue_status.progress;
-			if (queue_status.queue) localTasks.value[index].queue = queue_status.queue;
-			if (queue_status.time_remained !== undefined)
-				localTasks.value[index].time_remained = queue_status.time_remained;
-			if (queue_status.message) localTasks.value[index].message = queue_status.message;
-		}
+    if (typeof queue_status.progress !== 'undefined') localTasks.value[index].progress = queue_status.progress;
+    if (typeof queue_status.queue !== 'undefined') localTasks.value[index].queue = queue_status.queue;
+    if (typeof queue_status.time_remained !== 'undefined')
+        localTasks.value[index].time_remained = queue_status.time_remained;
+    if (queue_status.message) localTasks.value[index].message = queue_status.message;
+}
 
 		if (queue_status.status === 'started' && index !== -1) {
 			localTasks.value[index].status = 4;
@@ -328,7 +340,7 @@ export default function useWorkFlow() {
 	};
 	/** 创建任务 */
 	const handleCreateTask = async () => {
-		const item : IDrawHistoryItemCreat = {
+		const item: IDrawHistoryItemCreat = {
 			params: { ...bindParam.value },
 			workflow_id: workflow.value._id,
 			user_id: getLoginInfo()._id,
@@ -343,7 +355,7 @@ export default function useWorkFlow() {
 	}
 
 	/** 更新本地任务的状态 */
-	const handleUpdateTaskStatus = async (taskItem : IDrawHistoryItem, output : IDrawResponse) => {
+	const handleUpdateTaskStatus = async (taskItem: IDrawHistoryItem, output: IDrawResponse) => {
 		const index = localTasks.value.findIndex(item => item._id === taskItem._id)
 		if (index !== -1) {
 			localTasks.value[index].output = output.output
@@ -373,13 +385,27 @@ export default function useWorkFlow() {
 		}
 		//深拷贝绘图参数
 		localTasks.value.unshift(newTask)
-		const requestParams : IComfyUIRequestParams = {
-			params: { ...bindParam.value },
+		const flatParams = { ...bindParam.value };
+		if (flatParams.advance_onlineEdit_origin && typeof flatParams.advance_onlineEdit_origin === 'object' && 'advance_onlineEdit_origin' in flatParams.advance_onlineEdit_origin) {
+			// 先保存遮罩图URL
+			const maskUrl = flatParams.advance_onlineEdit_origin.advance_onlineEdit_mask || '';
+			// 再覆盖原图URL
+			flatParams.advance_onlineEdit_origin = flatParams.advance_onlineEdit_origin.advance_onlineEdit_origin;
+			// 最后赋值遮罩图参数
+			flatParams.maskUrl_mask = maskUrl;
+		}
+
+		// 只保留这一个requestParams声明
+
+		const requestParams: IComfyUIRequestParams = {
+			params: flatParams, // 使用处理后的扁平化参数
 			options: {
 				workflow_id: workflow.value._id,
-				task_id: newTask._id, //重要，已经创建任务的时候传入任务ID，否则系统会新建
+				task_id: newTask._id,
 			},
 		}
+
+
 		const result = await submitCustomWorkflow(requestParams)
 		if (result.status === 'success' && result.output && result.output.length > 0) {
 			await handleUpdateTaskStatus(newTask, result)

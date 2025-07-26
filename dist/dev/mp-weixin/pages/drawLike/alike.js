@@ -51,11 +51,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       currentVideoIndex.value = index;
     }
     function handleVideoFullscreenChange(e) {
-      common_vendor.index.__f__("log", "at pages/drawLike/alike.vue:216", "全屏变化:", e.detail.fullScreen);
+      console.log("全屏变化:", e.detail.fullScreen);
     }
     function handleVideoError(e) {
       common_vendor.index.showToast({ title: "视频加载失败", icon: "none" });
-      common_vendor.index.__f__("error", "at pages/drawLike/alike.vue:222", "视频错误:", e.detail.errMsg);
+      console.error("视频错误:", e.detail.errMsg);
     }
     function onSwiperChange(e) {
       var _a;
@@ -79,7 +79,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (swiperRef.value && typeof swiperRef.value.setCurrent === "function") {
         swiperRef.value.setCurrent(index);
       } else {
-        common_vendor.index.__f__("warn", "at pages/drawLike/alike.vue:250", "setCurrent 方法不可用或 swiper 未正确初始化");
+        console.warn("setCurrent 方法不可用或 swiper 未正确初始化");
       }
     }
     function previewImage(url) {
@@ -100,16 +100,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         if (!params.id) {
           throw new Error("缺少必要参数：id");
         }
-        common_vendor.index.__f__("log", "at pages/drawLike/alike.vue:316", "id:", params.id, user.value, draw_data);
+        console.log("id:", params.id, user.value, draw_data);
         detailId.value = params.id;
         await composables_aiChat.getdetail(user.value, params.id).then((res) => {
-          common_vendor.index.__f__("log", "at pages/drawLike/alike.vue:320", "获取到的getUserKey信息:", res.data);
+          console.log("获取到的getUserKey信息:", res.data);
           draw_data.value = res.data;
         }).catch((err) => {
-          common_vendor.index.__f__("error", "at pages/drawLike/alike.vue:323", "获取getUserKey失败:", err);
+          console.error("获取getUserKey失败:", err);
         });
       } catch (err) {
-        common_vendor.index.__f__("error", "at pages/drawLike/alike.vue:327", "数据加载失败:", err);
+        console.error("数据加载失败:", err);
         error.value = "加载失败，请重试";
         loading.value = false;
       }
@@ -149,7 +149,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               const res2 = await composables_aiChat.getdetail(user.value, detailId.value);
               draw_data.value = res2.data;
             } catch (err) {
-              common_vendor.index.__f__("error", "at pages/drawLike/alike.vue:391", "删除失败:", err);
+              console.error("删除失败:", err);
               common_vendor.index.showToast({ title: "删除失败", icon: "none" });
             }
           }
@@ -225,7 +225,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         draw_data.value = res.data;
         newComment.value = "";
       } catch (err) {
-        common_vendor.index.__f__("error", "at pages/drawLike/alike.vue:498", "评论提交失败:", err);
+        console.error("评论提交失败:", err);
         common_vendor.index.showToast({ title: "评论失败，请重试", icon: "none" });
       }
     }
@@ -348,4 +348,3 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   }
 });
 wx.createPage(_sfc_main);
-//# sourceMappingURL=../../../.sourcemap/mp-weixin/pages/drawLike/alike.js.map

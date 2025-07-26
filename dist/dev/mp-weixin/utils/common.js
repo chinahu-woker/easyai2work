@@ -48,4 +48,3 @@ exports.generateRandomNumber = generateRandomNumber;
 exports.isVideo = isVideo;
 exports.parseJSONToObject = parseJSONToObject;
 exports.randomId = randomId;
-//# sourceMappingURL=../../.sourcemap/mp-weixin/utils/common.js.map

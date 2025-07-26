@@ -7,4 +7,3 @@ function c(hljs) {
   return lang;
 }
 exports.c = c;
-//# sourceMappingURL=../../../../../../.sourcemap/mp-weixin/components/firstui/fui-parse/high-light/languages/c.js.map

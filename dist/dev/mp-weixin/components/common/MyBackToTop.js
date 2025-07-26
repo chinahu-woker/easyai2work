@@ -27,4 +27,3 @@ const _sfc_defineComponent = common_vendor.defineComponent({
 });
 _sfc_defineComponent.__runtimeHooks = 1;
 wx.createComponent(_sfc_defineComponent);
-//# sourceMappingURL=../../../.sourcemap/mp-weixin/components/common/MyBackToTop.js.map

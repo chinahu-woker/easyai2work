@@ -14,11 +14,16 @@ const MyTitle = () => "../common/MyTitle.js";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "MoreImageUpload",
   props: /* @__PURE__ */ common_vendor.mergeModels({
-    title: { default: " " },
+    title: { default: "遮罩绘制" },
     workflow_id: {},
     options: {}
   }, {
-    "modelValue": { default: [] },
+    "modelValue": {
+      default: () => ({
+        "advance_onlineEdit_origin": "",
+        "advance_onlineEdit_mask": ""
+      })
+    },
     "modelModifiers": {}
   }),
   emits: /* @__PURE__ */ common_vendor.mergeModels(["update:modelValue"], ["update:modelValue"]),
@@ -30,10 +35,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     common_vendor.ref("/static/placeholder.png");
     const modelValue = common_vendor.useModel(__props, "modelValue");
     common_vendor.onMounted(() => {
-      imageList_mask.value = modelValue.value || [];
+      if (modelValue.value["advance_onlineEdit_mask"]) {
+        imageList_mask.value = [modelValue.value["advance_onlineEdit_mask"], modelValue.value["advance_onlineEdit_origin"]];
+      }
     });
-    common_vendor.watch(imageList_mask, (newVal) => {
-      modelValue.value = newVal;
+    common_vendor.watch(modelValue, (newVal) => {
+      if (newVal["advance_onlineEdit_mask"]) {
+        imageList_mask.value = [newVal["advance_onlineEdit_mask"], newVal["advance_onlineEdit_origin"]];
+      }
     }, { deep: true });
     const onClick = async () => {
       try {
@@ -71,16 +80,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               }
             });
           } else {
-            common_vendor.index.__f__("error", "at components/dynamic/MoreImageUpload.vue:122", "chj-imgEdit组件异常");
+            console.error("chj-imgEdit组件异常");
             show.value = false;
           }
         }
       } catch (error) {
-        common_vendor.index.__f__("error", "at components/dynamic/MoreImageUpload.vue:127", "选择图片失败:", error);
+        console.error("选择图片失败:", error);
       }
     };
     const zehzhao = () => {
-      common_vendor.index.__f__("log", "at components/dynamic/MoreImageUpload.vue:133", "用户点击了遮罩");
+      console.log("用户点击了遮罩");
     };
     const waitForComponentReady = async () => {
       const maxRetries = 10;
@@ -92,37 +101,46 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         retries++;
       }
       if (retries >= maxRetries) {
-        common_vendor.index.__f__("warn", "at components/dynamic/MoreImageUpload.vue:149", "等待组件超时");
+        console.warn("等待组件超时");
       }
     };
     const imageList_mask = common_vendor.ref([]);
     const confirm = async (emtData) => {
-      common_vendor.index.__f__("log", "at components/dynamic/MoreImageUpload.vue:156", "编辑确认，路径:", emtData.Sync);
+      console.log("编辑确认，返回数据:", emtData);
       try {
-        const imagePaths = Array.isArray(emtData.paths) ? emtData.paths : [emtData.paths];
-        common_vendor.index.__f__("log", "at components/dynamic/MoreImageUpload.vue:159", "imagePaths:", imagePaths);
-        const uploadPromises = imagePaths.map(
-          (path) => utils_request.uploadFile(path, "/file/upload")
-        );
-        const uploadResults = await Promise.all(uploadPromises);
-        imageList_mask.value = uploadResults[1];
-        modelValue.value = uploadResults[1];
-        common_vendor.index.__f__("log", "at components/dynamic/MoreImageUpload.vue:172", "所有图片上传成功:", uploadResults);
+        const { originPath, maskPath } = emtData;
+        if (!originPath || !maskPath) {
+          throw new Error("缺少原图或遮罩图路径");
+        }
+        const [originResult, maskResult] = await Promise.all([
+          utils_request.uploadFile(originPath, "/file/upload"),
+          utils_request.uploadFile(maskPath, "/file/upload")
+        ]);
+        const uploadResults = await Promise.all([originResult, maskResult]);
+        console.log("uploadResults", uploadResults);
+        const result = {
+          // 替换为工作流中定义的参数name（示例：originUrl和maskUrl）
+          "advance_onlineEdit_origin": originResult,
+          "advance_onlineEdit_mask": maskResult
+        };
+        modelValue.value = result;
+        console.log("上传成功，结果:", result);
+        common_vendor.index.showToast({ title: "上传成功", icon: "success" });
       } catch (error) {
-        common_vendor.index.__f__("error", "at components/dynamic/MoreImageUpload.vue:174", "图片上传失败:", error);
-        common_vendor.index.showToast({ title: "上传失败", icon: "error" });
+        console.error("图片上传失败:", error);
+        common_vendor.index.showToast({ title: "上传失败: " + error.message, icon: "error" });
       }
       show.value = false;
     };
     const cancel = () => {
-      common_vendor.index.__f__("log", "at components/dynamic/MoreImageUpload.vue:183", "编辑取消");
+      console.log("编辑取消");
       show.value = false;
     };
     const getLineLength = (length) => {
-      common_vendor.index.__f__("log", "at components/dynamic/MoreImageUpload.vue:189", "线条长度:", length + "px");
+      console.log("线条长度:", length + "px");
     };
     const getRectPosition = (obj) => {
-      common_vendor.index.__f__("log", "at components/dynamic/MoreImageUpload.vue:194", "矩形位置:", obj);
+      console.log("矩形位置:", obj);
     };
     return (_ctx, _cache) => {
       return common_vendor.e({
@@ -131,7 +149,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         }),
         b: !imageList_mask.value || imageList_mask.value.length === 0
       }, !imageList_mask.value || imageList_mask.value.length === 0 ? {} : {
-        c: common_vendor.f([imageList_mask.value], (image, index, i0) => {
+        c: common_vendor.f(imageList_mask.value, (image, index, i0) => {
           return {
             a: image,
             b: index
@@ -163,4 +181,3 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
 });
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-96383370"]]);
 wx.createComponent(Component);
-//# sourceMappingURL=../../../.sourcemap/mp-weixin/components/dynamic/MoreImageUpload.js.map

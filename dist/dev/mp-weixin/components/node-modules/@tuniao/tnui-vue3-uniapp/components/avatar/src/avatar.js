@@ -59,4 +59,3 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
 });
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-3fca5491"]]);
 wx.createComponent(Component);
-//# sourceMappingURL=../../../../../../../../.sourcemap/mp-weixin/components/node-modules/@tuniao/tnui-vue3-uniapp/components/avatar/src/avatar.js.map

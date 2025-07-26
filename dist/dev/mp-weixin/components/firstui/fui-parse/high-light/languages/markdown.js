@@ -121,4 +121,3 @@ function markdown(hljs) {
   };
 }
 exports.markdown = markdown;
-//# sourceMappingURL=../../../../../../.sourcemap/mp-weixin/components/firstui/fui-parse/high-light/languages/markdown.js.map

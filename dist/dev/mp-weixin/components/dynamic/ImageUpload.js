@@ -26,7 +26,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       imageList.value = modelValue.value ? [modelValue.value] : [];
     });
     common_vendor.watch(imageList, () => {
-      common_vendor.index.__f__("log", "at components/dynamic/ImageUpload.vue:34", "imageList", imageList);
+      console.log("imageList", imageList);
       for (const item of imageList.value) {
         modelValue.value = item;
       }
@@ -36,7 +36,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const url = file.path;
       return new Promise(async (resolve, reject) => {
         const uploadResult = await utils_request.uploadFile(url);
-        common_vendor.index.__f__("log", "at components/dynamic/ImageUpload.vue:45", "uploadResult", uploadResult);
+        console.log("uploadResult", uploadResult);
         if (uploadResult) {
           resolve(uploadResult);
         }
@@ -64,4 +64,3 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
 });
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-6b5cdc15"]]);
 wx.createComponent(Component);
-//# sourceMappingURL=../../../.sourcemap/mp-weixin/components/dynamic/ImageUpload.js.map

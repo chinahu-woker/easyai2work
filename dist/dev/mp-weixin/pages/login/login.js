@@ -57,10 +57,10 @@ const _sfc_main = {
           const userData = JSON.parse(options.userData);
           username.value = userData.username;
           password.value = userData.password;
-          common_vendor.index.__f__("log", "at pages/login/login.vue:150", "loginOnload", options, userData);
-          common_vendor.index.__f__("log", "at pages/login/login.vue:151", "loginOnload---2", username.value, password.value);
+          console.log("loginOnload", options, userData);
+          console.log("loginOnload---2", username.value, password.value);
         } catch (error) {
-          common_vendor.index.__f__("error", "at pages/login/login.vue:153", "解析 userData 出错:", error);
+          console.error("解析 userData 出错:", error);
         }
       }
     });
@@ -82,7 +82,7 @@ const _sfc_main = {
           username: username.value,
           password: password.value
         });
-        common_vendor.index.__f__("log", "at pages/login/login.vue:179", "---------result------------", result);
+        console.log("---------result------------", result);
         if (result.status == 0) {
           common_vendor.index.showToast({
             title: "登录成功",
@@ -106,7 +106,7 @@ const _sfc_main = {
           title: "请求出错检查网络",
           icon: "none"
         });
-        common_vendor.index.__f__("error", "at pages/login/login.vue:206", "Login error:", error);
+        console.error("Login error:", error);
       }
     };
     const handleLoginByWechat = async () => {
@@ -134,7 +134,7 @@ const _sfc_main = {
           title: "微信登录失败",
           icon: "none"
         });
-        common_vendor.index.__f__("error", "at pages/login/login.vue:236", "Wechat login error:", error);
+        console.error("Wechat login error:", error);
       }
     };
     const toRegiest = () => {
@@ -209,4 +209,3 @@ const _sfc_main = {
 };
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-cdfe2409"]]);
 wx.createPage(MiniProgramPage);
-//# sourceMappingURL=../../../.sourcemap/mp-weixin/pages/login/login.js.map

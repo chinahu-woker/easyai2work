@@ -69,6 +69,9 @@
 					id="chj_imgEdit_canvas_hx" />
 				<canvas style="pointer-events: none;z-index: 4;" class="canvas" canvas-id="chj_imgEdit_canvas_cj"
 					id="chj_imgEdit_canvas_cj" />
+					<!-- 用于处理遮罩的临时canvas -->
+				<canvas style="visibility: hidden; position: absolute; z-index: -1;" class="canvas" 
+					canvas-id="mask_process_canvas" id="mask_process_canvas" />
 				<!-- </movable-view>
 			</movable-area> -->
 			</view>
@@ -484,27 +487,16 @@ export default {
 						tempFilePath = await this.canvasGetImagePath('chj_imgEdit_canvas_save', this.bgPosition);
 					}
 					
-					const maskFilePath = await this.canvasGetImagePath('chj_imgEdit_canvas');
-					const convertToBase64 = (path) => {
-						return new Promise((resolve, reject) => {
-							uni.getFileSystemManager().readFile({
-								filePath: path,
-								encoding: 'base64',
-								success: (res) => resolve(`data:image/png;base64,${res.data}`),
-								fail: reject
-							})
-						})
-					};
-					// const [originalBase64, maskBase64] = await Promise.all([
-					// 	convertToBase64(this.path),
-					// 	convertToBase64(tempFilePath)
-					// ]);
-
-
-					// this.$emit('confirm',tempFilePath);
-					// this.$emit('confirm', [this.path, tempFilePath]);
-					const emitData = { paths:[this.path,maskFilePath],Sync:tempFilePath}
-					this.$emit('confirm',emitData);
+					// 获取遮罩图路径（绘制路径透明，其余部分纯色）
+					const maskFilePath = await this.createTransparentMask();
+					
+					// 返回原图和遮罩图路径
+					const emitData = { 
+						originPath: this.path,  // 原图路径
+						maskPath: maskFilePath  // 遮罩图路径（绘制路径透明，其余部分纯色）
+					}
+					
+					this.$emit('confirm', emitData);
 					this.show = false;
 					uni.hideLoading();
 					// #ifdef H5
@@ -513,6 +505,74 @@ export default {
 					// #endif
 				});
 			}
+		},
+		// 创建透明遮罩（绘制路径为透明，其余部分为纯色）
+		async createTransparentMask() {
+  return new Promise((resolve, reject) => {
+    const query = uni.createSelectorQuery().in(this);
+    query.select('#chj_imgEdit_canvas').boundingClientRect((data) => {
+      if (!data) {
+        reject('未找到画布元素');
+        return;
+      }
+      const { width, height } = data;
+      // 先导出用户路径
+      uni.canvasToTempFilePath({
+        canvasId: 'chj_imgEdit_canvas',
+        width, height,
+        destWidth: width, destHeight: height,
+        success: (res) => {
+          // 1. 先填充纯色
+          const maskCtx = uni.createCanvasContext('mask_process_canvas', this);
+          maskCtx.setFillStyle('#FFFFFF'); // 遮罩色
+          maskCtx.fillRect(0, 0, width, height);
+          // 2. destination-out 用户路径
+          maskCtx.globalCompositeOperation = 'destination-out';
+          maskCtx.drawImage(res.tempFilePath, 0, 0, width, height);
+          // 3. draw 一次，必须 reserve=false
+          maskCtx.draw(false, () => {
+            // 4. 导出遮罩
+            uni.canvasToTempFilePath({
+              canvasId: 'mask_process_canvas',
+              width, height,
+              destWidth: width, destHeight: height,
+              success: (maskRes) => resolve(maskRes.tempFilePath),
+              fail: () => resolve(res.tempFilePath)
+            }, this);
+          });
+        },
+        fail: (err) => reject('导出遮罩失败：' + err.errMsg)
+      }, this);
+    }).exec();
+  });
+},
+		// 创建遮罩的备选方案
+		createMaskFallback(tempFilePath, width, height, resolve) {
+			// 创建遮罩canvas上下文
+			const maskCtx = uni.createCanvasContext('mask_process_canvas', this);
+			
+			// 填充透明背景
+			maskCtx.clearRect(0, 0, width, height);
+			maskCtx.draw();
+			
+			// 等待清空完成
+			setTimeout(() => {
+				// 绘制原始图像
+				maskCtx.drawImage(tempFilePath, 0, 0, width, height);
+				maskCtx.draw(false, () => {
+					// 导出处理后的遮罩
+					uni.canvasToTempFilePath({
+						canvasId: 'mask_process_canvas',
+						success: (maskRes) => {
+							resolve(maskRes.tempFilePath);
+						},
+						fail: () => {
+							// 失败时返回原始路径
+							resolve(tempFilePath);
+						}
+					}, this);
+				});
+			}, 100);
 		},
 		// 取消
 		async cancel() {
@@ -556,20 +616,26 @@ export default {
 			this.ctx_text.clearRect(0, 0, 10000, 10000);
 			this.ctx_save.clearRect(0, 0, 10000, 10000);
 			this.ctx_cj.clearRect(0, 0, 10000, 10000);
-			this.ctx.draw();
+			
+			// 设置背景画布为纯白色
+			this.ctx_bg.setFillStyle('#FFFFFF');
+			this.ctx_bg.fillRect(0, 0, 10000, 10000);
 			this.ctx_bg.draw();
+			
+			this.ctx.draw();
 			this.ctx_hx.draw();
 			this.ctx_text.draw();
 			this.ctx_save.draw();
 			this.ctx_cj.draw();
+			
 			// 当前激活的操作
 			this.tx_list_activate = '画笔';
 			// 当前激活的是笔还是橡皮
 			this.tx_type_activate = '笔';
-			// 当前笔的颜色
-			this.pan_color = '#000';
+			// 当前笔的颜色（黑色，用户可见）
+			this.pan_color = '#000000';
 			// 笔或橡皮的大小
-			this.pen_size = 10;
+			this.pen_size = 50;
 			// 选中的颜色
 			this.active_color_id = '1';
 			// 绘画历史记录
@@ -887,19 +953,30 @@ export default {
 			// #ifdef MP-WEIXIN
 			if (this.tx_type_activate != '橡皮') {
 				this.setCanvasStyle();
-				this.ctx.lineTo(x, y);
-				this.ctx.stroke();
+				// 绘制圆形让用户看到路径
+				this.ctx.beginPath();
+				this.ctx.arc(x, y, this.pen_size/2, 0, 2 * Math.PI);
+				this.ctx.fill();
 				this.ctx.draw(true);
-				this.ctx.moveTo(x, y);
 			}
 			// #endif
 			// #ifndef MP-WEIXIN
 			this.setCanvasStyle();
-			this.ctx.lineTo(x, y);
-			this.ctx.stroke();
+			// 绘制圆形让用户看到路径
+			this.ctx.beginPath();
+			this.ctx.arc(x, y, this.pen_size/2, 0, 2 * Math.PI);
+			this.ctx.fill();
 			this.ctx.draw(true);
-			this.ctx.moveTo(x, y);
 			// #endif
+		},
+		drawLineHX({ x, y }) {
+			if (this.tx_list_activate != '画笔' || this.tx_type_activate == '橡皮') return;
+			this.setCanvasStyle();
+			// 在回显canvas上绘制圆形
+			this.ctx_hx.beginPath();
+			this.ctx_hx.arc(x, y, this.pen_size/2, 0, 2 * Math.PI);
+			this.ctx_hx.fill();
+			this.ctx_hx.draw(true);
 		},
 		// 画矩形
 		drawRect({ x, y }) {
@@ -1355,10 +1432,22 @@ export default {
 			this.setTextSize(this.pen_size);
 		},
 		// 设置canvas画图所有的样式
+		// 设置canvas画图所有的样式
 		setCanvasStyle() {
-			this.setStrokeStyle();
-			this.sliderChange();
-			this.changeType();
+			// 使用当前选中的颜色绘制，让用户可以看到绘制路径
+			this.ctx.setFillStyle(this.pan_color);
+			this.ctx.setStrokeStyle(this.pan_color);
+			this.ctx.setLineWidth(this.pen_size);
+			this.ctx.setLineJoin('round');
+			this.ctx.setLineCap('round');
+			// 把回显canvas也设置了
+			this.ctx_hx.setFillStyle(this.pan_color);
+			this.ctx_hx.setStrokeStyle(this.pan_color);
+			this.ctx_hx.setLineWidth(this.pen_size);
+			this.ctx_hx.setLineJoin('round');
+			this.ctx_hx.setLineCap('round');
+			// 设置文本大小
+			this.setTextSize(this.pen_size);
 		},
 		// 获取图片的参数
 		imgInfo(src) {
