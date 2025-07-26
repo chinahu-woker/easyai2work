@@ -443,8 +443,52 @@ export default {
 			}
 			this.show = true;
 			this.$nextTick(() => {
+				// 重置所有状态后再初始化画布
+				this.resetAllState();
 				this.initCanvas();
+				 
 			});
+		},
+		
+		// 重置所有状态
+		resetAllState() {
+			// 重置操作状态
+			this.tx_list_activate = '画笔';
+			this.tx_type_activate = '笔';
+			// 重置颜色
+			this.pan_color = '#000000';
+			this.active_color_id = '1';
+			// 重置笔刷大小
+			this.pen_size = 50;
+			// 清空历史记录
+			this.history_list = [];
+			this.history_index = -1;
+			// 清空文本
+			this.textList = [];
+			// 重置旋转角度
+			this.degrees = 0;
+			// 重置裁剪数据
+			this.cj_data = {
+				x: 0,
+				y: 0,
+				width: 0,
+				height: 0,
+				dragging: false,
+				edge: null
+			};
+			// 重置背景位置
+			this.bgPosition = {
+				x: 0,
+				y: 0,
+				width: 0,
+				height: 0
+			};
+			this.bgPositionFlip_false = {
+				x: 0,
+				y: 0,
+				width: 0,
+				height: 0
+			};
 		},
 		// 确定
 		async confirm() {
@@ -593,6 +637,7 @@ export default {
 			this.x = 0;
 			this.y = 0;
 		},
+		// 初始化canvas
 		// 初始化canvas
 		initCanvas() {
 			// #ifdef H5

@@ -156,25 +156,28 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           };
         })
       }, {
-        d: common_vendor.sr(chjImgEditRef, "96383370-2,96383370-1", {
+        d: show.value
+      }, show.value ? {
+        e: common_vendor.sr(chjImgEditRef, "96383370-2,96383370-1", {
           "k": "chjImgEditRef"
         }),
-        e: common_vendor.o(getLineLength),
-        f: common_vendor.o(getRectPosition),
-        g: common_vendor.o(confirm),
-        h: common_vendor.o(cancel),
-        i: common_vendor.p({
+        f: imagePath.value,
+        g: common_vendor.o(getLineLength),
+        h: common_vendor.o(getRectPosition),
+        i: common_vendor.o(confirm),
+        j: common_vendor.o(cancel),
+        k: common_vendor.p({
           isAllCanvas: false,
           ["image-path"]: imagePath.value
         }),
-        j: common_vendor.o(zehzhao),
-        k: common_vendor.p({
+        l: common_vendor.o(zehzhao),
+        m: common_vendor.p({
           show: show.value,
           closable: true
-        }),
-        l: show.value,
-        m: common_vendor.o(onClick),
-        n: common_vendor.gei(_ctx, "")
+        })
+      } : {}, {
+        n: common_vendor.o(onClick),
+        o: common_vendor.gei(_ctx, "")
       });
     };
   }

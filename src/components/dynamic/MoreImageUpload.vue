@@ -28,9 +28,10 @@
     </view>
 
     <!-- 图片编辑弹窗，v-show 控制显隐 -->
-    <view v-show="show" class="editor-wrapper">
+    <view v-if="show" class="editor-wrapper">
       <fui-backdrop :show="show" closable @click="zehzhao">
         <chj-imgEdit 
+        :key="imagePath" 
           :isAllCanvas="false" 
           :image-path="imagePath" 
           ref="chjImgEditRef"

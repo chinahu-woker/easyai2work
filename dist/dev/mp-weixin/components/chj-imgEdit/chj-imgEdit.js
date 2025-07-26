@@ -281,8 +281,41 @@ const _sfc_main = {
       }
       this.show = true;
       this.$nextTick(() => {
+        this.resetAllState();
         this.initCanvas();
       });
+    },
+    // 重置所有状态
+    resetAllState() {
+      this.tx_list_activate = "画笔";
+      this.tx_type_activate = "笔";
+      this.pan_color = "#000000";
+      this.active_color_id = "1";
+      this.pen_size = 50;
+      this.history_list = [];
+      this.history_index = -1;
+      this.textList = [];
+      this.degrees = 0;
+      this.cj_data = {
+        x: 0,
+        y: 0,
+        width: 0,
+        height: 0,
+        dragging: false,
+        edge: null
+      };
+      this.bgPosition = {
+        x: 0,
+        y: 0,
+        width: 0,
+        height: 0
+      };
+      this.bgPositionFlip_false = {
+        x: 0,
+        y: 0,
+        width: 0,
+        height: 0
+      };
     },
     // 确定
     async confirm() {
@@ -405,6 +438,7 @@ const _sfc_main = {
       this.x = 0;
       this.y = 0;
     },
+    // 初始化canvas
     // 初始化canvas
     initCanvas() {
       this.ctx = common_vendor.index.createCanvasContext("chj_imgEdit_canvas", this);
