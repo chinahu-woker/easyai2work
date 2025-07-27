@@ -94,13 +94,13 @@ function useWorkFlow() {
     if (!composables_useCommon.isLogin.value) {
       throw new Error("未登录状态，不允许初始化Websocket");
     }
-    console.log("socket init execution，status", (_a = socketState.socket) == null ? void 0 : _a.readyState);
+    common_vendor.index.__f__("log", "at composables/useWorkFlow.ts:152", "socket init execution，status", (_a = socketState.socket) == null ? void 0 : _a.readyState);
     if ((socketState == null ? void 0 : socketState.isInitialized) && ((_c = (_b = socketState.options) == null ? void 0 : _b.params) == null ? void 0 : _c.type) === ((_d = options == null ? void 0 : options.params) == null ? void 0 : _d.type)) {
-      console.log("WebSocket is already initialized");
+      common_vendor.index.__f__("log", "at composables/useWorkFlow.ts:154", "WebSocket is already initialized");
       return;
     }
     if ((socketState == null ? void 0 : socketState.isInitialized) && ((_f = (_e = socketState == null ? void 0 : socketState.options) == null ? void 0 : _e.params) == null ? void 0 : _f.type) !== ((_g = options == null ? void 0 : options.params) == null ? void 0 : _g.type)) {
-      console.log("WebSocket is already initialized,but scene is different,reinitialize");
+      common_vendor.index.__f__("log", "at composables/useWorkFlow.ts:159", "WebSocket is already initialized,but scene is different,reinitialize");
       await closeSocketAsync();
       socketState.isInitialized = false;
     }
@@ -111,12 +111,12 @@ function useWorkFlow() {
     socketState.socket = common_vendor.index.connectSocket({
       url,
       complete: () => {
-        console.log("WebSocket connect complete");
+        common_vendor.index.__f__("log", "at composables/useWorkFlow.ts:172", "WebSocket connect complete");
       }
     });
     socketState.isInitialized = true;
     common_vendor.index.onSocketOpen((result) => {
-      console.log("WebSocket opened", result);
+      common_vendor.index.__f__("log", "at composables/useWorkFlow.ts:177", "WebSocket opened", result);
       socketState.options = options;
       if (options.onConnect) {
         options.onConnect();
@@ -129,7 +129,7 @@ function useWorkFlow() {
       handleSocketMessage(msg.data);
     });
     common_vendor.index.onSocketError((err) => {
-      console.error("WebSocket onError", err);
+      common_vendor.index.__f__("error", "at composables/useWorkFlow.ts:191", "WebSocket onError", err);
       socketState.isInitialized = false;
       if (options.onConnectError) {
         options.onConnectError(err);
@@ -137,7 +137,7 @@ function useWorkFlow() {
     });
     common_vendor.index.onSocketClose(() => {
       socketState.isInitialized = false;
-      console.log("WebSocket onClose");
+      common_vendor.index.__f__("log", "at composables/useWorkFlow.ts:199", "WebSocket onClose");
       if (options.onDisconnect) {
         options.onDisconnect();
       }
@@ -156,7 +156,7 @@ function useWorkFlow() {
       (_a = socketState.socket) == null ? void 0 : _a.send({
         data: "ping",
         success(result) {
-          console.log(result);
+          common_vendor.index.__f__("log", "at composables/useWorkFlow.ts:219", result);
           clearTimeout(timeoutID);
           resolve(true);
         }
@@ -165,7 +165,7 @@ function useWorkFlow() {
   };
   const handleSocketMessage = (msg, callback) => {
     var _a, _b;
-    console.log("原始消息", msg);
+    common_vendor.index.__f__("log", "at composables/useWorkFlow.ts:274", "原始消息", msg);
     if (typeof msg !== "string" || !msg.startsWith("{") && !msg.startsWith("[")) {
       return;
     }
@@ -173,7 +173,7 @@ function useWorkFlow() {
     try {
       msgObj = utils_common.parseJSONToObject(msg);
     } catch (error) {
-      console.error("解析WebSocket消息时出错，消息不是有效的JSON格式:", error);
+      common_vendor.index.__f__("error", "at composables/useWorkFlow.ts:283", "解析WebSocket消息时出错，消息不是有效的JSON格式:", error);
       return;
     }
     if (!msgObj)
@@ -248,7 +248,7 @@ function useWorkFlow() {
       await socketInit();
     }
     const newTask = await handleCreateTask();
-    console.log("newTask", newTask);
+    common_vendor.index.__f__("log", "at composables/useWorkFlow.ts:382", "newTask", newTask);
     if (!newTask) {
       return;
     }
@@ -295,3 +295,4 @@ function useWorkFlow() {
 }
 exports.getModelListByWorkflowId = getModelListByWorkflowId;
 exports.useWorkFlow = useWorkFlow;
+//# sourceMappingURL=../../.sourcemap/mp-weixin/composables/useWorkFlow.js.map

@@ -33,14 +33,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return new Promise(async (resolve, reject) => {
         try {
           const uploadResult = await utils_request.uploadFile(url);
-          console.log("uploadResult", uploadResult);
+          common_vendor.index.__f__("log", "at components/dynamic/ImageUploadMore.vue:43", "uploadResult", uploadResult);
           if (uploadResult) {
             resolve(uploadResult);
           } else {
             reject(new Error("上传失败"));
           }
         } catch (error) {
-          console.error("上传错误", error);
+          common_vendor.index.__f__("error", "at components/dynamic/ImageUploadMore.vue:51", "上传错误", error);
           reject(error);
         }
       });
@@ -73,3 +73,4 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
 });
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-20b9aaaa"]]);
 wx.createComponent(Component);
+//# sourceMappingURL=../../../.sourcemap/mp-weixin/components/dynamic/ImageUploadMore.js.map

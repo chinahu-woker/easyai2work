@@ -29,7 +29,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     });
     function onTabClick(e) {
       e.index;
-      console.log("tabClick", e.index);
+      common_vendor.index.__f__("log", "at pages/console/console.vue:67", "tabClick", e.index);
       if (e.index == 1) {
         managerInfo();
       }
@@ -38,7 +38,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const url = file.path;
       return new Promise(async (resolve, reject) => {
         const uploadResult = await utils_request.uploadFile(url);
-        console.log("uploadResult", uploadResult);
+        common_vendor.index.__f__("log", "at pages/console/console.vue:77", "uploadResult", uploadResult);
         subPicUrl.value = uploadResult;
         if (uploadResult) {
           resolve(uploadResult);
@@ -58,13 +58,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           "label": ""
         });
       });
-      console.log("Newdata的值是", Newdata);
+      common_vendor.index.__f__("log", "at pages/console/console.vue:102", "Newdata的值是", Newdata);
       const token = common_vendor.ref();
       await composables_aiChat.getUserToken().then((res) => {
-        console.log("getUserToken获取到的getUserToken信息:", res.data);
+        common_vendor.index.__f__("log", "at pages/console/console.vue:105", "getUserToken获取到的getUserToken信息:", res.data);
         token.value = res.data.token;
       }).catch((err) => {
-        console.error("getUserToken获取getUserToken失败:", err);
+        common_vendor.index.__f__("error", "at pages/console/console.vue:108", "getUserToken获取getUserToken失败:", err);
         common_vendor.index.showToast({
           title: "Token失效",
           duration: 2e3
@@ -72,7 +72,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         return 0;
       });
       await composables_console.SubmitSwiper(token.value, { "home_banner": Newdata }).then((res) => {
-        console.log("Newdata的回调值是", { "home_banner": Newdata });
+        common_vendor.index.__f__("log", "at pages/console/console.vue:117", "Newdata的回调值是", { "home_banner": Newdata });
         allData.value = res.data;
         managerData.value = res.data.home_banner.map((a) => a.src);
         common_vendor.index.showToast({
@@ -80,23 +80,23 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           duration: 2e3
         });
       }).catch((err) => {
-        console.error("获取getUserToken失败:", err);
+        common_vendor.index.__f__("error", "at pages/console/console.vue:125", "获取getUserToken失败:", err);
       });
     }
     async function managerInfo() {
       const token = common_vendor.ref();
       await composables_aiChat.getUserToken().then((res) => {
-        console.log("managerInfo获取到的getUserToken信息:", res.data);
+        common_vendor.index.__f__("log", "at pages/console/console.vue:132", "managerInfo获取到的getUserToken信息:", res.data);
         token.value = res.data.token;
       }).catch((err) => {
-        console.error("获取getUserToken失败:", err);
+        common_vendor.index.__f__("error", "at pages/console/console.vue:136", "获取getUserToken失败:", err);
       });
       await composables_console.GetAllManagerInfor(token.value).then((res) => {
-        console.log("managerInfo获取到的managerInfo信息:", res.data);
+        common_vendor.index.__f__("log", "at pages/console/console.vue:139", "managerInfo获取到的managerInfo信息:", res.data);
         allData.value = res.data;
         managerData.value = res.data.home_banner.map((a) => a.src);
       }).catch((err) => {
-        console.error("获取getUserToken失败:", err);
+        common_vendor.index.__f__("error", "at pages/console/console.vue:143", "获取getUserToken失败:", err);
       });
     }
     const vtabs = [
@@ -163,3 +163,4 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   }
 });
 wx.createPage(_sfc_main);
+//# sourceMappingURL=../../../.sourcemap/mp-weixin/pages/console/console.js.map

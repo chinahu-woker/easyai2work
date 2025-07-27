@@ -54,19 +54,19 @@ const _sfc_main = {
       });
     },
     confirm(path) {
-      console.log("确定");
+      common_vendor.index.__f__("log", "at pages/draw/image-editor.vue:62", "确定");
       common_vendor.index.previewImage({
         urls: [path]
       });
     },
     cancel() {
-      console.log("取消");
+      common_vendor.index.__f__("log", "at pages/draw/image-editor.vue:68", "取消");
     },
     getLineLength(length) {
-      console.log("获取线条长度" + length + "px");
+      common_vendor.index.__f__("log", "at pages/draw/image-editor.vue:71", "获取线条长度" + length + "px");
     },
     getRectPosition(obj) {
-      console.log(obj);
+      common_vendor.index.__f__("log", "at pages/draw/image-editor.vue:74", obj);
     }
   }
 };
@@ -94,3 +94,4 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
 }
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render]]);
 wx.createPage(MiniProgramPage);
+//# sourceMappingURL=../../../.sourcemap/mp-weixin/pages/draw/image-editor.js.map

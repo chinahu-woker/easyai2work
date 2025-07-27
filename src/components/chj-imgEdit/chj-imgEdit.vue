@@ -312,13 +312,13 @@ export default {
 			// 颜色list
 			color_list: [
 				{ id: '1', type: '默认', color: '#000' },
-				{ id: '2', type: '默认', color: '#fff' },
-				{ id: '3', type: '默认', color: '#ff0000' },
-				{ id: '4', type: '默认', color: '#ffaa00' },
-				{ id: '5', type: '默认', color: '#00aa00' },
-				{ id: '6', type: '默认', color: '#0055ff' },
-				{ id: '7', type: '默认', color: '#aa00ff' },
-				{ id: '8', type: '选择', color: '' },
+				// { id: '2', type: '默认', color: '#fff' },
+				// { id: '3', type: '默认', color: '#ff0000' },
+				// { id: '4', type: '默认', color: '#ffaa00' },
+				// { id: '5', type: '默认', color: '#00aa00' },
+				// { id: '6', type: '默认', color: '#0055ff' },
+				// { id: '7', type: '默认', color: '#aa00ff' },
+				// { id: '8', type: '选择', color: '' },
 			],
 			// 选中的颜色
 			active_color_id: '1',

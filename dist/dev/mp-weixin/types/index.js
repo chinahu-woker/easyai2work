@@ -15,3 +15,4 @@ var IWebsocketSceneType = /* @__PURE__ */ ((IWebsocketSceneType2) => {
 })(IWebsocketSceneType || {});
 exports.IPayChannel = IPayChannel;
 exports.IWebsocketSceneType = IWebsocketSceneType;
+//# sourceMappingURL=../../.sourcemap/mp-weixin/types/index.js.map

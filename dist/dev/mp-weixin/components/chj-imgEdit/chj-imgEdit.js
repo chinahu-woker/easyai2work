@@ -164,14 +164,14 @@ const _sfc_main = {
       history_index: -1,
       // 颜色list
       color_list: [
-        { id: "1", type: "默认", color: "#000" },
-        { id: "2", type: "默认", color: "#fff" },
-        { id: "3", type: "默认", color: "#ff0000" },
-        { id: "4", type: "默认", color: "#ffaa00" },
-        { id: "5", type: "默认", color: "#00aa00" },
-        { id: "6", type: "默认", color: "#0055ff" },
-        { id: "7", type: "默认", color: "#aa00ff" },
-        { id: "8", type: "选择", color: "" }
+        { id: "1", type: "默认", color: "#000" }
+        // { id: '2', type: '默认', color: '#fff' },
+        // { id: '3', type: '默认', color: '#ff0000' },
+        // { id: '4', type: '默认', color: '#ffaa00' },
+        // { id: '5', type: '默认', color: '#00aa00' },
+        // { id: '6', type: '默认', color: '#0055ff' },
+        // { id: '7', type: '默认', color: '#aa00ff' },
+        // { id: '8', type: '选择', color: '' },
       ],
       // 选中的颜色
       active_color_id: "1",
@@ -1434,3 +1434,4 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-9a4b8c37"]]);
 wx.createComponent(Component);
+//# sourceMappingURL=../../../.sourcemap/mp-weixin/components/chj-imgEdit/chj-imgEdit.js.map

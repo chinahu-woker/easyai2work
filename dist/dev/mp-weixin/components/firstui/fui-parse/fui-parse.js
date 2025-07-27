@@ -422,3 +422,4 @@ wx.createComponent(Component);
 const RjovTXlHaXRodWIvbXlzZWxmLWFjZ2ktbXB3ZWl4aW4vc3JjL2NvbXBvbmVudHMvZmlyc3R1aS9mdWktcGFyc2UvZnVpLXBhcnNlLnZ1ZQ = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null
 }, Symbol.toStringTag, { value: "Module" }));
+//# sourceMappingURL=../../../../.sourcemap/mp-weixin/components/firstui/fui-parse/fui-parse.js.map

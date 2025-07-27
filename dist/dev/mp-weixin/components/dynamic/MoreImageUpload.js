@@ -80,16 +80,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
               }
             });
           } else {
-            console.error("chj-imgEdit组件异常");
+            common_vendor.index.__f__("error", "at components/dynamic/MoreImageUpload.vue:132", "chj-imgEdit组件异常");
             show.value = false;
           }
         }
       } catch (error) {
-        console.error("选择图片失败:", error);
+        common_vendor.index.__f__("error", "at components/dynamic/MoreImageUpload.vue:137", "选择图片失败:", error);
       }
     };
     const zehzhao = () => {
-      console.log("用户点击了遮罩");
+      common_vendor.index.__f__("log", "at components/dynamic/MoreImageUpload.vue:143", "用户点击了遮罩");
     };
     const waitForComponentReady = async () => {
       const maxRetries = 10;
@@ -101,46 +101,46 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         retries++;
       }
       if (retries >= maxRetries) {
-        console.warn("等待组件超时");
+        common_vendor.index.__f__("warn", "at components/dynamic/MoreImageUpload.vue:159", "等待组件超时");
       }
     };
     const imageList_mask = common_vendor.ref([]);
     const confirm = async (emtData) => {
-      console.log("编辑确认，返回数据:", emtData);
+      common_vendor.index.__f__("log", "at components/dynamic/MoreImageUpload.vue:194", "编辑确认，返回数据:", emtData);
       try {
         const { originPath, maskPath } = emtData;
         if (!originPath || !maskPath) {
           throw new Error("缺少原图或遮罩图路径");
         }
         const [originResult, maskResult] = await Promise.all([
-          utils_request.uploadFile(originPath, "/file/upload"),
-          utils_request.uploadFile(maskPath, "/file/upload")
+          utils_request.uploadFile(originPath),
+          utils_request.uploadFile(maskPath)
         ]);
         const uploadResults = await Promise.all([originResult, maskResult]);
-        console.log("uploadResults", uploadResults);
+        common_vendor.index.__f__("log", "at components/dynamic/MoreImageUpload.vue:209", "uploadResults", uploadResults);
         const result = {
           // 替换为工作流中定义的参数name（示例：originUrl和maskUrl）
           "advance_onlineEdit_origin": originResult,
           "advance_onlineEdit_mask": maskResult
         };
         modelValue.value = result;
-        console.log("上传成功，结果:", result);
+        common_vendor.index.__f__("log", "at components/dynamic/MoreImageUpload.vue:221", "上传成功，结果:", result);
         common_vendor.index.showToast({ title: "上传成功", icon: "success" });
       } catch (error) {
-        console.error("图片上传失败:", error);
+        common_vendor.index.__f__("error", "at components/dynamic/MoreImageUpload.vue:224", "图片上传失败:", error);
         common_vendor.index.showToast({ title: "上传失败: " + error.message, icon: "error" });
       }
       show.value = false;
     };
     const cancel = () => {
-      console.log("编辑取消");
+      common_vendor.index.__f__("log", "at components/dynamic/MoreImageUpload.vue:231", "编辑取消");
       show.value = false;
     };
     const getLineLength = (length) => {
-      console.log("线条长度:", length + "px");
+      common_vendor.index.__f__("log", "at components/dynamic/MoreImageUpload.vue:237", "线条长度:", length + "px");
     };
     const getRectPosition = (obj) => {
-      console.log("矩形位置:", obj);
+      common_vendor.index.__f__("log", "at components/dynamic/MoreImageUpload.vue:242", "矩形位置:", obj);
     };
     return (_ctx, _cache) => {
       return common_vendor.e({
@@ -184,3 +184,4 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
 });
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-96383370"]]);
 wx.createComponent(Component);
+//# sourceMappingURL=../../../.sourcemap/mp-weixin/components/dynamic/MoreImageUpload.js.map

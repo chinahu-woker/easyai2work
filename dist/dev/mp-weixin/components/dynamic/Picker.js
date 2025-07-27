@@ -42,7 +42,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     });
     const selected = common_vendor.useModel(__props, "modelValue");
     const handleConfirm = (item) => {
-      console.log("confirm", item);
+      common_vendor.index.__f__("log", "at components/dynamic/Picker.vue:47", "confirm", item);
       if (!item)
         return;
       selected.value = item;
@@ -82,3 +82,4 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   }
 });
 wx.createComponent(_sfc_main);
+//# sourceMappingURL=../../../.sourcemap/mp-weixin/components/dynamic/Picker.js.map

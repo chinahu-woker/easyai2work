@@ -202,8 +202,8 @@ const confirm = async (emtData) => {
 
     // 分别上传原图和遮罩图，使用与ImageUpload.vue一致的上传逻辑
     const [originResult, maskResult] = await Promise.all([
-      uploadFile(originPath, '/file/upload' ),
-      uploadFile( maskPath,'/file/upload' )
+       uploadFile<string>(originPath),
+      uploadFile<string>(maskPath)
     ]);
     const uploadResults = await Promise.all([originResult, maskResult]);
     console.log("uploadResults", uploadResults);

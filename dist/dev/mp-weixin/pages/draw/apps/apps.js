@@ -41,10 +41,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       handleGetWorkFlwById,
       workFlowParamLists,
       bindParam,
+      params_component_list,
+      socketInit,
       handleFindComponentName,
       handleSubmitTaskTask
     } = composables_useWorkFlow.useWorkFlow();
-    console.log("--------------------------", workFlowParamLists);
+    common_vendor.index.__f__("log", "at pages/draw/apps/apps.vue:75", "--------------------------", workFlowParamLists);
     const workflowId = common_vendor.ref("");
     common_vendor.onLoad(async () => {
       const currentPage = getCurrentPages().pop();
@@ -65,7 +67,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const FlotButton = common_vendor.ref("空闲");
     const currentSwiperIndex = common_vendor.ref(0);
     common_vendor.watch(currentSwiperIndex, () => {
-      console.log("currentSwiperIndex", currentSwiperIndex.value);
+      common_vendor.index.__f__("log", "at pages/draw/apps/apps.vue:106", "currentSwiperIndex", currentSwiperIndex.value);
     });
     const { localTasks } = common_vendor.storeToRefs(stores_appStore.useAppStore());
     const currentProgress = common_vendor.computed(() => {
@@ -145,13 +147,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       const imageRegex = /\.(jpg|jpeg|png|gif|bmp)$/i;
       const videoRegex = /\.(mp3|wav|ogg)$/i;
       if (!input) {
-        console.log("==============", "是空值");
+        common_vendor.index.__f__("log", "at pages/draw/apps/apps.vue:247", "==============", "是空值");
         return 0;
       } else if (imageRegex.test(input)) {
-        console.log("==============", "是图片");
+        common_vendor.index.__f__("log", "at pages/draw/apps/apps.vue:252", "==============", "是图片");
         return 1;
       } else if (videoRegex.test(input)) {
-        console.log("==============", "是音频");
+        common_vendor.index.__f__("log", "at pages/draw/apps/apps.vue:257", "==============", "是音频");
         return 2;
       }
     }
@@ -324,3 +326,4 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
 });
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-6cf62e12"]]);
 wx.createPage(MiniProgramPage);
+//# sourceMappingURL=../../../../.sourcemap/mp-weixin/pages/draw/apps/apps.js.map

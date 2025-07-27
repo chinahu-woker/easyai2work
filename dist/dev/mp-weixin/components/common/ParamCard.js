@@ -22,3 +22,4 @@ function _sfc_render(_ctx, _cache) {
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-ebc1f76e"]]);
 wx.createComponent(Component);
+//# sourceMappingURL=../../../.sourcemap/mp-weixin/components/common/ParamCard.js.map

@@ -22,17 +22,17 @@ const _sfc_defineComponent = common_vendor.defineComponent({
   __name: "App",
   setup(__props) {
     common_vendor.onShow(() => {
-      console.log("App onShow");
+      common_vendor.index.__f__("log", "at App.vue:9", "App onShow");
     });
     common_vendor.onHide(() => {
-      console.log("App onHide");
+      common_vendor.index.__f__("log", "at App.vue:12", "App onHide");
     });
     stores_appStore.useAppStore().init();
     const socketState = common_vendor.reactive({ socket: null, isInitialized: false });
     common_vendor.provide("socketState", socketState);
     common_vendor.index.getSystemInfo({
       success: (res) => {
-        console.log("平台信息", res.uniPlatform);
+        common_vendor.index.__f__("log", "at App.vue:23", "平台信息", res.uniPlatform);
       }
     });
     return () => {
@@ -51,3 +51,4 @@ function createApp() {
 }
 createApp().app.mount("#app");
 exports.createApp = createApp;
+//# sourceMappingURL=../.sourcemap/mp-weixin/app.js.map

@@ -43,7 +43,7 @@ const _sfc_main = {
       this.innerAudioContext = common_vendor.index.createInnerAudioContext();
       this.innerAudioContext.src = src;
       this.innerAudioContext.onPlay(() => {
-        console.log("开始播放");
+        common_vendor.index.__f__("log", "at components/firstui/fui-parse/firstui-audio.vue:73", "开始播放");
       });
       this.innerAudioContext.onCanplay(() => {
         this.innerAudioContext.duration;
@@ -53,8 +53,8 @@ const _sfc_main = {
         }, 1e3);
       });
       this.innerAudioContext.onError((res) => {
-        console.log(res.errMsg);
-        console.log(res.errCode);
+        common_vendor.index.__f__("log", "at components/firstui/fui-parse/firstui-audio.vue:86", res.errMsg);
+        common_vendor.index.__f__("log", "at components/firstui/fui-parse/firstui-audio.vue:87", res.errCode);
       });
       this.innerAudioContext.onEnded(() => {
         this.isPlay = false;
@@ -105,3 +105,4 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
 }
 const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-330431b2"]]);
 wx.createComponent(Component);
+//# sourceMappingURL=../../../../.sourcemap/mp-weixin/components/firstui/fui-parse/firstui-audio.js.map

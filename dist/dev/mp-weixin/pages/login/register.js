@@ -64,7 +64,7 @@ const _sfc_main = {
           common_vendor.index.showToast({ title: response.message || "注册失败！" });
         }
       } catch (error) {
-        console.error("注册失败:", error);
+        common_vendor.index.__f__("error", "at pages/login/register.vue:125", "注册失败:", error);
         throw error;
       }
     }
@@ -85,13 +85,13 @@ const _sfc_main = {
           "inviteCode": ""
         };
         const response = await toregist(userData);
-        console.log("regiest", response);
+        common_vendor.index.__f__("log", "at pages/login/register.vue:150", "regiest", response);
         setTimeout(() => {
           common_vendor.index.redirectTo({ url: `/pages/login/login?userData=${JSON.stringify(response.data)}` });
         }, 1500);
       } catch (error) {
         common_vendor.index.showToast({ title: "注册失败", icon: "none" });
-        console.error("注册错误:", error);
+        common_vendor.index.__f__("error", "at pages/login/register.vue:158", "注册错误:", error);
       }
     };
     const backToLogin = () => {
@@ -150,3 +150,4 @@ const _sfc_main = {
 };
 const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["__scopeId", "data-v-12565c11"]]);
 wx.createPage(MiniProgramPage);
+//# sourceMappingURL=../../../.sourcemap/mp-weixin/pages/login/register.js.map
