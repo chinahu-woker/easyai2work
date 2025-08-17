@@ -1,0 +1,8 @@
+{
+  "component": true,
+  "usingComponents": {
+    "firstui-code": "./firstui-code",
+    "firstui-audio": "./firstui-audio",
+    "fui-parse": "./fui-parse"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "component": true,
+  "usingComponents": {
+    "tn-lazy-load": "../../lazy-load/src/lazy-load"
+  }
+}

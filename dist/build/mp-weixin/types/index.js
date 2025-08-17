@@ -1,0 +1,1 @@
+"use strict";var s=(s=>(s.WEB="WEB",s.MP_WEIXIN="MP_WEIXIN",s.APP_ANDROID="APP_ANDROID",s.APP_IOS="APP_IOS",s))(s||{}),P=(s=>(s.wechatOfficialLogin="wechatOfficialLogin",s.drawProcessPush="drawProcessPush",s.serverStatusPush="serverStatusPush",s.payStatusPush="payStatusPush",s))(P||{});exports.IPayChannel=s,exports.IWebsocketSceneType=P;

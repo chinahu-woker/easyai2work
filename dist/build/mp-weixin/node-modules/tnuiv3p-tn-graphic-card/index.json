@@ -1,0 +1,10 @@
+{
+  "component": true,
+  "usingComponents": {
+    "tn-icon": "../@tuniao/tnui-vue3-uniapp/components/icon/src/icon",
+    "tn-photo-album": "../@tuniao/tnui-vue3-uniapp/components/photo-album/src/photo-album",
+    "tn-avatar": "../@tuniao/tnui-vue3-uniapp/components/avatar/src/avatar",
+    "tn-avatar-group": "../@tuniao/tnui-vue3-uniapp/components/avatar/src/avatar-group",
+    "tn-lazy-load": "../@tuniao/tnui-vue3-uniapp/components/lazy-load/src/lazy-load"
+  }
+}

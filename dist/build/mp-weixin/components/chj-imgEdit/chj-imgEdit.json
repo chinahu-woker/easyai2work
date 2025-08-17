@@ -1,0 +1,6 @@
+{
+  "component": true,
+  "usingComponents": {
+    "chj-color-picker": "../chj-color-picker/chj-color-picker"
+  }
+}

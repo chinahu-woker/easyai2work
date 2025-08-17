@@ -1,0 +1,1 @@
+<view class="{{['fui-backdrop__wrap', 'data-v-544e1802', a && 'fui-backdrop__bg', b && 'fui-backdrop__show', virtualHostClass]}}" style="{{'background:' + c + ';' + ('position:' + d) + ';' + ('z-index:' + e) + ';' + virtualHostStyle}}" catchtap="{{f}}" hidden="{{virtualHostHidden || false}}" id="{{g}}"><slot></slot></view>

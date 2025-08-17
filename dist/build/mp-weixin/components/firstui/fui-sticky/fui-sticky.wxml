@@ -1,0 +1,1 @@
+<view class="{{['fui-sticky__wrap', 'data-v-0856a42e', d && 'fui-sticky__fixed', virtualHostClass]}}" style="{{e + ';' + virtualHostStyle}}" id="{{f}}" ref="fui_sticky__el" hidden="{{virtualHostHidden || false}}"><view class="{{['data-v-0856a42e', a && 'fui-sticky__fixed', b && 'fui-sticky__fixed-mp']}}" style="{{c}}"><slot></slot></view><slot name="content"></slot></view>

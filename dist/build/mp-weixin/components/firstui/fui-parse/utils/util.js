@@ -1,0 +1,1 @@
+"use strict";const e=require("../../../../common/vendor.js");let t=0,n=0;e.index.getSystemInfo({success(e){t=e.windowWidth,n=e.windowHeight}});const s={getSystemInfo:()=>[t,n],cacheInstance:(()=>{let e={};return{set:(t,n=null)=>(e[t]||(e[t]=n),e[t]||{}),get:t=>e[t]||{},clear:()=>{e={}},remove:t=>{e[t]&&delete e[t]}}})()};exports.util=s;

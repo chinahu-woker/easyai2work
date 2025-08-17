@@ -1,0 +1,6 @@
+{
+  "component": true,
+  "usingComponents": {
+    "tn-icon": "../@tuniao/tnui-vue3-uniapp/components/icon/src/icon"
+  }
+}

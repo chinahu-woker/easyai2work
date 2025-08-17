@@ -1,0 +1,11 @@
+{
+  "navigationBarTitleText": "Fuzi-AI",
+  "usingComponents": {
+    "fui-background-image": "../../components/firstui/fui-background-image/fui-background-image",
+    "up-gap": "../../node-modules/uview-plus/components/u-gap/u-gap",
+    "app-swiper": "../../components/home/AppSwiper",
+    "search": "../../components/home/Search",
+    "app-tags": "../../components/home/AppTags",
+    "app-water-fall": "../../components/home/AppWaterFall"
+  }
+}

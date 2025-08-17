@@ -1,0 +1,1 @@
+<view ref="fui_vtabs__el" id="{{a}}" class="{{['fui-vtabs-content__wrap', 'data-v-87a469ee', virtualHostClass]}}" style="{{virtualHostStyle}}" hidden="{{virtualHostHidden || false}}"><slot></slot></view>

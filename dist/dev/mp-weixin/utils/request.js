@@ -161,8 +161,8 @@ const uploadFile = (filePath, options = {}, apiUrl = "/file/upload") => {
     });
   });
 };
-const getBaseURL = () => "http://8.156.65.78:3001";
-const getBaseWsURL = () => "ws://8.156.65.78:3002";
+const getBaseURL = () => "https://nailoffice.cn/api";
+const getBaseWsURL = () => "wss://nailoffice.cn/websocket";
 const getToken = () => composables_useCommon.getLoginInfo().token;
 const getRefreshToken = () => composables_useCommon.getLoginInfo().refresh_token;
 exports.getBaseWsURL = getBaseWsURL;

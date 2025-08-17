@@ -1,0 +1,1 @@
+<view style="{{a + ';' + virtualHostStyle}}" class="{{['u-status-bar', 'data-v-b85c5140', virtualHostClass]}}" hidden="{{virtualHostHidden || false}}" id="{{b}}"><slot/></view>

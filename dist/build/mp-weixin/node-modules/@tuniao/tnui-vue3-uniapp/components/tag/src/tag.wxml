@@ -1,0 +1,1 @@
+<label class="{{['data-v-20f0df79', virtualHostClass]}}" style="{{virtualHostStyle}}" hidden="{{virtualHostHidden || false}}" id="{{d}}"><label class="{{['tn-tag', 'data-v-20f0df79', a]}}" style="{{b}}" catchtap="{{c}}"><slot/></label></label>
