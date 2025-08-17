@@ -1,7 +1,0 @@
-{
-  "component": true,
-  "usingComponents": {
-    "tn-icon": "../../icon/src/icon",
-    "tn-loading": "../../loading/src/loading"
-  }
-}

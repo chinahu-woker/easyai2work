@@ -1,1 +1,0 @@
-<view class="{{['data-v-052cb609', a, virtualHostClass]}}" style="{{b + ';' + virtualHostStyle}}" catchtap="{{c}}" catchtouchmove="{{d}}" hidden="{{virtualHostHidden || false}}" id="{{e}}"><slot/></view>

@@ -1,7 +1,0 @@
-{
-  "component": true,
-  "usingComponents": {
-    "u-loading-icon": "../u-loading-icon/u-loading-icon",
-    "u-icon": "../u-icon/u-icon"
-  }
-}

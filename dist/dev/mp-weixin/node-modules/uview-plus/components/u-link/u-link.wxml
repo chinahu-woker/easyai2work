@@ -1,1 +1,0 @@
-<text catchtap="{{b}}" style="{{c + ';' + d + ';' + virtualHostStyle}}" class="{{['u-link', 'data-v-dedad317', virtualHostClass]}}" hidden="{{virtualHostHidden || false}}" id="{{e}}">{{a}}</text>

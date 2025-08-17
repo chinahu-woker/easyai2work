@@ -1,9 +1,0 @@
-{
-  "navigationBarTitleText": "作品详情",
-  "usingComponents": {
-    "fui-icon": "../../components/firstui/fui-icon/fui-icon",
-    "fui-nav-bar": "../../components/firstui/fui-nav-bar/fui-nav-bar",
-    "up-button": "../../node-modules/uview-plus/components/u-button/u-button",
-    "fui-avatar": "../../components/firstui/fui-avatar/fui-avatar"
-  }
-}

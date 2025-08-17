@@ -1,1 +1,0 @@
-<view class="{{[f, g, virtualHostClass]}}" catchtap="{{h}}" style="{{virtualHostStyle}}" hidden="{{virtualHostHidden || false}}" id="{{i}}"><view class="{{[b, c]}}" style="{{d}}"><tn-icon wx:if="{{a}}" u-i="42380752-0" bind:__l="__l" u-p="{{a}}"/></view><view class="{{[e]}}"><slot/></view></view>

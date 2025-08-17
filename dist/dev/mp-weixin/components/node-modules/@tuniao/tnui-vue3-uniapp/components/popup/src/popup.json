@@ -1,7 +1,0 @@
-{
-  "component": true,
-  "usingComponents": {
-    "tn-overlay": "../../overlay/src/overlay",
-    "tn-icon": "../../icon/src/icon"
-  }
-}

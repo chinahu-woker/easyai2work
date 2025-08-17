@@ -1,8 +1,0 @@
-{
-  "component": true,
-  "usingComponents": {
-    "task-excuting": "../components/common/TaskExcuting",
-    "payment-popup": "../components/home/PaymentPopup",
-    "my-back-to-top": "../components/common/MyBackToTop"
-  }
-}

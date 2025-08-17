@@ -1,8 +1,0 @@
-{
-  "component": true,
-  "usingComponents": {
-    "u-status-bar": "../u-status-bar/u-status-bar",
-    "up-icon": "../u-icon/u-icon",
-    "up-line": "../u-line/u-line"
-  }
-}
