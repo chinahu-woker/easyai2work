@@ -1,1 +1,0 @@
-<view class="{{[virtualHostClass]}}" style="{{'margin-top:40%' + ';' + virtualHostStyle}}" hidden="{{virtualHostHidden || false}}" id="{{d}}"><fui-empty wx:if="{{c}}" u-s="{{['d']}}" u-i="c527d35c-0" bind:__l="__l" u-p="{{c}}"><fui-button wx:if="{{b}}" bindclick="{{a}}" u-i="c527d35c-1,c527d35c-0" bind:__l="__l" u-p="{{b}}"></fui-button></fui-empty></view>

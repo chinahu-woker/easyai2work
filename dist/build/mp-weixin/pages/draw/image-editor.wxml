@@ -1,1 +1,0 @@
-<view class="{{[virtualHostClass]}}" style="{{virtualHostStyle}}" hidden="{{virtualHostHidden || false}}" id="{{h}}"><button bindtap="{{a}}">开启图片编辑</button><chj-img-edit wx:if="{{g}}" class="r" virtualHostClass="r" u-r="chjImgEdit" bindconfirm="{{c}}" bindcancel="{{d}}" bindgetLineLength="{{e}}" bindgetRectPosition="{{f}}" u-i="26459ed1-0" bind:__l="__l" u-p="{{g}}"/></view>

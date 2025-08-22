@@ -1,1 +1,0 @@
-<up-back-top wx:if="{{a}}" u-i="03f0ae8e-0" bind:__l="__l" u-p="{{a}}" class="{{[virtualHostClass]}}" virtualHostClass="{{[virtualHostClass]}}" style="{{virtualHostStyle}}" virtualHostStyle="{{virtualHostStyle}}" hidden="{{virtualHostHidden || false}}" virtualHostHidden="{{virtualHostHidden || false}}" id="{{b}}" virtualHostId="{{b}}"></up-back-top>

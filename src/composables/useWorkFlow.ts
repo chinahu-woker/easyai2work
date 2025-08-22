@@ -360,7 +360,7 @@ export default function useWorkFlow() {
 		if (index !== -1) {
 			localTasks.value[index].output = output.output
 			localTasks.value[index].status = 1
-			// localTasks.value = [...localTasks.value]
+			localTasks.value = [...localTasks.value]
 		}
 	}
 

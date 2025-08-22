@@ -1,7 +1,0 @@
-{
-  "component": true,
-  "usingComponents": {
-    "u-icon": "../u-icon/u-icon",
-    "u-transition": "../u-transition/u-transition"
-  }
-}
