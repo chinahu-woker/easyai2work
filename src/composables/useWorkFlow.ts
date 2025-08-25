@@ -68,10 +68,7 @@ export default function useWorkFlow() {
 		{ param: 'image_path_face', component: 'ImageUpload', title: '参考上传' },
 		{ param: 'image_path_style', component: 'ImageUpload', title: '参考上传' },
 		{ param: 'image_path', component: 'ImageUpload', title: '参考上传' },
-<<<<<<< HEAD
 		{ param: 'video_path', component: 'VideoUpload', title: '视频上传' },
-=======
->>>>>>> da05f2e6841bf28fad604aecea21d3ba518460f2
 		{ param: 'advance_select_image_preview', component: 'ImageSelectPreview', title: '高级-图像预览选择' },
 		{ param: 'multi_image_path', component: 'ImageUploadMore', title: '多图上传' },
 		// { param: 'advance_onlineEdit_mask', component: 'MoreImageUpload', title: '遮罩上传' },

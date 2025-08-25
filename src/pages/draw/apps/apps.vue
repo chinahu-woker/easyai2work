@@ -8,11 +8,7 @@ import useWorkFlow from "@/composables/useWorkFlow.ts";
 import ImageUpload from "@/components/dynamic/ImageUpload.vue";
 import ImageUploadMore from "@/components/dynamic/ImageUploadMore.vue";
 import MoreImageUpload from "@/components/dynamic/MoreImageUpload.vue";
-<<<<<<< HEAD
 import VideoUpload from "@/components/dynamic/VideoUpload.vue";
-=======
-
->>>>>>> da05f2e6841bf28fad604aecea21d3ba518460f2
 import AudioUpload from "@/components/dynamic/AudioUpload.vue";
 import CustomSlider from "@/components/dynamic/CustomSlider.vue";
 import Height from "@/components/dynamic/Height.vue";
@@ -53,10 +49,7 @@ const components = {
 	ImageSelectPreview,
 	ModeSelect,
 	MoreImageUpload,
-<<<<<<< HEAD
 	VideoUpload
-=======
->>>>>>> da05f2e6841bf28fad604aecea21d3ba518460f2
 	// chjImgEdit
 }
 
@@ -360,14 +353,11 @@ const imageList_mask = ref()
 								<MoreImageUpload :title="item.title" v-model="bindParam[item.name]"  />
 							
 						</view>
-<<<<<<< HEAD
 						<view v-else-if="handleFindComponentName(item.name) === 'VideoUpload'">
 						
 								<VideoUpload :title="item.title" v-model="bindParam[item.name]"  />
 
 						</view>
-=======
->>>>>>> da05f2e6841bf28fad604aecea21d3ba518460f2
 						
 
 

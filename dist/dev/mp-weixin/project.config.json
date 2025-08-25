@@ -1,27 +1,39 @@
 {
   "description": "项目配置文件。",
   "packOptions": {
-    "ignore": []
+    "ignore": [],
+    "include": []
   },
   "setting": {
-<<<<<<< HEAD
     "urlCheck": false,
-=======
-    "urlCheck": true,
->>>>>>> da05f2e6841bf28fad604aecea21d3ba518460f2
     "es6": true,
     "postcss": true,
     "minified": true,
     "newFeature": true,
-    "bigPackageSizeSupport": true
+    "bigPackageSizeSupport": true,
+    "compileWorklet": false,
+    "uglifyFileName": false,
+    "uploadWithSourceMap": true,
+    "enhance": false,
+    "packNpmManually": false,
+    "packNpmRelationList": [],
+    "minifyWXSS": true,
+    "minifyWXML": true,
+    "localPlugins": false,
+    "disableUseStrict": false,
+    "useCompilerPlugins": false,
+    "condition": false,
+    "swc": false,
+    "disableSWC": true,
+    "babelSetting": {
+      "ignore": [],
+      "disablePlugins": [],
+      "outputPath": ""
+    }
   },
   "compileType": "miniprogram",
   "libVersion": "",
-<<<<<<< HEAD
   "appid": "wx60ad6ca1891c4258",
-=======
-  "appid": "touristappid",
->>>>>>> da05f2e6841bf28fad604aecea21d3ba518460f2
   "projectname": "FuziAI",
   "condition": {
     "search": {
@@ -47,5 +59,7 @@
         }
       ]
     }
-  }
+  },
+  "simulatorPluginLibVersion": {},
+  "editorSetting": {}
 }
