@@ -1,0 +1,1 @@
+<custom-slider wx:if="{{b}}" u-i="2637d4c9-0" bind:__l="__l" bindupdateModelValue="{{a}}" u-p="{{b}}" class="{{[virtualHostClass]}}" virtualHostClass="{{[virtualHostClass]}}" style="{{virtualHostStyle}}" virtualHostStyle="{{virtualHostStyle}}" hidden="{{virtualHostHidden}}" virtualHostHidden="{{virtualHostHidden}}" id="{{virtualHostId}}" virtualHostId="{{virtualHostId}}"/>

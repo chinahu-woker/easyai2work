@@ -1,0 +1,39 @@
+// 本文件由FirstUI授权予佛山市航电梦联网络科技有限公司（会员ID： 11 2 7，营业执照号：9  1 4  4060    5  MA 5   56H1KX  H）专用，请尊重知识产权，勿私下传播，违者追究法律责任。
+function scroll(event, ownerInstance) {
+	var detail = event.detail
+	var scrollWidth = detail.scrollWidth
+	var scrollLeft = detail.scrollLeft
+	var dataset = event.currentTarget.dataset
+	var width = dataset.width || 0
+	var scrollBarWidth = dataset.bgwidth || 0
+	var blockWidth = dataset.blockwidth || 0
+	var x = scrollLeft / (scrollWidth - width) * (scrollBarWidth - blockWidth)
+	setBarStyle(ownerInstance, x)
+}
+
+function scrolltolower(event, ownerInstance) {
+	ownerInstance.callMethod('scrollEvent', 'right')
+	var dataset = event.currentTarget.dataset
+	var scrollBarWidth = dataset.bgwidth || 0
+	var blockWidth = dataset.blockwidth || 0
+	setBarStyle(ownerInstance, scrollBarWidth - blockWidth)
+}
+
+function scrolltoupper(event, ownerInstance) {
+	ownerInstance.callMethod('scrollEvent', 'left')
+	setBarStyle(ownerInstance, 0)
+}
+
+function setBarStyle(ownerInstance, x) {
+	var block = ownerInstance.selectComponent('.fui-hor__scroll-indicator')
+	block && block.setStyle({
+		transform: 'translate3d(' + x + 'px,0,0)'
+	})
+
+}
+
+module.exports = {
+	scroll: scroll,
+	scrolltolower: scrolltolower,
+	scrolltoupper: scrolltoupper
+}

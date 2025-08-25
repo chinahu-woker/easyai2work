@@ -1,0 +1,14 @@
+{
+  "navigationBarTitleText": "Fuzi-AI",
+  "usingComponents": {
+    "up-status-bar": "../../node-modules/uview-plus/components/u-status-bar/u-status-bar",
+    "tn-time-line": "../../node-modules/tnuiv3p-tn-time-line/time-line",
+    "tn-time-line-item": "../../node-modules/tnuiv3p-tn-time-line/time-line-item",
+    "tn-time-line-data": "../../node-modules/tnuiv3p-tn-time-line/time-line-data",
+    "tn-photo-album": "../../node-modules/@tuniao/tnui-vue3-uniapp/components/photo-album/src/photo-album",
+    "tn-switch-tab": "../../node-modules/@tuniao/tnui-vue3-uniapp/components/switch-tab/src/switch-tab",
+    "tn-lazy-load": "../../node-modules/@tuniao/tnui-vue3-uniapp/components/lazy-load/src/lazy-load",
+    "base-layout": "../../layouts/BaseLayout",
+    "tn-tag": "../../node-modules/@tuniao/tnui-vue3-uniapp/components/tag/src/tag"
+  }
+}

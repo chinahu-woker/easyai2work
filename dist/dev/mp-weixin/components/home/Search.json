@@ -1,0 +1,6 @@
+{
+  "component": true,
+  "usingComponents": {
+    "up-search": "../../node-modules/uview-plus/components/u-search/u-search"
+  }
+}

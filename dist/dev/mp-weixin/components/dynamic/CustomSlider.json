@@ -1,0 +1,8 @@
+{
+  "component": true,
+  "usingComponents": {
+    "up-slider": "../../node-modules/uview-plus/components/u-slider/u-slider",
+    "my-title": "../common/MyTitle",
+    "param-card": "../common/ParamCard"
+  }
+}

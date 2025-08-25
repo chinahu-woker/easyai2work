@@ -1,0 +1,120 @@
+/**
+ * 这里是uni-app内置的常用样式变量
+ *
+ * uni-app 官方扩展插件及插件市场（https://ext.dcloud.net.cn）上很多三方插件均使用了这些样式变量
+ * 如果你是插件开发者，建议你使用scss预处理，并在插件代码中直接使用这些变量（无需 import 这个文件），方便用户通过搭积木的方式开发整体风格一致的App
+ *
+ */
+/**
+ * 如果你是App开发者（插件使用者），你可以通过修改这些变量来定制自己的插件主题，实现自定义主题功能
+ *
+ * 如果你的项目同样使用了scss预处理，你也可以直接在你的 scss 代码中使用如下变量，同时无需 import 这个文件
+ */
+/* 颜色变量 */
+/* 行为相关颜色 */
+/* 文字基本颜色 */
+/* 背景颜色 */
+/* 边框颜色 */
+/* 尺寸变量 */
+/* 文字尺寸 */
+/* 图片尺寸 */
+/* Border Radius */
+/* 水平间距 */
+/* 垂直间距 */
+/* 透明度 */
+/* 文章场景相关 */
+.fui-banner__item.data-v-defa837f {
+  width: 100%;
+  height: 1400rpx;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 34rpx;
+  font-weight: 600;
+}
+.fui-banner__wrap.data-v-defa837f {
+  z-index: 110;
+  height: 1500rpx;
+}
+.CardStyle.data-v-defa837f {
+  margin-top: 20%;
+  text-align: center;
+}
+.fui-section__title.data-v-defa837f {
+  margin-left: 32rpx;
+}
+.custom-view.data-v-defa837f {
+  padding: 10px;
+  /* 内边距 */
+  color: #333;
+  /* 文本颜色 */
+  font-size: 16px;
+  /* 字体大小 */
+}
+.scroll-Y.data-v-defa837f {
+  height: 1200rpx;
+}
+.fui-scroll__view.data-v-defa837f {
+  width: 100%;
+  height: 600rpx;
+}
+.progress-container.data-v-defa837f {
+  z-index: 110;
+  position: absolute;
+  top: 35%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.bottom-container.data-v-defa837f {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: fixed;
+  bottom: 40rpx;
+  width: 100%;
+  padding-bottom: 5%;
+  padding-left: 5%;
+  padding-right: 5%;
+}
+.bottom-icon.data-v-defa837f {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 90rpx;
+  height: 90rpx;
+  color: #857ed1;
+  margin-right: 20rpx;
+  background-color: #f3f4f6;
+  border-radius: 50%;
+  font-size: 70rpx;
+  box-shadow: 0 5px 15px rgba(46, 54, 80, 0.3);
+  overflow: hidden;
+  /* 确保水波纹不超出圆形按钮 */
+}
+.bottom-icon.data-v-defa837f::before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.2);
+  transform: scale(0);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.6s, opacity 0.6s;
+}
+.bottom-icon.data-v-defa837f:active::before {
+  transform: scale(4);
+  opacity: 1;
+}
+.params-icon.data-v-defa837f {
+  color: gray;
+  margin-right: 20rpx;
+}
+.image-count.data-v-defa837f {
+  position: absolute;
+  right: 120rpx;
+  bottom: 120rpx;
+}

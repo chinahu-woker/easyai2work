@@ -1,0 +1,116 @@
+
+.fui-vtabs__wrap.data-v-d30634da {
+
+		display: flex;
+
+		flex-direction: row;
+}
+.fui-vtabs__scroll-bar.data-v-d30634da {
+		flex-shrink: 0;
+}
+.fui-vtabs__item__wrap.data-v-d30634da {
+
+		display: flex;
+		flex-shrink: 0;
+
+		align-items: center;
+		justify-content: center;
+		flex-direction: column;
+}
+.fui-vtabs__item.data-v-d30634da {
+		padding: 0 20rpx;
+
+		display: flex;
+		box-sizing: border-box;
+		overflow: hidden;
+
+		flex-direction: row;
+
+		align-items: center;
+		justify-content: center;
+		text-align: center;
+}
+.fui-vtabs__icon.data-v-d30634da {
+		width: 40rpx;
+		height: 40rpx;
+		margin-right: 12rpx;
+}
+.fui-vtabs__item-hover.data-v-d30634da {
+}
+.fui-vtabs__item-disable.data-v-d30634da {
+		opacity: .5;
+}
+.fui-vtabs__left-border.data-v-d30634da {
+		border-left-width: 8rpx;
+		border-left-style: solid;
+}
+.fui-vtabs__text.data-v-d30634da {
+
+		display: block;
+
+
+
+
+
+
+
+		position: relative;
+}
+.fui-vtabs__badge.data-v-d30634da {
+		height: 36rpx;
+		padding: 0 12rpx;
+		color: #FFFFFF;
+		font-size: 24rpx;
+		line-height: 36rpx;
+		border-radius: 100px;
+
+		min-width: 36rpx !important;
+		display: flex;
+		box-sizing: border-box;
+
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+		position: absolute;
+		right: -32rpx;
+		top: -18rpx;
+		transform: scale(0.9);
+		z-index: 10;
+}
+.fui-vtabs__badge-dot.data-v-d30634da {
+		height: 8px !important;
+		width: 8px !important;
+
+
+
+
+
+		display: inline-block;
+
+
+		border-radius: 50%;
+
+		position: absolute;
+		right: -6px;
+		top: -3px;
+		z-index: 10;
+}
+.fui-vtabs__content-wrap.data-v-d30634da {
+		flex: 1;
+}
+.fui-vtabs__content.data-v-d30634da {
+
+		width: 100%;
+		height: 100%;
+}
+.fui-vtabs__selected-color.data-v-d30634da {
+		color: var(--fui-color-primary, #465CFF) !important;
+}
+.fui-vtabs__border-color.data-v-d30634da {
+		border-left-color: var(--fui-color-primary, #465CFF) !important;
+}
+.fui-vtabs__badge-color.data-v-d30634da {
+		background: var(--fui-color-danger, #FF2B2B) !important;
+}
+
+

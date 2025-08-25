@@ -1,0 +1,66 @@
+
+.fui-avatar__wrap.data-v-cde923ba {
+		position: relative;
+
+		display: inline-flex;
+		overflow: hidden;
+		flex-shrink: 0;
+		z-index: 3;
+
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+}
+.fui-avatar__img.data-v-cde923ba {
+		flex: 1;
+
+		display: block;
+		-o-object-fit: cover;
+		   object-fit: cover;
+}
+.fui-avatar__text.data-v-cde923ba {
+		flex: 1;
+
+		display: block;
+		white-space: nowrap;
+		box-sizing: border-box;
+
+
+
+
+		overflow: hidden;
+		text-overflow: ellipsis;
+		text-align: center;
+}
+.fui-avatar__size-small.data-v-cde923ba {
+		width: 64rpx !important;
+		height: 64rpx !important;
+}
+.fui-avatar__text-small.data-v-cde923ba {
+		font-size: 32rpx !important;
+}
+.fui-avatar__size-middle.data-v-cde923ba {
+		width: 96rpx !important;
+		height: 96rpx !important;
+}
+.fui-avatar__text-middle.data-v-cde923ba {
+		font-size: 44rpx !important;
+}
+.fui-avatar__size-large.data-v-cde923ba {
+		width: 128rpx !important;
+		height: 128rpx !important;
+}
+.fui-avatar__text-large.data-v-cde923ba {
+		font-size: 56rpx !important;
+}
+.fui-avatar__circle.data-v-cde923ba {
+
+
+
+
+
+		border-radius: 50% !important;
+}
+.fui-avatar__square.data-v-cde923ba {
+		border-radius: 8rpx !important;
+}

@@ -1,0 +1,105 @@
+/**
+ * 这里是uni-app内置的常用样式变量
+ *
+ * uni-app 官方扩展插件及插件市场（https://ext.dcloud.net.cn）上很多三方插件均使用了这些样式变量
+ * 如果你是插件开发者，建议你使用scss预处理，并在插件代码中直接使用这些变量（无需 import 这个文件），方便用户通过搭积木的方式开发整体风格一致的App
+ *
+ */
+/**
+ * 如果你是App开发者（插件使用者），你可以通过修改这些变量来定制自己的插件主题，实现自定义主题功能
+ *
+ * 如果你的项目同样使用了scss预处理，你也可以直接在你的 scss 代码中使用如下变量，同时无需 import 这个文件
+ */
+/* 颜色变量 */
+/* 行为相关颜色 */
+/* 文字基本颜色 */
+/* 背景颜色 */
+/* 边框颜色 */
+/* 尺寸变量 */
+/* 文字尺寸 */
+/* 图片尺寸 */
+/* Border Radius */
+/* 水平间距 */
+/* 垂直间距 */
+/* 透明度 */
+/* 文章场景相关 */
+.tn-lazy-load.data-v-b259162f {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  min-height: 1rpx;
+  background-color: var(--tn-color-gray-light);
+  color: var(--tn-color-gray);
+  /* 正常显示图片 start */
+  /* 正常显示图片 end */
+  /* 内容容器 start */
+  /* 内容容器 end */
+  /* 正在加载 start */
+  /* 正在加载 end */
+  /* 图片加载失败 start */
+  /* 图片加载失败 end */
+  /* 图片 start */
+  /* 图片 end */
+}
+.tn-lazy-load.is-show-image.data-v-b259162f {
+  background-color: transparent;
+  color: transparent;
+}
+.tn-lazy-load__container.data-v-b259162f {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+}
+.tn-lazy-load__loading.data-v-b259162f {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.tn-lazy-load__loading__icon.data-v-b259162f {
+  font-size: 90rpx;
+  animation: loading-icon-animation-b259162f 3s linear infinite;
+}
+.tn-lazy-load__error.data-v-b259162f {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 100rpx;
+}
+.tn-lazy-load__image.data-v-b259162f {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  opacity: 0;
+  /* 没有动画效果 */
+  /* 有加载动画 */
+}
+.tn-lazy-load__image.is-no-animation.data-v-b259162f {
+  opacity: 1;
+}
+.tn-lazy-load__image.is-animation.data-v-b259162f {
+  animation: show-image-animation-b259162f 0.25s ease both;
+}
+@keyframes loading-icon-animation-b259162f {
+from {
+    transform: rotate(0deg);
+}
+to {
+    transform: rotate(360deg);
+}
+}
+@keyframes show-image-animation-b259162f {
+from {
+    opacity: 0;
+}
+to {
+    opacity: 1;
+}
+}

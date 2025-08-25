@@ -1,0 +1,7 @@
+{
+  "component": true,
+  "usingComponents": {
+    "my-title": "../common/MyTitle",
+    "param-card": "../common/ParamCard"
+  }
+}

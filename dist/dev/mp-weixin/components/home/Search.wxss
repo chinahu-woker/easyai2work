@@ -1,0 +1,9 @@
+
+.search{
+  /* margin: 0 50rpx 0 50rpx; */
+  border-color:gray;
+}
+.searchColor{
+	margin-left: 5%;
+	margin-right: 5%;
+}

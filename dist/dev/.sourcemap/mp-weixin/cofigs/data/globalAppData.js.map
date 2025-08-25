@@ -1,0 +1,1 @@
+{"version":3,"file":"globalAppData.js","sources":["cofigs/data/globalAppData.ts"],"sourcesContent":["export const globalAppData = {\n  name: 'globalAppData',\n  share: {\n    appInfo: '这款全民使用的AI程序，简直好用到爆炸',\n  },\n}\n"],"names":[],"mappings":";AAAO,MAAM,gBAAgB;AAAA,EAE3B,OAAO;AAAA,IACL,SAAS;AAAA,EAAA;AAEb;;"}

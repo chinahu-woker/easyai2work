@@ -1,0 +1,10 @@
+{
+  "navigationBarTitleText": "Fuzi-AI",
+  "usingComponents": {
+    "fui-background-image": "../../components/firstui/fui-background-image/fui-background-image",
+    "up-status-bar": "../../node-modules/uview-plus/components/u-status-bar/u-status-bar",
+    "fui-footer": "../../components/firstui/fui-footer/fui-footer",
+    "base-layout": "../../layouts/BaseLayout",
+    "my-graphic-card": "../../components/custom/MyGraphicCard/MyGraphicCard"
+  }
+}

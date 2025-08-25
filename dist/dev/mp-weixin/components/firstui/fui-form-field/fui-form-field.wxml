@@ -1,0 +1,1 @@
+<view class="{{['data-v-3aa2974b', a && 'fui-form__field', virtualHostClass]}}" style="{{virtualHostStyle}}" hidden="{{virtualHostHidden}}" id="{{virtualHostId}}"><slot></slot></view>

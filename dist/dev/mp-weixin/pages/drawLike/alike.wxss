@@ -1,0 +1,369 @@
+
+.comment-item {
+  position: relative;
+  padding: 30rpx 120rpx 30rpx 30rpx;
+}
+.refrenc-comment {
+  position: absolute;
+  /* top: 30rpx;         */
+  right: -5rpx;
+
+  font-size: 24rpx;
+  color: #999;
+  /* background: rgba(255, 255, 255, 0.98);   */
+  /* padding: 6rpx 14rpx;   */
+  /* border-radius: 30rpx;   */
+  /* box-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.12);   */
+  z-index: 2;
+  /* backdrop-filter: blur(4rpx);   */
+  transition: all 0.2s ease-in-out;
+}
+.refrenc-comment:active {
+    transform: scale(0.96) translateY(2rpx);
+    box-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.15);
+}
+.delete-comment {
+  position: absolute;
+  /* top: 0rpx;         */
+  right: 80rpx;
+  font-size: 24rpx;
+  color: #999;
+  /* background: rgba(255, 255, 255, 0.98);   */
+  /* padding: 6rpx 14rpx;   */
+  /* border-radius: 30rpx;   */
+  /* box-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.12);   */
+  z-index: 2;
+  /* backdrop-filter: blur(4rpx);   */
+  transition: all 0.2s ease-in-out;
+}
+.delete-comment:active {
+    transform: scale(0.96) translateY(2rpx);
+    box-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.15);
+}
+.comment-section {
+  margin: 60rpx 30rpx;
+  padding: 30rpx;
+  background-color: #fff;
+  border-radius: 20rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+.comment-header {
+  font-size: 32rpx;
+  font-weight: bold;
+  margin-bottom: 30rpx;
+}
+.comment-list {
+  margin-bottom: 40rpx;
+}
+.comment-author {
+  margin-left: 16rpx;
+  max-width: 250rpx;
+  /* 设置最大宽度，根据容器大小调整 */
+  white-space: nowrap;
+  /* 不换行 */
+  overflow: hidden;
+  /* 隐藏溢出内容 */
+  text-overflow: ellipsis;
+  /* 超出显示省略号 */
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10rpx;
+}
+.comment-content {
+  font-size: 28rpx;
+  color: #666;
+  line-height: 1.5;
+}
+.comment-time {
+  font-size: 24rpx;
+  color: #aaa;
+  margin-top: 10rpx;
+}
+.no-comment {
+  text-align: center;
+  color: #bbb;
+  padding: 40rpx 0;
+}
+.comment-input-container {
+  display: flex;
+  align-items: center;
+  border: 2rpx solid #ddd;
+  border-radius: 40rpx;
+  padding: 0 20rpx;
+  height: 80rpx;
+}
+.comment-input {
+  flex: 1;
+  font-size: 28rpx;
+  padding-right: 20rpx;
+}
+.comment-btn {
+  width: 120rpx;
+  height: 60rpx;
+  line-height: 60rpx;
+  font-size: 24rpx;
+  color: #fff;
+  background-color: #465CFF;
+  border-radius: 30rpx;
+  margin-left: 20rpx;
+  padding: 0;
+  display: flex;
+  /* 确保内容正确显示 */
+  align-items: center;
+  /* 垂直居中对齐 */
+  justify-content: center;
+  /* 水平居中对齐 */
+  line-height: normal;
+  /* 取消默认行高 */
+}
+.comment-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+.username {
+  margin-left: 16rpx;
+  font-weight: bold;
+  color: #333;
+  max-width: 5vh;
+  /* 控制最大宽度 */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.reply-list {
+  margin-top: 20rpx;
+  padding-left: 40rpx;
+  border-left: 2rpx solid #eee;
+}
+.reply-item {
+  margin-bottom: 20rpx;
+}
+.reply-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 6rpx;
+}
+.reply-author {
+  font-weight: bold;
+  color: #333;
+  margin-left: 16rpx;
+}
+.at-user {
+  margin-left: 8rpx;
+  color: #888;
+  font-size: 24rpx;
+}
+.reply-content {
+  font-size: 26rpx;
+  color: #555;
+  margin-left: 56rpx;
+}
+.submit-button {
+  border: none;
+  /* 移除边框 */
+  box-shadow: none;
+  /* 移除阴影 */
+  background: linear-gradient(to right, #7E56FF, #4D31B2);
+  /* 设置渐变背景 */
+  border-radius: 50px;
+  /* 圆角 */
+  color: #fff;
+  /* 文字颜色为白色 */
+
+
+  cursor: pointer;
+  /* 鼠标悬停时变为指针 */
+  transition: all 0.3s ease;
+  /* 平滑过渡效果 */
+  display: flex;
+
+  /* 悬停状态 */
+}
+/* 点击状态 */
+.submit-button:active {
+    transform: scale(0.98);
+    /* 点击时轻微缩放 */
+}
+
+/* --------------------------------------------------------------- */
+.config-table {
+  margin: 40rpx 30rpx;
+  background-color: #f9f9f9;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
+  font-size: 28rpx;
+}
+.config-table .table-header {
+    display: flex;
+    justify-content: space-between;
+    padding: 20rpx 0;
+    border-bottom: 2rpx solid #eee;
+    font-weight: bold;
+    color: #333;
+    justify-content: center;
+    align-items: center;
+}
+.config-table .table-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20rpx 0;
+    border-bottom: 2rpx solid #eee;
+}
+.config-table .table-row:last-child {
+      border-bottom: none;
+}
+.config-table .label {
+    width: 30%;
+    color: #666;
+}
+.config-table .value {
+    width: 50%;
+    word-break: break-all;
+    color: #333;
+}
+.config-table .copy-btn {
+    width: 120rpx;
+    height: 50rpx;
+    line-height: 50rpx;
+    font-size: 24rpx;
+    color: #fff;
+    background-color: #465CFF;
+    border-radius: 40rpx;
+    padding: 0;
+}
+.config-table .generate-btn {
+    margin-top: 40rpx;
+    width: 100%;
+    height: 80rpx;
+    line-height: 80rpx;
+    font-size: 32rpx;
+    color: #fff;
+    background-color: #465CFF;
+    border-radius: 40rpx;
+    font-weight: bold;
+    box-shadow: 0 8rpx 16rpx rgba(70, 92, 255, 0.3);
+}
+
+/* ==================================== */
+.video-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.carousel-video {
+  width: 100%;
+  height: 100%;
+  border-radius: 20rpx;
+}
+.video-play-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+.thumbnail-nav {
+  display: flex;
+  justify-content: center;
+  /* 居中显示 */
+  gap: 20rpx;
+  margin-top: 30rpx;
+  padding: 0 20rpx;
+  overflow-x: auto;
+  /* 如果图片太多允许滚动 */
+  white-space: nowrap;
+}
+.thumbnail {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 12rpx;
+  opacity: 0.6;
+  transition: all 0.3s ease;
+  -o-object-fit: cover;
+     object-fit: cover;
+}
+.thumbnail.active {
+  opacity: 1;
+  transform: scale(1.1);
+  border: 2rpx solid #465CFF;
+}
+.thumbnail:active {
+  transform: scale(0.95);
+}
+.thumbnail-nav::-webkit-scrollbar {
+  height: 8rpx;
+  border-radius: 4rpx;
+  background: #f1f1f1;
+}
+.thumbnail-nav::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4rpx;
+}
+.carousel-container {
+  position: relative;
+  margin: 0 30rpx;
+  border-radius: 20rpx;
+  overflow: hidden;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.1);
+}
+.carousel-swiper {
+  height: 400rpx;
+  width: 100%;
+}
+.carousel-image {
+  width: 100%;
+  height: 100%;
+  border-radius: 20rpx;
+  transition: all 0.3s ease;
+}
+.carousel-image:active {
+    transform: scale(0.98);
+}
+.custom-indicator {
+  position: absolute;
+  bottom: 20rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 12rpx;
+  z-index: 10;
+}
+.indicator {
+  width: 16rpx;
+  height: 16rpx;
+  background-color: rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+.indicator.active {
+    background-color: #ffffff;
+    transform: scale(1.2);
+}
+@media screen and (max-width: 375px) {
+.carousel-swiper {
+    height: 320rpx;
+}
+.indicator {
+    width: 12rpx;
+    height: 12rpx;
+}
+}
+@keyframes fadeIn {
+from {
+    opacity: 0;
+}
+to {
+    opacity: 1;
+}
+}
+.carousel-image {
+  animation: fadeIn 0.5s ease-in-out;
+}

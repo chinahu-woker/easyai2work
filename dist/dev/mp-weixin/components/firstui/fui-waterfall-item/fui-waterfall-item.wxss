@@ -1,0 +1,29 @@
+
+.fui-waterfall__item-wrap.data-v-b64e611d {
+		position: absolute;
+		left: 0;
+		top: 0;
+
+		display: flex;
+		box-sizing: border-box;
+
+		overflow: hidden;
+		opacity: 0;
+		transition-property: opacity;
+		transition-duration: .5s;
+		flex-direction: column;
+}
+.fui-waterfall__item-show.data-v-b64e611d {
+		opacity: 1;
+}
+.fui-waterfall__img-wrap.data-v-b64e611d {
+		background: #F1F4FA;
+		overflow: hidden;
+}
+.fui-waterfall__hidden.data-v-b64e611d {
+		overflow: hidden;
+}
+.fui-waterfall__img.data-v-b64e611d {
+
+		display: block;
+}

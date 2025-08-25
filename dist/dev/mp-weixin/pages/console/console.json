@@ -1,0 +1,11 @@
+{
+  "navigationBarTitleText": "",
+  "usingComponents": {
+    "fui-icon": "../../components/firstui/fui-icon/fui-icon",
+    "fui-nav-bar": "../../components/firstui/fui-nav-bar/fui-nav-bar",
+    "fui-button": "../../components/firstui/fui-button/fui-button",
+    "fui-vtabs-content": "../../components/firstui/fui-vtabs-content/fui-vtabs-content",
+    "fui-vtabs": "../../components/firstui/fui-vtabs/fui-vtabs",
+    "tn-image-upload": "../../node-modules/@tuniao/tnui-vue3-uniapp/components/image-upload/src/image-upload"
+  }
+}

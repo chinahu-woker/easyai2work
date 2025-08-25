@@ -1,0 +1,68 @@
+// 本文件由FirstUI授权予佛山市航电梦联网络科技有限公司（会员ID：  1 127，营业执照号： 9  1 4  4  0 60  5MA5  5  6H1KX  H）专用，请尊重知识产权，勿私下传播，违者追究法律责任。
+import math from './math.js'
+
+function QRPolynomial(num, shift) {
+
+	if (num.length == undefined) {
+		throw new Error(num.length + "/" + shift);
+	}
+
+	var offset = 0;
+
+	while (offset < num.length && num[offset] == 0) {
+		offset++;
+	}
+
+	this.num = new Array(num.length - offset + shift);
+	for (var i = 0; i < num.length - offset; i++) {
+		this.num[i] = num[i + offset];
+	}
+}
+
+QRPolynomial.prototype = {
+
+	get : function(index) {
+		return this.num[index];
+	},
+
+	getLength : function() {
+		return this.num.length;
+	},
+
+	multiply : function(e) {
+
+		var num = new Array(this.getLength() + e.getLength() - 1);
+
+		for (var i = 0; i < this.getLength(); i++) {
+			for (var j = 0; j < e.getLength(); j++) {
+				num[i + j] ^= math.gexp(math.glog(this.get(i) ) + math.glog(e.get(j) ) );
+			}
+		}
+
+		return new QRPolynomial(num, 0);
+	},
+
+	mod : function(e) {
+
+		if (this.getLength() - e.getLength() < 0) {
+			return this;
+		}
+
+		var ratio = math.glog(this.get(0) ) - math.glog(e.get(0) );
+
+		var num = new Array(this.getLength() );
+
+		for (var i = 0; i < this.getLength(); i++) {
+			num[i] = this.get(i);
+		}
+
+		for (var i = 0; i < e.getLength(); i++) {
+			num[i] ^= math.gexp(math.glog(e.get(i) ) + ratio);
+		}
+
+		// recursive call
+		return new QRPolynomial(num, 0).mod(e);
+	}
+};
+
+export default QRPolynomial;

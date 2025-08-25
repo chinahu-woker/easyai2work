@@ -1,0 +1,40 @@
+
+	/* 全局样式中包含 fui-section 避免影响*/
+.fui-sections__wrap.data-v-20f3438b {
+
+		width: 100%;
+		box-sizing: border-box;
+}
+.fui-sections__title.data-v-20f3438b {
+		position: relative;
+
+		display: flex;
+		word-break: break-all;
+		flex-shrink: 0;
+
+		flex-direction: row;
+		align-items: center;
+}
+.fui-sections__title-text.data-v-20f3438b {
+
+		word-break: break-all;
+}
+.fui-sections__line.data-v-20f3438b {
+		position: absolute;
+		left: 0;
+}
+.fui-sections__descr.data-v-20f3438b {
+
+		word-break: break-all;
+}
+.fui-sections__descr-text.data-v-20f3438b {
+
+		word-break: break-all;
+
+		font-weight: 400;
+}
+.fui-sections__line-color.data-v-20f3438b {
+		background: var(--fui-color-primary, #465CFF) !important;
+}
+
+

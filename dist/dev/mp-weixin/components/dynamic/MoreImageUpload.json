@@ -1,0 +1,8 @@
+{
+  "component": true,
+  "usingComponents": {
+    "fui-backdrop": "../firstui/fui-backdrop/fui-backdrop",
+    "chj-img-edit": "../chj-imgEdit/chj-imgEdit",
+    "my-title": "../common/MyTitle"
+  }
+}

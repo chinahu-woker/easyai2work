@@ -1,0 +1,53 @@
+
+.fui-progress__wrap.data-v-c4450786 {
+
+		width: 100%;
+		display: flex;
+
+		flex-direction: row;
+		align-items: center;
+}
+
+	/* nvue android 端 overflow: hidden 无效，目前uni-app官方尚未修复此问题*/
+.fui-progress__bar-bg.data-v-c4450786 {
+
+		width: 100%;
+		transform: translateZ(0);
+
+		flex: 1;
+		position: relative;
+		overflow: hidden;
+}
+.fui-progress__bar.data-v-c4450786 {
+
+		width: 100%;
+		z-index: 2;
+
+		position: absolute;
+		left: 0;
+		right: 0;
+		top: 0;
+		bottom: 0;
+
+		transform: translate3d(-100%, 0, 0);
+		transition-delay: 0s;
+		transition-property: transform;
+		transition-timing-function: linear;
+
+
+
+
+
+		transition-duration: 0s;
+}
+.fui-progress__percent.data-v-c4450786 {
+		text-align: center;
+
+		display: block;
+		flex-shrink: 0;
+}
+.fui-progress__active-color.data-v-c4450786 {
+		background: var(--fui-color-primary, #465CFF) !important;
+}
+
+

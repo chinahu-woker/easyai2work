@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "",
+  "usingComponents": {
+    "fui-input": "../../components/firstui/fui-input/fui-input",
+    "fui-checkbox": "../../components/firstui/fui-checkbox/fui-checkbox",
+    "fui-checkbox-group": "../../components/firstui/fui-checkbox-group/fui-checkbox-group",
+    "fui-button": "../../components/firstui/fui-button/fui-button"
+  }
+}
