@@ -1,7 +1,0 @@
-{
-  "component": true,
-  "usingComponents": {
-    "up-loading-icon": "../u-loading-icon/u-loading-icon",
-    "up-swiper-indicator": "../u-swiper-indicator/u-swiper-indicator"
-  }
-}

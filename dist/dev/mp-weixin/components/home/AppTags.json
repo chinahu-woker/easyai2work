@@ -1,6 +1,0 @@
-{
-  "component": true,
-  "usingComponents": {
-    "up-tabs": "../../node-modules/uview-plus/components/u-tabs/u-tabs"
-  }
-}

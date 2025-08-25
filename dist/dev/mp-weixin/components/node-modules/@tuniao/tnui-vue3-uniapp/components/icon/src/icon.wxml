@@ -1,1 +1,0 @@
-<view class="{{['data-v-f2efb85b', e, virtualHostClass]}}" style="{{f + ';' + virtualHostStyle}}" bindtap="{{g}}" hidden="{{virtualHostHidden}}" id="{{virtualHostId}}"><image wx:if="{{a}}" class="image data-v-f2efb85b" src="{{b}}" mode="{{c}}"/><text wx:else class="{{['data-v-f2efb85b', 'icon', d]}}"/></view>
