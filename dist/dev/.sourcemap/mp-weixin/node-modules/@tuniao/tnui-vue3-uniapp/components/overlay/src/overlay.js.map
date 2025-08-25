@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 {"version":3,"file":"overlay.js","sources":["../uniComponent:/QzovVXNlcnMvMzU1NzcvRG93bmxvYWRzL2Vhc3lhaS11bmlhcHAtYWlnYy9ub2RlX21vZHVsZXMvQHR1bmlhby90bnVpLXZ1ZTMtdW5pYXBwL2NvbXBvbmVudHMvb3ZlcmxheS9zcmMvb3ZlcmxheS52dWU"],"sourcesContent":["import Component from 'C:/Users/35577/Downloads/easyai-uniapp-aigc/node_modules/@tuniao/tnui-vue3-uniapp/components/overlay/src/overlay.vue'\nwx.createComponent(Component)"],"names":["Component"],"mappings":";;AACA,GAAG,gBAAgBA,cAAS,WAAA;"}
+=======
+{"version":3,"file":"overlay.js","sources":["../uniComponent:/RjovTXlHaXRodWIvbXlzZWxmLWFjZ2ktbXB3ZWl4aW4vbm9kZV9tb2R1bGVzL0B0dW5pYW8vdG51aS12dWUzLXVuaWFwcC9jb21wb25lbnRzL292ZXJsYXkvc3JjL292ZXJsYXkudnVl"],"sourcesContent":["import Component from 'F:/MyGithub/myself-acgi-mpweixin/node_modules/@tuniao/tnui-vue3-uniapp/components/overlay/src/overlay.vue'\nwx.createComponent(Component)"],"names":["Component"],"mappings":";;AACA,GAAG,gBAAgBA,cAAS,WAAA;"}
+>>>>>>> da05f2e6841bf28fad604aecea21d3ba518460f2

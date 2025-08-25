@@ -1,0 +1,17 @@
+import type { TransformPluginContext } from 'rollup';
+import type { BindingMetadata, SFCDescriptor, SFCTemplateCompileOptions } from 'vue/compiler-sfc';
+import type { ResolvedOptions } from '.';
+import type { TemplateCompilerOptions } from '../compiler/options';
+export declare function resolveGenTemplateCodeOptions(relativeFileName: string, code: string, descriptor: SFCDescriptor, options: {
+    mode: 'module' | 'default';
+    inline: boolean;
+    rootDir: string;
+    className: string;
+    sourceMap: boolean;
+    bindingMetadata?: BindingMetadata;
+    preprocessLang?: string;
+    preprocessOptions?: any;
+}, pluginContext?: TransformPluginContext): TemplateCompilerOptions & {
+    genDefaultAs?: string;
+};
+export declare function resolveTemplateCompilerOptions(descriptor: SFCDescriptor, options: ResolvedOptions): Omit<SFCTemplateCompileOptions, 'source'> | undefined;

@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 {"version":3,"file":"MyNavbar.js","sources":["../uniComponent:/QzovVXNlcnMvMzU1NzcvRG93bmxvYWRzL2Vhc3lhaS11bmlhcHAtYWlnYy9zcmMvY29tcG9uZW50cy9jb21tb24vTXlOYXZiYXIudnVl"],"sourcesContent":["import Component from 'C:/Users/35577/Downloads/easyai-uniapp-aigc/src/components/common/MyNavbar.vue'\nwx.createComponent(Component)"],"names":["Component"],"mappings":";;;;;;;;;;;;;;;;;;;;;;;AACA,GAAG,gBAAgBA,SAAS;"}
+=======
+{"version":3,"file":"MyNavbar.js","sources":["../uniComponent:/RjovTXlHaXRodWIvbXlzZWxmLWFjZ2ktbXB3ZWl4aW4vc3JjL2NvbXBvbmVudHMvY29tbW9uL015TmF2YmFyLnZ1ZQ"],"sourcesContent":["import Component from 'F:/MyGithub/myself-acgi-mpweixin/src/components/common/MyNavbar.vue'\nwx.createComponent(Component)"],"names":["Component"],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;AACA,GAAG,gBAAgBA,SAAS;"}
+>>>>>>> da05f2e6841bf28fad604aecea21d3ba518460f2

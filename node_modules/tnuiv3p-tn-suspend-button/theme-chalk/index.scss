@@ -1,0 +1,84 @@
+@use 'sass:map';
+@use './mixins/mixins.scss' as *;
+
+$tn-inner-sizes: 'sm', 'lg', 'xl';
+
+$suspend-button-sizes: () !default;
+$suspend-button-sizes: map.merge(
+  (
+    'sm': (
+      size: 80rpx,
+      icon-size: 50rpx,
+    ),
+    '': (
+      size: 100rpx,
+      icon-size: 60rpx,
+    ),
+    'lg': (
+      size: 120rpx,
+      icon-size: 80rpx,
+    ),
+    'xl': (
+      size: 140rpx,
+      icon-size: 90rpx,
+    ),
+  ),
+  $suspend-button-sizes
+);
+
+@include b(suspend-button) {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  width: map-get(map-get($suspend-button-sizes, ''), size);
+  height: map-get(map-get($suspend-button-sizes, ''), size);
+
+  @include e(icon) {
+    font-size: map-get(map-get($suspend-button-sizes, ''), icon-size);
+  }
+
+  /* 动画 */
+  @include m(float) {
+    animation: suspend-button-float 4s ease-in-out infinite;
+  }
+
+  /* 尺寸 */
+  @each $size in $tn-inner-sizes {
+    @include m($size) {
+      width: map-get(map-get($suspend-button-sizes, $size), size);
+      height: map-get(map-get($suspend-button-sizes, $size), size);
+
+      @include e(icon) {
+        font-size: map-get(map-get($suspend-button-sizes, $size), icon-size);
+      }
+    }
+  }
+
+  /* 绝对位置 */
+  @include m(fixed) {
+    position: fixed;
+  }
+
+  /* 形状 */
+  @include m(circle) {
+    border-radius: 50%;
+  }
+  @include m(square) {
+    border-radius: 8rpx;
+  }
+}
+
+/* 上下漂浮的动画 */
+@keyframes suspend-button-float {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-30rpx);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}

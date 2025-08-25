@@ -1,0 +1,110 @@
+@use './mixins/mixins.scss' as *;
+
+@include b(update-user-info-popup) {
+  padding: 50rpx 30rpx 60rpx 30rpx;
+
+  .btn-reset {
+    background-color: transparent;
+    border-radius: 0rpx;
+    color: unset;
+    font-size: unset;
+    line-height: unset;
+    overflow: visible;
+    padding: 0rpx;
+    &::after {
+      border: none;
+      border-radius: 0rpx;
+    }
+  }
+
+  @include e(title) {
+    font-size: 36rpx;
+    font-weight: bold;
+  }
+
+  @include e(tips) {
+    color: var(--tn-color-gray);
+    font-size: 26rpx;
+    margin-top: 12rpx;
+  }
+
+  @include e(avatar) {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 60rpx;
+
+    @include m(container) {
+      position: relative;
+      width: 180rpx;
+      height: 180rpx;
+      border-radius: 50%;
+
+      &::before {
+        content: '';
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 110%;
+        height: 110%;
+        border-radius: 50%;
+        background-color: rgba(255, 255, 255, 0.4);
+        box-shadow: 0rpx 0rpx 80rpx 0rpx rgba(0, 0, 0, 0.15);
+      }
+    }
+
+    @include m(empty) {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background-color: var(--tn-color-gray-light);
+      color: var(--tn-color-grey-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 100rpx;
+    }
+
+    @include m(assist) {
+      position: absolute;
+      right: -10rpx;
+      bottom: -12rpx;
+      width: 64rpx;
+      height: 64rpx;
+      border-radius: 50%;
+      background-color: #080808;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40rpx;
+      border: 6rpx solid #fff;
+    }
+  }
+
+  @include e(nickname-input) {
+    position: relative;
+    width: 100%;
+    height: 80rpx;
+    background-color: var(--tn-color-gray-light);
+    margin-top: 50rpx;
+    padding: 0rpx 20rpx;
+    border-radius: 12rpx;
+    font-size: 28rpx;
+  }
+
+  @include e(submit-btn) {
+    position: relative;
+    width: 100%;
+    margin-top: 70rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 26rpx 0rpx;
+    border-radius: 12rpx;
+  }
+}

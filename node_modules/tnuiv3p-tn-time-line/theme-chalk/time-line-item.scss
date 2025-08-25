@@ -1,0 +1,58 @@
+@use './mixins/mixins.scss' as *;
+@use './mixins/config.scss' as *;
+@use './variables.scss' as *;
+
+@include b(time-line-item) {
+  position: relative;
+  width: 100%;
+  margin-top: 30rpx;
+
+  &:first-of-type {
+    margin-top: 0rpx;
+  }
+
+  /* 标题点 start */
+  @include e(title) {
+    position: relative;
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+
+    @include m(dot) {
+      position: relative;
+      flex-grow: 0;
+      flex-shrink: 0;
+      width: $itemDotWidth;
+      height: $itemDotWidth;
+      font-size: $itemDotFontSize;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      line-height: 1;
+
+      @include when(line) {
+        &::before {
+          content: '';
+          position: absolute;
+          left: 50%;
+          bottom: -30rpx;
+          width: 2rpx;
+          height: 30rpx;
+          background-color: $lineColor;
+          transform: translate(-50%, calc(50% - 8rpx));
+        }
+      }
+    }
+
+    @include m(data) {
+      flex-grow: 1;
+      font-size: 36rpx;
+      color: var(--tn-color-gray);
+      padding-left: $dotDataSpacing;
+      line-height: 1;
+    }
+  }
+  /* 标题点 end */
+}
