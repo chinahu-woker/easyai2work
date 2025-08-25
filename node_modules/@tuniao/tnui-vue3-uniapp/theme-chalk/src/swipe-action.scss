@@ -1,6 +1,0 @@
-@use '../mixins/mixins.scss' as *;
-
-@include b(swipe-action) {
-  position: relative;
-  width: 100%;
-}

@@ -1,7 +1,0 @@
-@use '../mixins/mixins' as *;
-
-@include b(form) {
-  display: block;
-  position: relative;
-  width: 100%;
-}

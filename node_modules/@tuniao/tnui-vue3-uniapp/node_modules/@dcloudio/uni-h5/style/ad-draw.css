@@ -1,8 +1,0 @@
-uni-ad-draw {
-  display: block;
-  overflow: hidden;
-}
-
-uni-ad-draw[hidden] {
-  display: none;
-}
