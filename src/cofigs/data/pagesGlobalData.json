@@ -1,0 +1,86 @@
+{
+  "globalAppData": {
+    "name": "globalAppData",
+    "share": {
+      "appInfo": "这款全民使用的AI程序，简直好用到爆炸"
+    }
+  },
+  "tabbarData": [
+    {
+      "text": "首页",
+      "iconPath": "https://static.nailoffice.cn/2025-09-21/6841119cb9df852ec0a2c684/upload/20250921152153882-画板1.svg",
+      "selectedIconPath": "https://static.nailoffice.cn/2025-09-17/6841119cb9df852ec0a2c684/upload/20250917223323627-画板2(2).png"
+    },
+    {
+      "text": "应用",
+      "iconPath": "https://static.nailoffice.cn/2025-09-21/6841119cb9df852ec0a2c684/upload/20250921152304246-默认变量(1).svg",
+      "selectedIconPath": "https://static.nailoffice.cn/2025-09-21/6841119cb9df852ec0a2c684/upload/20250921152249772-默认变量.svg"
+    },
+    {
+      "text": "我的",
+      "iconPath": "https://static.nailoffice.cn/2025-09-21/6841119cb9df852ec0a2c684/upload/20250921152428670-画板5.svg",
+      "selectedIconPath": "https://static.nailoffice.cn/2025-09-21/6841119cb9df852ec0a2c684/upload/20250921152442877-画板5(1).svg"
+    }
+  ],
+  "backGroundImage": "https://chinahu-ai-server.oss-cn-chengdu.aliyuncs.com/aidraw/image/temps/67873d6c232a3c5d52240dd6/Home2.jpg",
+  "HeadProps": {
+    "logo": "https://static.nailoffice.cn/2025-09-21/6841119cb9df852ec0a2c684/upload/20250921163322818-分组1.svg",
+    "appName": "聚类AI",
+    "title": "AIGC",
+    "subtitle": "上传图片\n生成专属内容",
+    "image": "https://static.nailoffice.cn/2025-09-19/6841119cb9df852ec0a2c684/upload/20250919115203543-微信图片_20250919115018_1016_164.jpg",
+    "image2": "https://static.nailoffice.cn/2025-09-19/6841119cb9df852ec0a2c684/upload/20250919135340532-12.svg",
+    "primaryText": "免费体验",
+    "rightButtonText": "人气功能",
+    "rightTitle": "AI视频",
+    "rightDesc": "上传图片\n生成趣味视频",
+    "badgeText": "VIP"
+  },
+  "iconData": {
+    "icons": [
+      {
+        "id": "icon-remen",
+        "symbol": "iconfontIndex ",
+        "label": "热门应用",
+        "action": "ai_expand",
+        "matchKeywords": ["热门", "热门应用"],
+        "actionButton": "false"
+      },
+      {
+        "id": "icon-x_touxiang",
+        "symbol": "iconfontIndex ",
+        "label": "趣味像素",
+        "action": "quality_enhance",
+        "matchKeywords": ["趣味", "趣味像素"],
+        "actionButton": "false"
+      },
+      {
+        "id": "icon-huihua",
+        "symbol": "iconfontIndex ",
+        "label": "AI绘画",
+        "action": "local_draw",
+        "matchKeywords": ["绘画", "AI绘画"],
+        "actionButton": "false"
+      },
+      {
+        "id": "icon-huazhizengqiang",
+        "symbol": "iconfontIndex ",
+        "label": "画质增强",
+        "action": "ai_headshot",
+        "matchKeywords": ["画质", "增强"],
+        "actionButton": "true"
+      }
+    ],
+    "columns": 4,
+    "iconSize": 100,
+    "gap": 42
+  },
+  "storeProps": {
+    "showTag": "AI工具",
+    "showTags": ["图生视频", "AI产品生成", "AI重绘"],
+    "filterMode": "any"
+  },    
+  "payWorkProps": {
+    "showTag": "付费应用"
+  }
+}

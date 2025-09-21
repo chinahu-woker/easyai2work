@@ -1,0 +1,15 @@
+@import "/src/static/icon/iconfont.css"; /* 全局导入 iconfont，便于小程序端加载字体 */
+
+.reset-button {
+    padding: 0;
+    background-color: transparent;
+    font-size: inherit;
+    line-height: inherit;
+    color: inherit;
+
+    &::after {
+        border: none;
+    }
+}
+
+@import 'weapp-tailwindcss';

@@ -1,0 +1,72 @@
+{
+  "id": "5024406",
+  "name": "nailoffice",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "45593095",
+      "name": "图生美甲",
+      "font_class": "tushengmeijia",
+      "unicode": "e601",
+      "unicode_decimal": 58881
+    },
+    {
+      "icon_id": "45593121",
+      "name": "穿戴甲定制",
+      "font_class": "chuandaijiadingzhi",
+      "unicode": "e602",
+      "unicode_decimal": 58882
+    },
+    {
+      "icon_id": "45593135",
+      "name": "文生美甲",
+      "font_class": "wenshengmeijia",
+      "unicode": "e604",
+      "unicode_decimal": 58884
+    },
+    {
+      "icon_id": "45593134",
+      "name": "AI上手",
+      "font_class": "AIshangshou",
+      "unicode": "e603",
+      "unicode_decimal": 58883
+    },
+    {
+      "icon_id": "3401731",
+      "name": "热门",
+      "font_class": "remen",
+      "unicode": "e6a6",
+      "unicode_decimal": 59046
+    },
+    {
+      "icon_id": "7163224",
+      "name": "x_头像",
+      "font_class": "x_touxiang",
+      "unicode": "e694",
+      "unicode_decimal": 59028
+    },
+    {
+      "icon_id": "8361787",
+      "name": "绘画",
+      "font_class": "huihua",
+      "unicode": "e6c2",
+      "unicode_decimal": 59074
+    },
+    {
+      "icon_id": "39348342",
+      "name": "画质增强",
+      "font_class": "huazhizengqiang",
+      "unicode": "e72a",
+      "unicode_decimal": 59178
+    },
+    {
+      "icon_id": "41455850",
+      "name": "AI扩图",
+      "font_class": "AIkuotu",
+      "unicode": "e6a1",
+      "unicode_decimal": 59041
+    }
+  ]
+}
