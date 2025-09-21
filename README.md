@@ -70,6 +70,7 @@
 ![1758447738139](images/README/1758447738139.png)
 
 
+
 ## 📌 项目特性
 
 - ✅ **兼容性强**：适配EasyAI官方后台系统
@@ -147,8 +148,9 @@
 
    # 2. 解压文件进入项目目录
    cd myself-acgi-mpweixin
+   cd src
 
-   # 3. 安装依赖（如果npm报错可以使用 pnpm install）
+   # 3. 安装依赖（如果npm报错可以使用，Windows建议使用pnpm兼容性好 pnpm install）
    npm install
    ```
 2. **环境配置**（修改 `.env` 文件）
