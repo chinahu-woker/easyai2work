@@ -1,6 +1,10 @@
 <template>
 
-    <view class="community-container">
+    <scroll-view 
+        class="community-container" 
+        scroll-y="true" 
+        @scrolltolower="loadMoreData"
+        :lower-threshold="100">
         <view style="margin-bottom: -55rpx;">
             <text style="font-size: 40rpx; margin-left: 25rpx; ">热门作品</text>
             <fui-icon custom-prefix="iconfontIndex" name="icon-remen" size="45"></fui-icon>
@@ -17,7 +21,7 @@
         <!-- 错误状态 -->
         <view v-else-if="errorMsg" class="error-container">
             <text class="error-text">{{ errorMsg }}</text>
-            <button class="retry-btn" @click="getTestImageData">重试</button>
+            <button class="retry-btn" @click="() => getTestImageData(false)">重试</button>
         </view>
 
         <!-- 空数据状态 -->
@@ -66,6 +70,17 @@
             </view>
         </view>
 
+        <!-- 加载更多状态 -->
+        <view v-if="loadingMore" class="loading-more-container">
+            <view class="loading-more-spinner"></view>
+            <text class="loading-more-text">加载更多中...</text>
+        </view>
+
+        <!-- 没有更多数据提示 -->
+        <view v-else-if="!hasMoreData && graphicDatas.length > 0" class="no-more-data">
+            <text class="no-more-text">已显示全部内容</text>
+        </view>
+
         <!-- 底部版权信息 -->
         <view class="footer-space">
             <fui-footer text="内容由AI生成请仔细甄别"></fui-footer>
@@ -77,7 +92,7 @@
         <!-- 隐藏的Canvas用于生成海报 -->
         <canvas canvas-id="posterCanvas"
             style="position: fixed; top: -9999px; left: -9999px; width: 750px; height: 1334px;"></canvas>
-    </view>
+    </scroll-view>
 </template>
 
 <script setup lang="ts">
@@ -96,10 +111,23 @@ const loading = ref(true)
 const errorMsg = ref('')
 const isComponentReady = ref(false)
 
-const getTestImageData = async () => {
+// 分页状态管理
+const currentPage = ref(1)
+const pageSize = ref(10)
+const hasMoreData = ref(true)
+const loadingMore = ref(false)
+const allImageData = ref<IDrawHistoryItem[]>([])
+const displayedCount = ref(10) // 当前显示的数据数量
+
+const getTestImageData = async (isLoadMore = false) => {
     try {
-        loading.value = true
-        errorMsg.value = ''
+        if (!isLoadMore) {
+            loading.value = true
+            errorMsg.value = ''
+        } else {
+            loadingMore.value = true
+        }
+
         const response = await request<IDrawHistoryItem[]>('draw/history/findMany', {
             method: 'POST',
             data: {
@@ -111,31 +139,79 @@ const getTestImageData = async () => {
         })
 
         if (response && Array.isArray(response) && response.length > 0) {
-            imageData.value = response
+            if (!isLoadMore) {
+                // 首次加载，重置所有数据
+                allImageData.value = response
+                displayedCount.value = Math.min(pageSize.value, response.length)
+                hasMoreData.value = response.length > pageSize.value
+            } else {
+                // 加载更多，保持原有数据不变，只增加显示数量
+                const newDisplayCount = Math.min(displayedCount.value + pageSize.value, allImageData.value.length)
+                displayedCount.value = newDisplayCount
+                hasMoreData.value = newDisplayCount < allImageData.value.length
+            }
         } else {
-            imageData.value = []
+            if (!isLoadMore) {
+                allImageData.value = []
+                displayedCount.value = 0
+            }
+            hasMoreData.value = false
         }
 
     } catch (err) {
         console.error('=== NewCommunity组件：获取数据失败 ===', err)
-        errorMsg.value = '数据加载失败: ' + (err as any)?.message || '未知错误'
-
-        imageData.value = []
+        if (!isLoadMore) {
+            errorMsg.value = '数据加载失败: ' + (err as any)?.message || '未知错误'
+            allImageData.value = []
+            displayedCount.value = 0
+        } else {
+            uni.showToast({
+                title: '加载失败，请重试',
+                icon: 'error'
+            })
+        }
+        hasMoreData.value = false
     } finally {
-        loading.value = false
+        if (!isLoadMore) {
+            loading.value = false
+        } else {
+            loadingMore.value = false
+        }
     }
+}
+
+// 加载更多数据
+const loadMoreData = async () => {
+    if (loadingMore.value || !hasMoreData.value) return
+    
+    console.log('触发加载更多数据')
+    await getTestImageData(true)
 }
 
 const imageData = ref<IDrawHistoryItem[]>([])
 
-// 图文卡片展示的数据
+// 图文卡片展示的数据 - 基于显示数量控制
 const graphicDatas = computed(() => {
-    if (!Array.isArray(imageData.value)) {
+    if (!Array.isArray(allImageData.value)) {
         return []
     }
 
-    const result = imageData.value.map((item, index) => {
+    // 只取当前应该显示的数据数量
+    const dataToShow = allImageData.value.slice(0, displayedCount.value)
+
+    const result = dataToShow.map((item, index) => {
         const it: any = item || {}
+
+        // 调试信息：输出视频类型的数据
+        if (it.type === 'video') {
+            console.log('处理视频数据:', {
+                id: it._id,
+                type: it.type,
+                workflowName: it.workflow_name,
+                outputCount: it.output?.length || 0,
+                outputUrls: it.output
+            })
+        }
 
         const mappedItem = {
             id: it._id,
@@ -144,35 +220,75 @@ const graphicDatas = computed(() => {
             username: it.user_id?.nickname || it.user_id?.username || '匿名用户',
             description: formatDateTime(new Date(it.created_at || Date.now())),
             tags: it.tags || [],
-            content: (it.params?.positive?.slice(0, 120) || '') + "...",
+            content: (() => {
+                if (it.type === 'video') {
+                    // 视频类型显示工作流名称和描述
+                    const workflowTitle = it.workflow_title || it.workflow_name || ''
+                    const positive = it.params?.positive || ''
+                    if (workflowTitle && positive) {
+                        return `${workflowTitle}: ${positive.slice(0, 80)}...`
+                    } else if (workflowTitle) {
+                        return workflowTitle
+                    } else if (positive) {
+                        return positive.slice(0, 120) + '...'
+                    } else {
+                        return '视频内容'
+                    }
+                } else {
+                    // 图片类型显示原来的逻辑
+                    return (it.params?.positive?.slice(0, 120) || '') + "..."
+                }
+            })(),
+            type: it.type || 'image', // 添加类型信息
+            mediaSize: it.mediaSize || null, // 添加媒体尺寸信息
+            workflowName: it.workflow_name || it.workflow_title || '', // 工作流名称
             images: (() => {
                 const inputImages: string[] = []
                 const paramsAny = it.params as Record<string, any> | undefined
+                
+                // 收集输入图片
                 if (paramsAny) {
                     for (const key in paramsAny) {
                         if (key.startsWith('image_path_') && paramsAny[key]) {
-                            inputImages.push(paramsAny[key])
+                            // 只有当参数值是图片URL时才添加
+                            const value = paramsAny[key]
+                            if (typeof value === 'string' && 
+                                value.match(/\.(jpg|jpeg|png|gif|bmp|webp|avif|svg|tiff|tif|ico)(\?|$)/i)) {
+                                inputImages.push(value)
+                            }
                         }
                     }
                 }
                 
-                let allImages = []
-                if (it.output && Array.isArray(it.output)) {
-                    allImages = [...inputImages, ...it.output]
+                let allMediaUrls = []
+                
+                // 根据数据类型处理输出内容
+                if (it.type === 'video') {
+                    // 如果是视频类型，output 中的内容应该作为视频处理
+                    if (it.output && Array.isArray(it.output)) {
+                        allMediaUrls = [...inputImages, ...it.output]
+                    } else {
+                        allMediaUrls = inputImages
+                    }
                 } else {
-                    allImages = inputImages
+                    // 如果不是视频类型，按原来的逻辑处理（主要是图片）
+                    if (it.output && Array.isArray(it.output)) {
+                        allMediaUrls = [...inputImages, ...it.output]
+                    } else {
+                        allMediaUrls = inputImages
+                    }
                 }
                 
-                // 过滤无效的图片URL
-                const validImages = allImages.filter(img => 
-                    img && 
-                    typeof img === 'string' && 
-                    img.trim() !== '' &&
-                    (img.startsWith('http://') || img.startsWith('https://'))
+                // 过滤无效的媒体URL
+                const validMediaUrls = allMediaUrls.filter(media => 
+                    media && 
+                    typeof media === 'string' && 
+                    media.trim() !== '' &&
+                    (media.startsWith('http://') || media.startsWith('https://'))
                 )
                 
-                // 如果没有有效图片，返回空数组
-                return validImages.length > 0 ? validImages : []
+                // 如果没有有效媒体，返回空数组
+                return validMediaUrls.length > 0 ? validMediaUrls : []
             })(),
             viewCount: (it.view_count ?? it.viewCount ?? Math.floor(Math.random() * 1000)),
             viewUserAvatars: it.view_user_avatars ?? it.viewUserAvatars ?? [],
@@ -411,13 +527,13 @@ function copyShareLink(itemData?: any) {
 
 onMounted(() => {
     console.log('=== NewCommunity组件：已挂载 ===')
-    getTestImageData()
+    getTestImageData(false)
 })
 
 // 组件挂载时处理已有数据
 onMounted(async () => {
     // 获取数据
-    await getTestImageData()
+    await getTestImageData(false)
     
     // 如果数据已经存在，立即初始化
     if (graphicDatas.value && graphicDatas.value.length > 0) {
@@ -430,13 +546,17 @@ onMounted(async () => {
 onUnmounted(() => {
     console.log('=== NewCommunity组件：已卸载 ===')
     // 销毁当前组件
-    imageData.value = []
+    allImageData.value = []
+    displayedCount.value = 0
+    hasMoreData.value = true
+    loadingMore.value = false
 })
 </script>
 <style scoped lang="scss">
 .community-container {
     background: transparent;
     min-height: 100vh;
+    height: 100vh;
     padding: 0 20rpx;
     box-sizing: border-box;
 }
@@ -631,5 +751,45 @@ onUnmounted(() => {
     font-size: 22rpx;
     color: #007aff;
     font-weight: 500;
+}
+
+/* 加载更多样式 */
+.loading-more-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40rpx;
+    margin-top: 20rpx;
+}
+
+.loading-more-spinner {
+    width: 60rpx;
+    height: 60rpx;
+    border: 4rpx solid #f3f3f3;
+    border-top: 4rpx solid #007aff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.loading-more-text {
+    margin-top: 20rpx;
+    font-size: 26rpx;
+    color: #666;
+}
+
+/* 无更多数据样式 */
+.no-more-data {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40rpx;
+    margin-top: 20rpx;
+}
+
+.no-more-text {
+    font-size: 26rpx;
+    color: #999;
+    opacity: 0.8;
 }
 </style>

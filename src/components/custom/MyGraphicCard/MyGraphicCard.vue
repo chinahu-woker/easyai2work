@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+	import { ref, reactive } from 'vue'
 	import TnIcon from '@tuniao/tnui-vue3-uniapp/components/icon/src/icon.vue'
 	import TnPhotoAlbum from '@tuniao/tnui-vue3-uniapp/components/photo-album/src/photo-album.vue'
 	import TnAvatar from '@tuniao/tnui-vue3-uniapp/components/avatar/src/avatar.vue'
@@ -9,6 +10,12 @@
 
 	const props = defineProps(graphicCardProps)
 	const emits = defineEmits(graphicCardEmits)
+
+	// 媒体加载状态管理
+	const imageLoadingStates = reactive<Record<number, boolean>>({})
+	const imageErrorStates = reactive<Record<number, boolean>>({})
+	const videoLoadingStates = reactive<Record<number, boolean>>({})
+	const videoErrorStates = reactive<Record<number, boolean>>({})
 
 	const {
 		viewUserAvatars,
@@ -34,22 +41,86 @@
 		likeStyle,
 	} = useGraphicCardCustomStyle(props)
 
+	// 图片事件处理
+	const onImageLoad = (event: any) => {
+		// 简化处理：由于uni-app限制，我们使用一个通用的处理方式
+		console.log('图片加载成功')
+	}
 
+	const onImageError = (event: any) => {
+		console.error('图片加载失败:', event)
+		uni.showToast({
+			title: '图片加载失败',
+			icon: 'none',
+			duration: 2000
+		})
+	}
+
+	// 视频事件处理
+	const onVideoLoadStart = (event: any) => {
+		console.log('视频开始加载')
+	}
+
+	const onVideoCanPlay = (event: any) => {
+		console.log('视频可以播放')
+	}
+
+	const onVideoError = (event: any) => {
+		console.error('视频加载失败:', event)
+		uni.showToast({
+			title: '视频加载失败',
+			icon: 'none',
+			duration: 2000
+		})
+	}
+
+	// 简化的索引获取函数
+	const getMediaIndex = (target: any): number => {
+		// 由于uni-app的DOM限制，这里返回0作为默认值
+		// 在实际项目中，可以通过其他方式来追踪具体的媒体项
+		return 0
+	}
+
+	// 重试加载图片
+	const retryLoadImage = (index: number, src: string) => {
+		console.log('重试加载图片:', src)
+		// 重新加载逻辑可以通过父组件的数据更新来实现
+		uni.showToast({
+			title: '正在重新加载...',
+			icon: 'loading',
+			duration: 1000
+		})
+	}
+
+	// 获取视频海报图
+	const getVideoPoster = (videoUrl: string): string => {
+		// 可以从videoUrl推断海报图URL，或返回默认海报
+		// 这里返回空字符串，让video组件使用默认行为
+		return ''
+	}
 
 	function linkType(url: string | undefined): number {
-		// console.log("------------------------imageCount----------",images)
 		// 如果输入不是字符串，返回 2（未知类型）
 		if (typeof url !== 'string') return 2;
 
-		// 图片扩展名正则表达式
-		const imageExtensions = /\.(jpg|jpeg|png|gif|bmp|webp)$/i;
-		// 视频扩展名正则表达式
-		const videoExtensions = /\.(mp4|avi|mov|mkv|flv|wmv)$/i;
+		// 移除 URL 中的查询参数和锚点，获取纯净的文件路径
+		const cleanUrl = url.split('?')[0].split('#')[0];
+
+		// 图片扩展名正则表达式 - 包含 WebP、AVIF 等现代格式
+		const imageExtensions = /\.(jpg|jpeg|png|gif|bmp|webp|avif|svg|tiff|tif|ico)$/i;
+		
+		// 视频扩展名正则表达式 - 包含更多视频格式
+		const videoExtensions = /\.(mp4|avi|mov|mkv|flv|wmv|webm|m4v|3gp|ogv|asf|rm|rmvb|vob|ts|mts|m2ts)$/i;
 
 		// 判断是否为图片
-		if (imageExtensions.test(url)) return 0; // 返回 0 表示图片
+		if (imageExtensions.test(cleanUrl)) return 0; // 返回 0 表示图片
+		
 		// 判断是否为视频
-		if (videoExtensions.test(url)) return 1; // 返回 1 表示视频
+		if (videoExtensions.test(cleanUrl)) return 1; // 返回 1 表示视频
+
+		// 通过 MIME 类型判断（如果URL包含MIME信息）
+		if (url.includes('image/')) return 0;
+		if (url.includes('video/')) return 1;
 
 		// 都不是，返回 2（未知类型）
 		return 2;
@@ -97,36 +168,43 @@
 						indicator-active-color="#007aff">
 						<swiper-item v-for="(item, index) in images" :key="`${index}-${item}`" :class="[ns.e('swiper-item')]">
 							<!-- 图片 -->
-							<view v-if="linkType(item) == 0" @tap.stop="previewImageHandle(index)" style="width: 100%; height: 100%;">
-								<!-- 原生image作为备选方案 -->
+							<view v-if="linkType(item) == 0" @tap.stop="previewImageHandle(index)" style="width: 100%; height: 100%; position: relative;">
+								<!-- 主图片 -->
 								<image 
 									class="swiper-image" 
 									mode="aspectFill" 
 									:src="item" 
 									style="width: 100%; height: 100%; border-radius: 12rpx;"
-									@load="() => $nextTick(() => $forceUpdate())"
-									@error="() => $nextTick(() => $forceUpdate())" />
-								<!-- TnLazyLoad备选 -->
-								<!-- <TnLazyLoad 
-									class="swiper-image" 
-									mode="aspectFill" 
-									:src="item" 
-									:width="'100%'"
-									:height="'100%'"
-									:lazy="false" /> -->
+									:show-menu-by-longpress="false"
+									:lazy-load="true"
+									@load="onImageLoad"
+									@error="onImageError">
+								</image>
 							</view>
+							
 							<!-- 视频 -->
-							<view v-else-if="linkType(item) == 1" style="width: 100%; height: 100%;">
+							<view v-else-if="linkType(item) == 1" style="width: 100%; height: 100%; position: relative;">
 								<video 
 									class="swiper-video"
 									:src="item" 
-									controls
-									style="width: 100%; height: 100%; object-fit: cover;">
+									:controls="true"
+									:show-center-play-btn="true"
+									:show-play-btn="true"
+									:enable-play-gesture="true"
+									:object-fit="'cover'"
+									:poster="getVideoPoster(item)"
+									style="width: 100%; height: 100%; border-radius: 12rpx;"
+									@error="onVideoError"
+									@loadstart="onVideoLoadStart"
+									@canplay="onVideoCanPlay">
 								</video>
 							</view>
+							
 							<!-- 未识别类型 -->
-							<view v-else style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #f0f0f0;">
-								<text style="color: #999;">无法显示内容</text>
+							<view v-else style="width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); border-radius: 12rpx;">
+								<TnIcon name="file" size="40" color="#ccc" />
+								<text style="color: #999; font-size: 24rpx; margin-top: 8rpx;">不支持的格式</text>
+								<text style="color: #ccc; font-size: 20rpx; margin-top: 4rpx;">{{ item.split('.').pop()?.toUpperCase() }}</text>
 							</view>
 						</swiper-item>
 					</swiper>
@@ -194,4 +272,86 @@
 
 <style lang="scss" scoped>
 	@import './theme-chalk/index.scss';
+
+	// 媒体加载状态样式
+	.image-loading-overlay,
+	.video-loading-overlay {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		background: rgba(255, 255, 255, 0.8);
+		border-radius: 12rpx;
+		z-index: 10;
+	}
+
+	.video-loading-overlay {
+		background: rgba(0, 0, 0, 0.6);
+	}
+
+	.image-error-overlay,
+	.video-error-overlay {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		background: rgba(245, 245, 245, 0.9);
+		border-radius: 12rpx;
+		cursor: pointer;
+		z-index: 10;
+		transition: all 0.3s ease;
+
+		&:hover {
+			background: rgba(240, 240, 240, 0.95);
+		}
+	}
+
+	.loading-spinner-small {
+		width: 40rpx;
+		height: 40rpx;
+		border: 3rpx solid rgba(255, 255, 255, 0.3);
+		border-top: 3rpx solid #007aff;
+		border-radius: 50%;
+		animation: spin-small 1s linear infinite;
+	}
+
+	@keyframes spin-small {
+		0% {
+			transform: rotate(0deg);
+		}
+		100% {
+			transform: rotate(360deg);
+		}
+	}
+
+	// 视频样式优化
+	.swiper-video {
+		border-radius: 12rpx;
+		background: #000;
+	}
+
+	// 图片样式优化
+	.swiper-image {
+		transition: all 0.3s ease;
+		
+		&:hover {
+			transform: scale(1.02);
+		}
+	}
+
+	// 媒体容器样式
+	.media-swiper {
+		border-radius: 12rpx;
+		overflow: hidden;
+	}
 </style>

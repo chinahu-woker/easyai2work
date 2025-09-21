@@ -28,8 +28,29 @@
     </swiper>
     <!-- 自定义指示器 -->
     <view class="thumbnail-nav" v-if="draw_data.data?.output?.length > 1">
-      <image v-for="(item, index_cer) in draw_data.data?.output" :key="index_cer" :src="item"
-        :class="['thumbnail', { active: currentIndex === index_cer }]" @click="goToSlide(index_cer)" />
+      <view v-for="(item, index_cer) in draw_data.data?.output" :key="index_cer" 
+            :class="['thumbnail-wrapper', { active: currentIndex === index_cer }]" 
+            @click="goToSlide(index_cer)">
+        
+        <!-- 图片缩略图 -->
+        <image v-if="getItemType(item) === 'image'" 
+               :src="item"
+               class="thumbnail" 
+               mode="aspectFill" />
+               
+        <!-- 视频缩略图 -->
+        <view v-else class="video-thumbnail">
+          <!-- 尝试使用视频的第一帧作为缩略图 -->
+          <image :src="getThumbnailUrl(item)" 
+                 class="thumbnail" 
+                 mode="aspectFill"
+                 @error="onThumbnailError" />
+          <!-- 视频图标覆盖层 -->
+          <view class="video-thumbnail-overlay">
+            <fui-icon name="play" color="#fff" size="16"></fui-icon>
+          </view>
+        </view>
+      </view>
     </view>
   </view>
 
@@ -184,7 +205,33 @@ const videoContexts = ref<UniApp.VideoContext[]>([])
 
 // 获取 item 类型
 function getItemType(url: string): 'image' | 'video' {
-  return /\.(mp4|webm|ogg|mov)$/i.test(url) ? 'video' : 'image'
+  if (!url || typeof url !== 'string') return 'image'
+  
+  // 移除URL参数，只检查文件扩展名
+  const cleanUrl = url.split('?')[0].split('#')[0]
+  const videoExtensions = /\.(mp4|webm|ogg|mov|avi|mkv|flv|wmv|m4v|3gp)$/i
+  
+  return videoExtensions.test(cleanUrl) ? 'video' : 'image'
+}
+
+// 获取缩略图URL - 为视频生成预览图
+function getThumbnailUrl(url: string): string {
+  if (getItemType(url) === 'video') {
+    // 对于视频，返回默认的视频图标
+    return '/static/video-placeholder.png'
+  }
+  
+  return url
+}
+
+// 缩略图加载错误处理
+function onThumbnailError(event: any) {
+  // 当视频缩略图加载失败时，使用存在的logo图标作为备用
+  const target = event.target
+  if (target) {
+    target.src = '/static/logo.png'
+    target.onerror = null // 防止无限循环
+  }
 }
 
 // 获取视频上下文
@@ -838,23 +885,56 @@ async function submitComment() {
   white-space: nowrap;
 }
 
-.thumbnail {
+.thumbnail-wrapper {
+  position: relative;
   width: 100rpx;
   height: 100rpx;
+  border-radius: 12rpx;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.thumbnail-wrapper.active {
+  transform: scale(1.1);
+  border: 2rpx solid #465CFF;
+}
+
+.thumbnail-wrapper:active {
+  transform: scale(0.95);
+}
+
+.thumbnail {
+  width: 100%;
+  height: 100%;
   border-radius: 12rpx;
   opacity: 0.6;
   transition: all 0.3s ease;
   object-fit: cover;
 }
 
-.thumbnail.active {
+.thumbnail-wrapper.active .thumbnail {
   opacity: 1;
-  transform: scale(1.1);
-  border: 2rpx solid #465CFF;
 }
 
-.thumbnail:active {
-  transform: scale(0.95);
+.video-thumbnail {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.video-thumbnail-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 32rpx;
+  height: 32rpx;
+  background-color: rgba(0, 0, 0, 0.6);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
 }
 
 .thumbnail-nav::-webkit-scrollbar {
