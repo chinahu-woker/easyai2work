@@ -9,14 +9,18 @@ import { storeProps } from '@/cofigs/data/globalAppData.ts';
 
 // 加载状态
 const isLoading = ref(true)
-// 瀑布流初始化状态
-const isWaterfallReady = ref(false)
-
-// 获取瀑布流元素的引用
-const waterfallElement = ref()
 
 // 防抖定时器
 let debounceTimer: number | null = null
+
+// 顶部三个区域轮播相关状态
+const currentAppIndex = ref(0) // 当前显示的应用起始索引
+const isContentTransitioning = ref(false)
+let contentCarouselTimer: number | null = null
+const CONTENT_CAROUSEL_INTERVAL = 6000 // 6秒轮播间隔
+
+// 标签切换状态（仅手动控制）
+const currentTagIndex = ref(0)
 
 // 组件挂载时初始化工作流数据
 onMounted(async () => {
@@ -24,10 +28,10 @@ onMounted(async () => {
     await useAppStore().initWorkFlows_All()
   } finally {
     isLoading.value = false
-    // 数据加载完成后启用瀑布流
+    // 数据加载完成后启动内容轮播
     nextTick(() => {
       setTimeout(() => {
-        isWaterfallReady.value = true
+        startContentCarousel() // 启动内容轮播
       }, 100)
     })
   }
@@ -39,9 +43,9 @@ onBeforeUnmount(() => {
     clearTimeout(debounceTimer)
     debounceTimer = null
   }
-  if (updateTimer) {
-    clearTimeout(updateTimer)
-    updateTimer = null
+  if (contentCarouselTimer) {
+    clearInterval(contentCarouselTimer)
+    contentCarouselTimer = null
   }
 })
 
@@ -60,153 +64,118 @@ const props = defineProps({
   filterMode: { type: String as PropType<'any' | 'all' | 'single'>, default: storeProps.filterMode }
 })
 
-// 只展示标签包含指定 showTag 的卡片
+// 当前标签
+const currentTag = computed(() => {
+  return props.showTags[currentTagIndex.value] || props.showTag
+})
+
+// 只展示当前标签的卡片
 const showApps = computed<IWorkFlow[]>(() => {
   if (!workflows_all.value?.length) return []
   
-  // 根据筛选模式决定使用的标签
-  let targetTags: string[] = []
-  if (props.filterMode === 'single') {
-    targetTags = [props.showTag]
-  } else if (props.showTags.length > 0) {
-    targetTags = props.showTags
-  } else {
-    targetTags = [props.showTag]
-  }
+  // 使用当前标签进行筛选
+  const targetTag = currentTag.value
   
   // 使用缓存避免重复计算
-  const cacheKey = `${props.filterMode}-${targetTags.join(',')}-${workflows_all.value.length}`
+  const cacheKey = `single-${targetTag}-${workflows_all.value.length}`
   if (filteredResultCache.value.has(cacheKey)) {
     return filteredResultCache.value.get(cacheKey)!
   }
   
-  let result: IWorkFlow[] = []
-  
-  switch (props.filterMode) {
-    case 'any':
-      // 匹配任一标签：应用的标签中包含目标标签中的任何一个
-      result = workflows_all.value.filter(item => 
-        item.tags?.some(tag => targetTags.includes(tag))
-      )
-      break
-    case 'all':
-      // 匹配所有标签：应用的标签中包含目标标签中的所有标签
-      result = workflows_all.value.filter(item => 
-        targetTags.every(targetTag => item.tags?.includes(targetTag))
-      )
-      break
-    case 'single':
-    default:
-      // 单标签匹配：应用的标签中包含指定的单个标签
-      result = workflows_all.value.filter(item => item.tags?.includes(targetTags[0]))
-      break
-  }
+  // 单标签匹配：应用的标签中包含当前标签
+  const result = workflows_all.value.filter(item => item.tags?.includes(targetTag))
   
   filteredResultCache.value.set(cacheKey, result)
-  console.log(`Filtering showApps by mode="${props.filterMode}", tags="${targetTags.join(',')}", found:`, result.length)
+  console.log(`Filtering showApps by tag="${targetTag}", found:`, result.length)
   return result
 })
 
-// 创建瀑布流的key，确保标签切换时强制重新渲染
-const waterfallKey = computed(() => {
-  const targetTags = props.showTags.length > 0 ? props.showTags.join(',') : props.showTag
-  return `waterfall-${props.filterMode}-${targetTags}-${showApps.value.length}`
+// 创建组件的key，确保内容变化时强制重新渲染
+const componentKey = computed(() => {
+  return `content-${currentTag.value}-${showApps.value.length}-${currentAppIndex.value}`
 })
 
-// 顶部 3 个应用（左大右小）与其余应用
+// 内容轮播控制函数
+const startContentCarousel = () => {
+  if (contentCarouselTimer) {
+    clearInterval(contentCarouselTimer)
+  }
+  
+  // 只有当应用数量大于3个时才启动轮播
+  if (showApps.value.length > 3) {
+    contentCarouselTimer = setInterval(() => {
+      nextContent()
+    }, CONTENT_CAROUSEL_INTERVAL) as any
+  }
+}
+
+const stopContentCarousel = () => {
+  if (contentCarouselTimer) {
+    clearInterval(contentCarouselTimer)
+    contentCarouselTimer = null
+  }
+}
+
+const nextContent = () => {
+  if (isContentTransitioning.value || showApps.value.length <= 3) return
+  
+  isContentTransitioning.value = true
+  // 每次轮播移动3个位置，显示完全不同的应用组合
+  currentAppIndex.value = (currentAppIndex.value + 3) % showApps.value.length
+  
+  // 过渡动画完成后重置状态
+  setTimeout(() => {
+    isContentTransitioning.value = false
+  }, 500)
+}
+
+// 标签切换函数（仅手动控制）
+const switchToTag = (index: number) => {
+  if (index === currentTagIndex.value) return
+  
+  currentTagIndex.value = index
+  currentAppIndex.value = 0 // 切换标签时重置内容索引
+  
+  // 重新开始内容轮播
+  setTimeout(() => {
+    startContentCarousel()
+  }, 100)
+}
+
+// 顶部 3 个应用（支持轮播切换）
 const topApps = computed(() => {
-  return showApps.value.slice(0, 3)
+  if (showApps.value.length === 0) return []
+  
+  // 如果应用数量少于等于3个，直接返回
+  if (showApps.value.length <= 3) {
+    return showApps.value
+  }
+  
+  // 轮播显示：从当前索引开始取3个应用
+  const apps = []
+  for (let i = 0; i < 3; i++) {
+    const index = (currentAppIndex.value + i) % showApps.value.length
+    apps.push(showApps.value[index])
+  }
+  return apps
 })
 
 const remainingApps = computed(() => {
-  return showApps.value.length > 3 ? showApps.value.slice(3) : []
+  // 不显示剩余应用，只保留顶部3个卡片的轮播
+  return []
 })
 
-// 防抖重置瀑布流
-const debouncedResetWaterfall = () => {
-  if (debounceTimer) {
-    clearTimeout(debounceTimer)
-  }
-  
-  debounceTimer = setTimeout(() => {
-    isWaterfallReady.value = false
-    nextTick(() => {
-      setTimeout(() => {
-        isWaterfallReady.value = true
-      }, 50)
-    })
-  }, 100) as any
-}
 
-// 图片加载状态管理
-const imageLoadStates = ref(new Map<string, boolean>())
-const loadedImageCount = ref(0)
 
-// 强制更新瀑布流布局
-const forceUpdateWaterfall = () => {
-  // 由于forceUpdate方法不存在，我们通过重新渲染来解决
-  isWaterfallReady.value = false
-  nextTick(() => {
-    setTimeout(() => {
-      isWaterfallReady.value = true
-      console.log('Waterfall re-rendered')
-    }, 50)
-  })
-}
-
-// 防抖更新瀑布流
-let updateTimer: number | null = null
-const debouncedUpdateWaterfall = () => {
-  if (updateTimer) {
-    clearTimeout(updateTimer)
-  }
-  updateTimer = setTimeout(() => {
-    forceUpdateWaterfall()
-  }, 200) as any
-}
-
-// 处理图片加载完成
-const handleImageLoad = (itemId: string) => {
-  if (!imageLoadStates.value.get(itemId)) {
-    imageLoadStates.value.set(itemId, true)
-    loadedImageCount.value++
-    console.log(`Image loaded: ${itemId}, total loaded: ${loadedImageCount.value}`)
-    
-    // 使用防抖更新，避免频繁重新渲染
-    debouncedUpdateWaterfall()
-  }
-}
-
-// 处理图片加载错误
-const handleImageError = (itemId: string) => {
-  console.warn(`Image load error: ${itemId}`)
-  if (!imageLoadStates.value.get(itemId)) {
-    imageLoadStates.value.set(itemId, true)
-    loadedImageCount.value++
-    
-    // 使用防抖更新
-    debouncedUpdateWaterfall()
-  }
-}
-
-// 处理视频加载完成
-const handleVideoLoad = (itemId: string) => {
-  console.log(`Video loaded: ${itemId}`)
-  debouncedUpdateWaterfall()
-}
-
-// 重置图片加载状态
-const resetImageLoadStates = () => {
-  imageLoadStates.value.clear()
-  loadedImageCount.value = 0
-}
-
-// 监听数据变化，重置瀑布流
-watch([showApps, () => props.showTag, () => props.showTags, () => props.filterMode], () => {
+// 监听数据变化，重新启动内容轮播
+watch([showApps, currentTagIndex], () => {
   if (!isLoading.value) {
-    resetImageLoadStates()
-    // 数据变化时使用防抖更新
-    debouncedUpdateWaterfall()
+    currentAppIndex.value = 0 // 重置内容索引
+    // 重新启动内容轮播
+    stopContentCarousel()
+    setTimeout(() => {
+      startContentCarousel()
+    }, 100)
   }
 }, { deep: true, immediate: false })
 
@@ -219,22 +188,35 @@ const handleNavigate = (item: IWorkFlow) => {
   uni.navigateTo({url: `/pages/draw/apps/apps?id=${item._id}`});// 跳转到应用详情页面
 }
 
-// 瀑布流初始化完成回调
-const handleWaterfallInit = () => {
-  console.log('Waterfall initialized')
-}
 
-// 瀑布流布局完成回调
-const handleWaterfallEnd = () => {
-  console.log('Waterfall layout completed')
-}
 </script>
 
 <template>
   <!-- 标题栏 -->
   <view class="title-bar">
-    <text class="title-text">AI团队</text>
-    
+    <view class="title-section">
+      <text class="title-text">AI团队</text>
+      <!-- 内容轮播进度指示器 -->
+      <view v-if="showApps.length > 3" class="content-progress">
+        <view 
+          v-for="n in Math.ceil(showApps.length / 3)" 
+          :key="n"
+          class="progress-dot"
+          :class="{ active: Math.floor(currentAppIndex / 3) === (n - 1) }"
+        ></view>
+      </view>
+    </view>
+    <view class="tag-indicators">
+      <view 
+        v-for="(tag, index) in props.showTags" 
+        :key="tag"
+        class="tag-indicator"
+        :class="{ active: index === currentTagIndex }"
+        @click="switchToTag(index)"
+      >
+        <text class="tag-name">{{ tag }}</text>
+      </view>
+    </view>
   </view>
   
     <!-- 加载状态 -->
@@ -242,93 +224,54 @@ const handleWaterfallEnd = () => {
       <text class="loading-text">正在加载应用...</text>
     </view>
     
-    <!-- 调试信息 -->
-    <!-- <view v-if="!isLoading" style="padding: 20rpx; background: #f0f0f0; margin: 10rpx; border-radius: 10rpx;">
-      <text style="font-size: 24rpx; color: #666;">
-        调试信息: 总数据{{workflows_all?.length || 0}}个，筛选后{{showApps.length}}个，标签"{{props.showTag}}"
-      </text>
-    </view> -->
-    
-    <!-- 顶部 3 格布局（左大右小） -->
-    <view v-if="!isLoading && showApps.length > 0" class="top-layout">
-      <view class="top-grid">
-        <view v-if="topApps[0]" class="tile left-large" @click="handleNavigate(topApps[0])">
-          <image v-if="!isVideo(topApps[0].cover)" :src="topApps[0].cover" mode="aspectFill" class="tile-image"/>
-          <video v-else :src="topApps[0].cover" autoplay loop muted object-fit="cover" class="tile-video"/>
-          <view class="tile-overlay">
-            <view class="tile-label">{{ topApps[0].title || topApps[0].name || '应用' }}</view>
-            <view v-if="topApps[0].tags && topApps[0].tags.length > 0" class="tile-tags">
-              <text v-for="tag in topApps[0].tags.slice(0, 2)" :key="tag" class="tile-tag">{{ tag }}</text>
-            </view>
-          </view>
-        </view>
-
-        <view class="right-column">
-          <view v-if="topApps[1]" class="tile right-top" @click="handleNavigate(topApps[1])">
-            <image v-if="!isVideo(topApps[1].cover)" :src="topApps[1].cover" mode="aspectFill" class="tile-image"/>
-            <video v-else :src="topApps[1].cover" autoplay loop muted object-fit="cover" class="tile-video"/>
-            <view class="tile-overlay">
-              <view class="tile-label">{{ topApps[1].title || topApps[1].name || '应用' }}</view>
-              <view v-if="topApps[1].tags && topApps[1].tags.length > 0" class="tile-tags">
-                <text v-for="tag in topApps[1].tags.slice(0, 2)" :key="tag" class="tile-tag">{{ tag }}</text>
+    <!-- 主要内容区域 -->
+    <view v-else>
+      <!-- 顶部 3 格布局（左大右小） -->
+      <transition name="fade" mode="out-in">
+        <view v-if="showApps.length > 0" class="top-layout" :class="{ transitioning: isContentTransitioning }" :key="currentTag + '-' + currentAppIndex">
+          <view class="top-grid">
+            <view v-if="topApps[0]" class="tile left-large" @click="handleNavigate(topApps[0])">
+              <image v-if="!isVideo(topApps[0].cover)" :src="topApps[0].cover" mode="aspectFill" class="tile-image"/>
+              <video v-else :src="topApps[0].cover" autoplay loop muted object-fit="cover" class="tile-video"/>
+              <view class="tile-overlay">
+                <view class="tile-label">{{ topApps[0].title || topApps[0].name || '应用' }}</view>
+                <view v-if="topApps[0].tags && topApps[0].tags.length > 0" class="tile-tags">
+                  <text v-for="tag in topApps[0].tags.slice(0, 2)" :key="tag" class="tile-tag">{{ tag }}</text>
+                </view>
               </view>
             </view>
-          </view>
 
-          <view v-if="topApps[2]" class="tile right-bottom" @click="handleNavigate(topApps[2])">
-            <image v-if="!isVideo(topApps[2].cover)" :src="topApps[2].cover" mode="aspectFill" class="tile-image"/>
-            <video v-else :src="topApps[2].cover" autoplay loop muted object-fit="cover" class="tile-video"/>
-            <view class="tile-overlay">
-              <view class="tile-label">{{ topApps[2].title || topApps[2].name || '应用' }}</view>
-              <view v-if="topApps[2].tags && topApps[2].tags.length > 0" class="tile-tags">
-                <text v-for="tag in topApps[2].tags.slice(0, 2)" :key="tag" class="tile-tag">{{ tag }}</text>
+            <view class="right-column">
+              <view v-if="topApps[1]" class="tile right-top" @click="handleNavigate(topApps[1])">
+                <image v-if="!isVideo(topApps[1].cover)" :src="topApps[1].cover" mode="aspectFill" class="tile-image"/>
+                <video v-else :src="topApps[1].cover" autoplay loop muted object-fit="cover" class="tile-video"/>
+                <view class="tile-overlay">
+                  <view class="tile-label">{{ topApps[1].title || topApps[1].name || '应用' }}</view>
+                  <view v-if="topApps[1].tags && topApps[1].tags.length > 0" class="tile-tags">
+                    <text v-for="tag in topApps[1].tags.slice(0, 2)" :key="tag" class="tile-tag">{{ tag }}</text>
+                  </view>
+                </view>
+              </view>
+
+              <view v-if="topApps[2]" class="tile right-bottom" @click="handleNavigate(topApps[2])">
+                <image v-if="!isVideo(topApps[2].cover)" :src="topApps[2].cover" mode="aspectFill" class="tile-image"/>
+                <video v-else :src="topApps[2].cover" autoplay loop muted object-fit="cover" class="tile-video"/>
+                <view class="tile-overlay">
+                  <view class="tile-label">{{ topApps[2].title || topApps[2].name || '应用' }}</view>
+                  <view v-if="topApps[2].tags && topApps[2].tags.length > 0" class="tile-tags">
+                    <text v-for="tag in topApps[2].tags.slice(0, 2)" :key="tag" class="tile-tag">{{ tag }}</text>
+                  </view>
+                </view>
               </view>
             </view>
           </view>
         </view>
-      </view>
-
-      <!-- 如果还有剩余应用，使用小型瀑布或列表展示 -->
-      <fui-waterfall 
-        v-if="isWaterfallReady && remainingApps.length > 0"
-        :key="`rest-${waterfallKey}`"
-        style="margin-top: 30rpx; margin-bottom:130rpx; padding: 0 20rpx;"
-        @init="handleWaterfallInit"
-        @end="handleWaterfallEnd"
-      >
-        <fui-waterfall-item v-for="(item, index) in remainingApps" :key="`${item._id}-rest-${index}`">
-          <view class="waterfall-data" @click="handleNavigate(item)">
-            <video 
-              class="video" 
-              v-if="isVideo(item.cover)"
-              autoplay
-              loop
-              muted
-              style="width:100%;"
-              object-fit="cover"
-              :controls="false"
-              :src="item.cover"
-              @loadeddata="() => handleVideoLoad(item._id)"
-              @error="() => handleImageError(item._id)"
-            />
-            <image 
-              class="image" 
-              v-else 
-              :src="item.cover" 
-              mode="widthFix" 
-              @load="() => handleImageLoad(item._id)"
-              @error="() => handleImageError(item._id)"
-              :lazy-load="true"
-              :fade-show="true"
-            />
-          </view>
-        </fui-waterfall-item>
-      </fui-waterfall>
-    </view>
-    
-    <!-- 无数据状态 -->
-    <view v-else-if="!isLoading && showApps.length === 0" class="empty-container">
-      <text class="empty-text">暂无应用数据</text>
+        
+        <!-- 无数据状态 -->
+        <view v-else class="empty-container" :key="'empty-' + currentTag">
+          <text class="empty-text">{{ currentTag }} 暂无应用数据</text>
+        </view>
+      </transition>
     </view>
        
   <!-- 调整底部占位高度，避免与下一个板块间距过大 -->
@@ -361,54 +304,114 @@ const handleWaterfallEnd = () => {
   }
 }
 
-.waterfall-data {
-  width: calc(100% - 20rpx);
-  margin: 10rpx;
-  border-radius: 15rpx;
-  box-shadow: 0 2rpx 8rpx rgba(200, 199, 204, 0.3);
-  transition: all 0.3s ease;
-  overflow: hidden;
-  background: #fff;
-
-  .image {
-    width: 100%;
-    height: auto;
-    border-radius: 15rpx;
-    display: block;
-    // 防止图片加载时闪烁
-    background-color: #f5f5f5;
-  }
-
-  .video {
-    border-radius: 15rpx;
-    display: block;
-    background-color: #000;
-  }
-  
-  // 添加点击反馈
-  &:active {
-    transform: scale(0.98);
-    opacity: 0.8;
-  }
-  
-  // 鼠标悬停效果（H5端）
-  &:hover {
-    box-shadow: 0 4rpx 16rpx rgba(200, 199, 204, 0.4);
-    transform: translateY(-2rpx);
-  }
-}
 
 /* 标题栏样式 */
 .title-bar {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 15rpx;
   padding: 20rpx 25rpx 15rpx 25rpx;
   
-  .title-text {
-    font-size: 40rpx;
-    font-weight: 600;
-    color: #333;
+  .title-section {
+    display: flex;
+    align-items: center;
+    gap: 15rpx;
+    
+    .title-text {
+      font-size: 40rpx;
+      font-weight: 600;
+      color: #333;
+    }
+    
+    .content-progress {
+      display: flex;
+      gap: 6rpx;
+      align-items: center;
+      
+      .progress-dot {
+        width: 8rpx;
+        height: 8rpx;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+        
+        &.active {
+          background: #667eea;
+          transform: scale(1.2);
+        }
+      }
+    }
+  }
+  
+  .tag-indicators {
+    display: flex;
+    gap: 8rpx;
+    
+    .tag-indicator {
+      padding: 8rpx 12rpx;
+      border-radius: 20rpx;
+      background: rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+      cursor: pointer;
+      
+      .tag-name {
+        font-size: 24rpx;
+        color: #666;
+        font-weight: 500;
+        transition: color 0.3s ease;
+      }
+      
+      &.active {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        box-shadow: 0 4rpx 12rpx rgba(102, 126, 234, 0.3);
+        
+        .tag-name {
+          color: #fff;
+          font-weight: 600;
+        }
+      }
+      
+      &:hover:not(.active) {
+        background: rgba(0, 0, 0, 0.1);
+        
+        .tag-name {
+          color: #333;
+        }
+      }
+      
+      &:active {
+        transform: scale(0.95);
+      }
+    }
+  }
+}
+
+/* 过渡动画样式 */
+.fade-enter-active, .fade-leave-active {
+  transition: all 0.5s ease;
+}
+
+.fade-enter-from {
+  opacity: 0;
+  transform: translateY(20rpx);
+}
+
+.fade-leave-to {
+  opacity: 0;
+  transform: translateY(-20rpx);
+}
+
+.transitioning {
+  pointer-events: none;
+}
+
+/* 顶部布局过渡动画 */
+.top-layout {
+  transition: all 0.3s ease;
+  
+  &.transitioning {
+    opacity: 0.7;
   }
 }
 
@@ -503,6 +506,42 @@ const handleWaterfallEnd = () => {
 
 /* 响应式布局优化 */
 @media screen and (max-width: 750rpx) {
+  .title-bar {
+    padding: 15rpx 20rpx 10rpx 20rpx;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10rpx;
+    
+    .title-section {
+      width: 100%;
+      justify-content: space-between;
+      
+      .title-text {
+        font-size: 36rpx;
+      }
+      
+      .content-progress {
+        .progress-dot {
+          width: 6rpx;
+          height: 6rpx;
+        }
+      }
+    }
+    
+    .tag-indicators {
+      width: 100%;
+      justify-content: center;
+      
+      .tag-indicator {
+        padding: 6rpx 10rpx;
+        
+        .tag-name {
+          font-size: 22rpx;
+        }
+      }
+    }
+  }
+  
   .top-layout {
     padding: 0 15rpx 10rpx 15rpx;
   }
@@ -533,10 +572,33 @@ const handleWaterfallEnd = () => {
 /* 超小屏幕优化 */
 @media screen and (max-width: 600rpx) {
   .title-bar {
-    padding: 15rpx 20rpx 10rpx 20rpx;
+    padding: 15rpx 15rpx 10rpx 15rpx;
     
-    .title-text {
-      font-size: 36rpx;
+    .title-section {
+      .title-text {
+        font-size: 32rpx;
+      }
+      
+      .content-progress {
+        gap: 4rpx;
+        
+        .progress-dot {
+          width: 5rpx;
+          height: 5rpx;
+        }
+      }
+    }
+    
+    .tag-indicators {
+      gap: 6rpx;
+      
+      .tag-indicator {
+        padding: 5rpx 8rpx;
+        
+        .tag-name {
+          font-size: 20rpx;
+        }
+      }
     }
   }
   

@@ -1,6 +1,9 @@
 <template class="carousel-container">
-  <fui-nav-bar background="transparent" :title="draw_data.data.options?.workflow_title" @leftClick="leftClick">
+  <fui-nav-bar background="transparent" :title="draw_data.data?.options?.workflow_title" @leftClick="leftClick">
     <fui-icon name="arrowleft"></fui-icon>
+    <view class="nav-right" slot="right">
+      <fui-icon name="share" @click="handleShare"></fui-icon>
+    </view>
   </fui-nav-bar>
 
 
@@ -8,7 +11,7 @@
     <swiper class="carousel-swiper" :circular="false" :indicator-dots="true" :autoplay="false" :interval="3000"
       :duration="500" :style="{ height: swiperHeight + 'px' }" @change="onSwiperChange">
 
-      <swiper-item :key="index" class="carousel-item" v-for="(item, index) in draw_data.data?.output">
+      <swiper-item :key="index" class="carousel-item" v-for="(item, index) in (draw_data.data?.output || [])">
         <template v-if="getItemType(item) === 'image'">
           <image class="carousel-image" :src="item" mode="aspectFill" @click="previewImage(item)" />
         </template>
@@ -27,7 +30,7 @@
 
     </swiper>
     <!-- 自定义指示器 -->
-    <view class="thumbnail-nav" v-if="draw_data.data?.output?.length > 1">
+    <view class="thumbnail-nav" v-if="(draw_data.data?.output && draw_data.data.output.length > 1)">
       <view v-for="(item, index_cer) in draw_data.data?.output" :key="index_cer" 
             :class="['thumbnail-wrapper', { active: currentIndex === index_cer }]" 
             @click="goToSlide(index_cer)">
@@ -64,9 +67,9 @@
     <!-- 手动列出你要展示的字段 -->
     <view class="table-row" v-for="key in visibleParams" :key="key">
       <text class="label">{{ formatLabel(key) }}</text>
-      <text class="value">{{ draw_data.data.params[key] }}</text>
-      <!-- <button class="copy-btn" @click="copyValue(draw_data.data.params[key])">复制</button> -->
-      <!-- <up-button class="submit-button copy-btn "   @click="copyValue(draw_data.data.params[key])" type="primary" shape="circle">
+      <text class="value text-ellipsis">{{ draw_data.data.params?.[key] }}</text>
+      <!-- <button class="copy-btn" @click="copyValue(draw_data.data.params?.[key])">复制</button> -->
+      <!-- <up-button class="submit-button copy-btn "   @click="copyValue(draw_data.data.params?.[key])" type="primary" shape="circle">
         复制
       </up-button> -->
     </view>
@@ -88,61 +91,64 @@
 
     <!-- 评论列表 -->
     <view class="comment-list">
+      <!-- 检查 draw_data.data.comment 是否存在且为数组 -->
+      <template v-if="Array.isArray(draw_data.data?.comment)">
+        <view class="comment-item" v-for="comment in draw_data.data.comment" :key="comment._id">
+          <!-- 在评论项的.comment-item容器内添加 -->
+          <!-- {{ comment.author._id == user._id   }}
+            
+          {{ user  }} -->
+          <view class="comment-content-wrapper">
 
-      <view class="comment-item" v-for="comment in draw_data.data.comment" :key="comment._id">
-        <!-- 在评论项的.comment-item容器内添加 -->
-        <!-- {{ comment.author._id == user._id   }}
-          
-        {{ user  }} -->
-        <view class="comment-content-wrapper">
+            <view class="comment-header">
 
-          <view class="comment-header">
-
-            <fui-avatar size="small" :src="comment.author?.avatar_url"></fui-avatar>
-            <view class="comment-author">{{ comment.author?.nickname || comment.author?.username }}</view>
-
-          </view>
-
-          <view class="comment-content">{{ comment?.content }}</view>
-          <view class="comment-time">{{ formatTime(comment.created_at) }}</view>
-          <view class="reply-list" v-if="comment.replies && comment.replies?.length">
-            <view class="reply-item" v-for="reply in comment.replies" :key="reply._id">
-              <view class="reply-header">
-                <fui-avatar size="small" :src="reply.author?.avatar_url"></fui-avatar>
-                <view class="reply-author">
-                  {{ reply.author?.nickname || reply.author?.username }}
-                  <text class="comment-author">@{{ comment.author?.nickname || comment.author?.username }}</text>
-                </view>
-              </view>
-              <view class="reply-content">{{ reply.content }}</view>
-              <view class="comment-time">{{ formatTime(reply.created_at) }}</view>
-
-           
-                <!-- <text v-if="comment.author._id === user._id" class="delete-comment"
-                  @click="deleteComment(comment._id)">删除</text> -->
-                <!-- <text class="refrenc-comment"
-                  @click="RefComments(comment._id, comment._id, comment.author._id)">回复</text> -->
-         
-
-
-
-
+              <fui-avatar size="small" :src="comment.author?.avatar_url"></fui-avatar>
+              <view class="comment-author">{{ comment.author?.nickname || comment.author?.username || '未知用户' }}</view>
 
             </view>
 
+            <view class="comment-content">{{ comment?.content }}</view>
+            <view class="comment-time">{{ formatTime(comment.created_at) }}</view>
+            <view class="reply-list" v-if="comment.replies && comment.replies?.length">
+              <view class="reply-item" v-for="reply in comment.replies" :key="reply._id">
+                <view class="reply-header">
+                  <fui-avatar size="small" :src="reply.author?.avatar_url"></fui-avatar>
+                  <view class="reply-author">
+                    {{ reply.author?.nickname || reply.author?.username || '未知用户' }}
+                    <text class="comment-author">@{{ comment.author?.nickname || comment.author?.username || '未知用户' }}</text>
+                  </view>
+                </view>
+                <view class="reply-content">{{ reply.content }}</view>
+                <view class="comment-time">{{ formatTime(reply.created_at) }}</view>
+
+             
+                  <!-- <text v-if="comment.author._id === user._id" class="delete-comment"
+                    @click="deleteComment(comment._id)">删除</text> -->
+                  <!-- <text class="refrenc-comment"
+                    @click="RefComments(comment._id, comment._id, comment.author._id)">回复</text> -->
+             
+
+
+
+
+
+              </view>
+
+
+            </view>
+            <text v-if="comment.author?._id === user?._id" class="delete-comment"
+              @click="deleteComment(comment._id)">删除</text>
+            <text class="refrenc-comment" @click="RefComments(comment._id, comment._id, comment.author?._id)">回复</text>
+
 
           </view>
-          <text v-if="comment.author._id === user._id" class="delete-comment"
-            @click="deleteComment(comment._id)">删除</text>
-          <text class="refrenc-comment" @click="RefComments(comment._id, comment._id, comment.author._id)">回复</text>
-
-
         </view>
-      </view>
 
-      <!-- 暂无评论提示 -->
-      <view v-if="!draw_data?.data.comment?.length" class="no-comment">暂无评论</view>
-      <!-- <view v-if="draw_data.data.comment && !draw_data.data.comment.length" class="no-comment">暂无评论</view> -->
+        <!-- 暂无评论提示 -->
+        <view v-if="!draw_data?.data?.comment?.length" class="no-comment">暂无评论</view>
+      </template>
+      <!-- 当 comment 数据不存在时的兜底提示 -->
+      <view v-else class="no-comment">暂无评论</view>
     </view>
 
     <!-- 评论输入框 -->
@@ -165,7 +171,7 @@
 
 <script setup lang="ts">
 
-import { onLoad } from "@dcloudio/uni-app";
+import { onLoad, onShareAppMessage, onShareTimeline } from "@dcloudio/uni-app";
 import { ref } from 'vue'
 import { getdetail, Comment, allUserName, delComment } from "@/composables/aiChat.ts";
 import { useAppStore } from "@/stores/appStore.ts";
@@ -173,6 +179,8 @@ import {
   isLogin
 } from "@/composables/useCommon.ts";
 import { storeToRefs } from "pinia";
+import { globalAppData } from "@/cofigs/data/globalAppData.ts";
+import { getShareData, clearShareData } from "@/utils/shareManager";
 const { user } = storeToRefs(useAppStore())
 // 在 script setup 顶部添加
 interface CommentItem {
@@ -190,8 +198,45 @@ interface CommentItem {
   replies?: CommentItem[]
 }
 function leftClick() {
-  uni.navigateBack({ url: '/pages/index/index?pageindex=2' });
+  try {
+    const pages = getCurrentPages();
+    if (pages && pages.length > 1) {
+      uni.navigateBack();
+    } else {
+      // 从分享页打开时没有历史，回首页以避免卡住
+      uni.navigateTo({ url: '/pages/index/index' });
+    }
+  } catch (e) {
+    uni.navigateTo({ url: '/pages/index/index' });
+  }
+}
 
+// 分享按钮点击处理
+function handleShare() {
+  // 显示分享菜单
+  uni.showActionSheet({
+    itemList: ['分享给好友', '分享到朋友圈'],
+    success: function (res) {
+      if (res.tapIndex === 0) {
+        // 分享给好友
+        // 在小程序中，这会触发 onShareAppMessage
+        uni.showShareMenu({
+          withShareTicket: true,
+          menus: ['shareAppMessage']
+        });
+      } else if (res.tapIndex === 1) {
+        // 分享到朋友圈
+        // 在小程序中，这会触发 onShareTimeline
+        uni.showShareMenu({
+          withShareTicket: true,
+          menus: ['shareTimeline']
+        });
+      }
+    },
+    fail: function (err) {
+      console.log('分享失败:', err);
+    }
+  });
 }
 
 const currentIndex = ref(0)
@@ -297,13 +342,13 @@ function goToSlide(index: number) {
     console.warn('setCurrent 方法不可用或 swiper 未正确初始化')
   }
 }
-// function getAvatarUrl(userId: string): string {
-//   const users = uni.getStorageSync('allUserNames') || []
-//   if (!Array.isArray(users)) return ''
+function getAvatarUrl(userId: string): string {
+  const users = uni.getStorageSync('allUserNames') || []
+  if (!Array.isArray(users)) return 'https://ai-1357282892.cos.ap-shanghai.myqcloud.com/6811db59c58c28287e07e45c/upload/20250521115936505-3434-06.png'
 
-//   const user = users.find(u => u._id === userId)
-//   return user?.avatar_url || '/static/default-avatar.png' // 默认头像路径
-// }
+  const user = (users as any[]).find(u => u._id === userId)
+  return user?.avatar_url || 'https://ai-1357282892.cos.ap-shanghai.myqcloud.com/6811db59c58c28287e07e45c/upload/20250521115936505-3434-06.png'
+}
 
 
 // function onSwiperChange(e) {
@@ -347,7 +392,19 @@ async function fetchAndSaveUserNames() {
   }
 }
 // const draw_data = ref<any>()
-const draw_data = ref<{ data: { comment?: CommentItem[] } }>({
+// 定义更完整的类型定义，包含 params 字段
+const draw_data = ref<{
+  data: {
+    comment?: CommentItem[],
+    params?: Record<string, any>,
+    options?: {
+      workflow_title?: string
+    },
+    _id?: string,
+    is_public?: boolean,
+    workflow_id?: string
+  }
+}>({
   data: {}
 });
 
@@ -356,24 +413,44 @@ const detailId = ref<string>('')
 onLoad(async (params) => {
   try {
     // 验证参数
-    if (!params.id) {
+    if (!params?.id) {
       throw new Error('缺少必要参数：id')
     }
+    
+    // 保存 id 供后续使用
+    detailId.value = params.id
+    console.log('设置detailId:', detailId.value)
+    
     // 加载数据
     console.log('id:', params.id, user.value, draw_data)
-    detailId.value = params.id // 保存 id 供后续使用
-
-    await getdetail(user.value, params.id).then(res => {
+    await getdetail(user.value, params.id).then((res: any) => {
       console.log('获取到的getUserKey信息:', res.data);
-      draw_data.value = res.data
+      draw_data.value = res.data || { data: {} }
+      
+      // 确保数据加载后也设置了一次detailId，作为备用
+      if (!detailId.value && res.data?.data?._id) {
+        detailId.value = res.data.data._id
+        console.log('从数据中设置detailId:', detailId.value)
+      }
     }).catch(err => {
       console.error('获取getUserKey失败:', err);
+      draw_data.value = { data: {} }
+      // 显示错误提示，但不跳转页面
+      uni.showToast({
+        title: '数据加载失败，请刷新重试',
+        icon: 'none',
+        duration: 2000
+      })
     })
 
   } catch (err) {
     console.error('数据加载失败:', err)
-    error.value = '加载失败，请重试'
-    loading.value = false
+    // 显示错误提示，但不跳转页面
+    uni.showToast({
+      title: '参数错误，请重试',
+      icon: 'none',
+      duration: 2000
+    })
   }
   // fetchAndSaveUserNames()
 })
@@ -401,20 +478,50 @@ function copyValue(value: any) {
   });
 }
 function generateSame() {
-  if (draw_data.value.data.is_public) {
-    uni.navigateTo({
-      url: '/pages/draw/apps/apps?id=' + draw_data.value.data.workflow_id +
-        '&isRegenerate=true&regenerateParams=' + encodeURIComponent(JSON.stringify(draw_data.value.data.params))
+  // 防御性检查：确保数据存在
+  const data = draw_data.value?.data;
+  if (!data) {
+    uni.showToast({
+      title: '数据加载中，请稍后重试',
+      icon: 'none',
+      duration: 2000
     });
+    return;
   }
-  else {
+
+  // 检查是否公开
+  if (!data.is_public) {
     uni.showToast({
       title: '该应用目前不可用',
       icon: 'none',
       duration: 2000
     });
+    return;
   }
 
+  // 检查 workflow_id 是否存在
+  if (!data.workflow_id) {
+    uni.showToast({
+      title: '缺少工作流信息',
+      icon: 'none',
+      duration: 2000
+    });
+    return;
+  }
+
+  try {
+    uni.navigateTo({
+      url: '/pages/draw/apps/apps?id=' + data.workflow_id +
+        '&isRegenerate=true&regenerateParams=' + encodeURIComponent(JSON.stringify(data.params || {}))
+    });
+  } catch (error) {
+    console.error('导航失败:', error);
+    uni.showToast({
+      title: '页面跳转失败',
+      icon: 'none',
+      duration: 2000
+    });
+  }
 }
 
 // --------------------------------------------------------------------
@@ -453,8 +560,6 @@ function formatTime(timestamp: number): string {
 }
 const newComment = ref('')
 function getUsernameById(userId: string | { _id: string }): string {
-
-
   let id: string
   if (typeof userId === 'string') {
     id = userId
@@ -463,8 +568,12 @@ function getUsernameById(userId: string | { _id: string }): string {
   } else {
     return '未知用户'
   }
+  
+  const users = uni.getStorageSync('allUserNames') || []
+  if (!Array.isArray(users)) return '未知用户'
 
-
+  const user = (users as any[]).find(u => u._id === id)
+  return user?.nickname || user?.username || '未知用户'
 }
 
 // 回复相关状态
@@ -505,6 +614,122 @@ function RefComments(targetId: string, rootId: string, replyTo: string) {
 function clearReply() {
   activeReply.value = null
 }
+// 分享功能
+onShareAppMessage((res: any) => {
+  const inviteCode = useAppStore().user.my_invite_code || ''
+
+  // 检查是否有特定的分享数据
+  const shareData = getShareData()
+  if (shareData) {
+    // 清除已使用的分享数据
+    clearShareData()
+
+    // 确保分享数据中的路径有效
+    let sharePath = shareData.path || '/pages/drawLike/alike'
+    // 确保路径以 / 开头
+    if (!sharePath.startsWith('/')) {
+      sharePath = '/' + sharePath
+    }
+    
+    // 如果路径是alike页面但没有id参数，尝试从当前页面获取
+    if (sharePath.includes('/pages/drawLike/alike') && !sharePath.includes('id=')) {
+      const id = detailId.value || draw_data.value?.data?._id
+      if (id) {
+        sharePath = inviteCode ? `${sharePath}?id=${id}&inviteCode=${inviteCode}` : `${sharePath}?id=${id}`
+      } else if (inviteCode) {
+        sharePath = `${sharePath}?inviteCode=${inviteCode}`
+      }
+    } else if (inviteCode && !sharePath.includes('inviteCode=')) {
+      // 如果路径中没有inviteCode参数，添加inviteCode
+      sharePath = sharePath.includes('?') ? `${sharePath}&inviteCode=${inviteCode}` : `${sharePath}?inviteCode=${inviteCode}`
+    }
+    
+    // 构建完整路径
+    console.log('分享路径:', sharePath)
+    
+    return {
+      title: shareData.title,
+      path: sharePath,
+      imageUrl: shareData.imageUrl || ''
+    }
+  }
+
+  // 默认分享内容，使用当前作品标题
+  const workTitle = draw_data.value?.data?.options?.workflow_title || '精美作品'
+  const id = detailId.value || draw_data.value?.data?._id || ''
+  
+  if (!id) {
+    console.error('分享失败：缺少作品ID')
+    // 即使没有作品ID，也尝试分享当前页面，而不是跳转到首页
+    const currentPath = inviteCode ? `/pages/drawLike/alike?inviteCode=${inviteCode}` : '/pages/drawLike/alike'
+    console.log('当前页面分享路径:', currentPath)
+    return {
+      title: `${workTitle} - 精美设计 | AI创作`,
+      path: currentPath,
+      imageUrl: ''
+    }
+  }
+  
+  // 构建作品详情页路径
+  const detailPath = inviteCode ? `/pages/drawLike/alike?id=${id}&inviteCode=${inviteCode}` : `/pages/drawLike/alike?id=${id}`
+  console.log('作品详情页路径:', detailPath)
+  return {
+    title: `${workTitle} - 精美设计 | AI创作`,
+    path: detailPath,
+    imageUrl: '' // 可以使用作品的第一张图片作为分享图片
+  }
+})
+
+// 朋友圈分享
+onShareTimeline(() => {
+  const inviteCode = useAppStore().user.my_invite_code || ''
+
+  // 检查是否有特定的分享数据
+  const shareData = getShareData()
+  if (shareData) {
+    // 清除已使用的分享数据
+    clearShareData()
+
+    // 确保分享数据中的路径有效
+    let sharePath = shareData.path || '/pages/index/index'
+    // 确保路径以 / 开头
+    if (!sharePath.startsWith('/')) {
+      sharePath = '/' + sharePath
+    }
+    
+    // 构建完整路径
+    const fullPath = inviteCode ? `${sharePath}?inviteCode=${inviteCode}` : sharePath
+    console.log('朋友圈分享路径:', fullPath)
+    
+    return {
+      title: shareData.title,
+      path: fullPath
+    }
+  }
+
+  // 默认分享内容，使用当前作品标题
+  const workTitle = draw_data.value?.data?.options?.workflow_title || '精美作品'
+  const id = detailId.value || draw_data.value?.data?._id || ''
+  
+  if (!id) {
+    console.error('分享失败：缺少作品ID')
+    const defaultPath = inviteCode ? `/pages/index/index?inviteCode=${inviteCode}` : '/pages/index/index'
+    console.log('朋友圈默认分享路径:', defaultPath)
+    return {
+      title: `我分享了一个${workTitle}，真的太棒了！`,
+      path: defaultPath,
+    }
+  }
+  
+  // 构建作品详情页路径
+  const detailPath = inviteCode ? `/pages/drawLike/alike?id=${id}&inviteCode=${inviteCode}` : `/pages/drawLike/alike?id=${id}`
+  console.log('朋友圈作品详情页路径:', detailPath)
+  return {
+    title: `我分享了一个${workTitle}，真的太棒了！`,
+    path: detailPath,
+  }
+})
+
 async function submitComment() {
   if (!isLogin.value) {
     uni.showToast({ title: '请先登录', icon: 'error' })
@@ -549,6 +774,14 @@ async function submitComment() {
 </script>
 
 <style>
+.nav-right {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60rpx;
+  height: 60rpx;
+}
+
 .comment-item {
   position: relative;
   padding: 30rpx 120rpx 30rpx 30rpx;
@@ -821,6 +1054,14 @@ async function submitComment() {
     word-break: break-all;
     color: #333;
   }
+  
+  .text-ellipsis {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
   .copy-btn {
     width: 120rpx;
@@ -831,6 +1072,18 @@ async function submitComment() {
     background-color: #465CFF;
     border-radius: 40rpx;
     padding: 0;
+    margin-left: 20rpx;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .copy-btn:hover {
+    background-color: #3a4bdf;
+  }
+
+  .copy-btn:active {
+    transform: scale(0.98);
   }
 
   .generate-btn {

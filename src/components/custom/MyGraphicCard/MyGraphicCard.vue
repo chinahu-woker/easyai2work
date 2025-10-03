@@ -225,7 +225,7 @@
 			<view v-for="(tagItem, tagIndex) in tags" :key="tagIndex" class="tag-item" :class="[tagClass]"
 				:style="tagStyle">
 				<TnIcon name="topics-fill" />
-				{{ tagItem }}
+				<text class="tag-text">{{ tagItem }}</text>
 			</view>
 		</view>
 

@@ -240,7 +240,7 @@ const handleNavigate = (item: IWorkFlow) => {
 </script>
 
 <template>
-  <text class="page-title">AI生图</text>
+  <text class="page-title">{{ payWorkProps?.title || 'AI应用' }}</text>
  
   
     <!-- 加载状态 -->

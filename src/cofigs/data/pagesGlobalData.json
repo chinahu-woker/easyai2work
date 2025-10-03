@@ -1,25 +1,49 @@
 {
+  "iconTagName": [
+    {
+      "name": "Style-depth-510nail_8style",
+      "index": 0
+    },
+    {
+      "name": "fakenail2manicure1",
+      "index": 1
+    },
+    {
+      "name": "text-llm-depth-10nail",
+      "index": 2
+    }
+  ],
   "globalAppData": {
     "name": "globalAppData",
     "share": {
       "appInfo": "这款全民使用的AI程序，简直好用到爆炸"
     }
   },
+  "organizations_store": [
+    "68d23a545ae1fbd83108633a",
+    "68c4d63fd9d81c765dd8c3cd"
+  ],
   "tabbarData": [
     {
       "text": "首页",
+      "tabText": "home",
       "iconPath": "https://static.nailoffice.cn/2025-09-21/6841119cb9df852ec0a2c684/upload/20250921152153882-画板1.svg",
-      "selectedIconPath": "https://static.nailoffice.cn/2025-09-17/6841119cb9df852ec0a2c684/upload/20250917223323627-画板2(2).png"
+      "selectedIconPath": "https://static.nailoffice.cn/2025-09-17/6841119cb9df852ec0a2c684/upload/20250917223323627-画板2(2).png",
+      "organizations": []
     },
     {
       "text": "应用",
+      "tabText": "store",
       "iconPath": "https://static.nailoffice.cn/2025-09-21/6841119cb9df852ec0a2c684/upload/20250921152304246-默认变量(1).svg",
-      "selectedIconPath": "https://static.nailoffice.cn/2025-09-21/6841119cb9df852ec0a2c684/upload/20250921152249772-默认变量.svg"
+      "selectedIconPath": "https://static.nailoffice.cn/2025-09-21/6841119cb9df852ec0a2c684/upload/20250921152249772-默认变量.svg",
+      "organizations": []
     },
     {
       "text": "我的",
+      "tabText": "profile",
       "iconPath": "https://static.nailoffice.cn/2025-09-21/6841119cb9df852ec0a2c684/upload/20250921152428670-画板5.svg",
-      "selectedIconPath": "https://static.nailoffice.cn/2025-09-21/6841119cb9df852ec0a2c684/upload/20250921152442877-画板5(1).svg"
+      "selectedIconPath": "https://static.nailoffice.cn/2025-09-21/6841119cb9df852ec0a2c684/upload/20250921152442877-画板5(1).svg",
+      "organizations": []
     }
   ],
   "backGroundImage": "https://chinahu-ai-server.oss-cn-chengdu.aliyuncs.com/aidraw/image/temps/67873d6c232a3c5d52240dd6/Home2.jpg",
@@ -43,7 +67,10 @@
         "symbol": "iconfontIndex ",
         "label": "热门应用",
         "action": "ai_expand",
-        "matchKeywords": ["热门", "热门应用"],
+        "matchKeywords": [
+          "热门",
+          "热门应用"
+        ],
         "actionButton": "false"
       },
       {
@@ -51,7 +78,10 @@
         "symbol": "iconfontIndex ",
         "label": "趣味像素",
         "action": "quality_enhance",
-        "matchKeywords": ["趣味", "趣味像素"],
+        "matchKeywords": [
+          "趣味",
+          "趣味像素"
+        ],
         "actionButton": "false"
       },
       {
@@ -59,7 +89,10 @@
         "symbol": "iconfontIndex ",
         "label": "AI绘画",
         "action": "local_draw",
-        "matchKeywords": ["绘画", "AI绘画"],
+        "matchKeywords": [
+          "绘画",
+          "AI绘画"
+        ],
         "actionButton": "false"
       },
       {
@@ -67,7 +100,10 @@
         "symbol": "iconfontIndex ",
         "label": "画质增强",
         "action": "ai_headshot",
-        "matchKeywords": ["画质", "增强"],
+        "matchKeywords": [
+          "画质",
+          "增强"
+        ],
         "actionButton": "true"
       }
     ],
@@ -77,10 +113,222 @@
   },
   "storeProps": {
     "showTag": "AI工具",
-    "showTags": ["图生视频", "AI产品生成", "AI重绘"],
+    "showTags": [
+      "图生视频",
+      "AI产品生成",
+      "AI重绘"
+    ],
     "filterMode": "any"
-  },    
+  },
   "payWorkProps": {
+    "title": "应用",
     "showTag": "付费应用"
+  },
+  "loginInfoIcons": {
+    "scanIcon": "scan",
+    "arrowIcon": "arrow-right",
+    "historyIcon": "https://chinahu-ai-server.oss-cn-chengdu.aliyuncs.com/Iconly_Glass_Gallery.png",
+    "chatIcon": "https://chinahu-ai-server.oss-cn-chengdu.aliyuncs.com/Iconly_Glass_Chat.png",
+    "logoutIcon": "https://chinahu-ai-server.oss-cn-chengdu.aliyuncs.com/Iconly_Glass_Home.png",
+    "consoleIcon": "https://chinahu-ai-server.oss-cn-chengdu.aliyuncs.com/Iconly_Glass_Setting.png",
+    "bannerImage": "https://chinahu-ai-server.oss-cn-chengdu.aliyuncs.com/67873d6c232a3c5d52240dd6/upload/20250703230841666-banner.png"
+  },
+  "pageComponents": {
+    "home": {
+      "title": "首页",
+      "components": [
+        
+        {
+          "id": "home-header",
+          "component": "Newhead",
+          "props": {
+            "logo": "{{HeadProps.logo}}",
+            "appName": "{{HeadProps.appName}}",
+            "title": "{{HeadProps.title}}",
+            "subtitle": "{{HeadProps.subtitle}}"
+          },
+          "style": {
+            "marginBottom": "20rpx"
+          }
+        },
+        {
+          "id": "home-swiper",
+          "component": "NewSwiper",
+          "props": {},
+          "style": {
+            "marginBottom": "30rpx"
+          }
+        },
+        {
+          "id": "home-icons",
+          "component": "NewIcon",
+          "props": {
+            "iconData": "{{iconData}}"
+          },
+          "style": {
+            "marginBottom": "30rpx"
+          }
+        },
+       
+        {
+          "id": "profile-community",
+          "component": "NewCommunity",
+          "props": {},
+          "style": {
+            "marginBottom": "20rpx"
+          }
+        }
+      ],
+      "layout": {
+        "padding": "20rpx",
+        "backgroundColor": "#f5f5f5"
+      }
+    },
+    "store": {
+      "title": "应用",
+      "components": [
+        {
+          "id": "store-header",
+          "component": "NewStore",
+          "props": {
+            "showTag": "{{storeProps.showTag}}",
+            "showTags": "{{storeProps.showTags}}",
+            "filterMode": "{{storeProps.filterMode}}"
+          },
+          "style": {
+            "marginBottom": "20rpx"
+          }
+        },
+        {
+          "id": "store-waterfall",
+          "component": "NewClassWaterFall",
+          "props": {},
+          "style": {
+            "marginBottom": "20rpx"
+          }
+        }
+      ],
+      "layout": {
+        "padding": "20rpx",
+        "backgroundColor": "#f5f5f5"
+      }
+    },
+    "profile": {
+      "title": "我的",
+      "components": [
+        {
+          "id": "profile-user",
+          "component": "NewLoginInfo",
+          "props": {},
+          "style": {
+            "marginBottom": "20rpx"
+          }
+        }
+        
+      ],
+      "layout": {
+        "padding": "20rpx",
+        "backgroundColor": "#f5f5f5"
+      }
+    },
+    "login": {
+      "title": "登录",
+      "components": [
+        {
+          "id": "login-info",
+          "component": "NewLoginInfo",
+          "props": {
+            "scanIcon": "{{loginInfoIcons.scanIcon}}",
+            "arrowIcon": "{{loginInfoIcons.arrowIcon}}",
+            "historyIcon": "{{loginInfoIcons.historyIcon}}",
+            "chatIcon": "{{loginInfoIcons.chatIcon}}",
+            "logoutIcon": "{{loginInfoIcons.logoutIcon}}",
+            "consoleIcon": "{{loginInfoIcons.consoleIcon}}",
+            "bannerImage": "{{loginInfoIcons.bannerImage}}"
+          },
+          "style": {
+            "marginBottom": "20rpx"
+          }
+        }
+      ],
+      "layout": {
+        "padding": "20rpx",
+        "backgroundColor": "#f5f5f5"
+      }
+    }
+  },
+  "dynamicComponentRules": {
+    "home": [
+      {
+        "componentId": "home-header",
+        "conditions": {
+          "userStatus": "all"
+        }
+      },
+      {
+        "componentId": "home-swiper",
+        "conditions": {
+          "userStatus": "all"
+        }
+      },
+      {
+        "componentId": "home-icons",
+        "conditions": {
+          "userStatus": "all"
+        }
+      },
+      {
+        "componentId": "home-waterfall",
+        "conditions": {
+          "userStatus": "all"
+        }
+      }
+    ],
+    "store": [
+      {
+        "componentId": "store-header",
+        "conditions": {
+          "userStatus": "all"
+        }
+      },
+      {
+        "componentId": "store-waterfall",
+        "conditions": {
+          "userStatus": "all"
+        }
+      },
+      {
+        "componentId": "store-paywork",
+        "conditions": {
+          "userStatus": "loggedIn",
+          "organizations": [
+            "68d23a545ae1fbd83108633a",
+            "68c4d63fd9d81c765dd8c3cd"
+          ]
+        }
+      }
+    ],
+    "profile": [
+      {
+        "componentId": "profile-user",
+        "conditions": {
+          "userStatus": "loggedIn"
+        }
+      },
+      {
+        "componentId": "profile-community",
+        "conditions": {
+          "userStatus": "loggedIn"
+        }
+      }
+    ],
+    "login": [
+      {
+        "componentId": "login-info",
+        "conditions": {
+          "userStatus": "notLoggedIn"
+        }
+      }
+    ]
   }
 }

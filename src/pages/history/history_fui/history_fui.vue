@@ -12,7 +12,7 @@ import type { IDrawHistoryItem } from "@/types";
 import BaseLayout from "@/layouts/BaseLayout.vue";
 import MyNavbar from "@/components/common/MyNavbar.vue";
 
-import { onLoad, onReady } from "@dcloudio/uni-app";
+import { onLoad, onReady, onReachBottom } from "@dcloudio/uni-app";
 import TnTag from '@tuniao/tnui-vue3-uniapp/components/tag/src/tag.vue'
 import { isLogin } from "@/composables/useCommon.ts";
 
@@ -48,15 +48,73 @@ onLoad(() => {
 })
 
 
+// 完整数据与分页显示数据
+const fullHistory = ref<IDrawHistoryItem[]>([])
 const historyData = ref<IDrawHistoryItem[]>([])
 
-// 根据用户获取绘图历史数据
-const getHistoryData = async (pageNumber?: number) => {
-	const { items } = await request<IHistoryResponse>(`/draw/history/${pageNumber}`)
-	historyData.value = items
-	console.log('pageNumber', pageNumber)
-	console.log('historyData', historyData.value)
+// 分页控制（本地分页：每页 10 条）
+const pageSize = 10
+const currentPage = ref(1)
+const total = ref(0)
+const isLoading = ref(false)
+
+// 折叠/展开提示词控制（按记录 _id）
+const expandedIds = ref<Record<string, boolean>>({})
+const isExpanded = (id?: string) => {
+	if (!id) return false
+	return !!expandedIds.value[id]
 }
+const toggleExpand = (id?: string) => {
+	if (!id) return
+	expandedIds.value[id] = !expandedIds.value[id]
+}
+
+// 获取全部历史记录（后端当 path 为 undefined 时返回全部）
+const getHistoryData = async () => {
+	try {
+		isLoading.value = true
+		// 当 pageNumber 未定义时，后端会返回全部数据（/draw/history/undefined）
+		const res = await request<IHistoryResponse>(`/draw/history/undefined`)
+		fullHistory.value = res.items || []
+		total.value = (typeof res.total === 'number' && res.total > 0) ? res.total : fullHistory.value.length
+
+		// 初始化只渲染第一页的数据
+		currentPage.value = 1
+		historyData.value = fullHistory.value.slice(0, pageSize)
+		console.log('loaded full history count', fullHistory.value.length)
+	} catch (err) {
+		console.error('getHistoryData error', err)
+	} finally {
+		isLoading.value = false
+	}
+}
+
+// 是否还有更多可加载项
+const hasMore = computed(() => historyData.value.length < total.value)
+
+// 手动或触底加载更多（每次追加 pageSize 条）
+const loadMore = () => {
+	if (isLoading.value) return
+	if (!hasMore.value) {
+		uni.showToast({ title: '没有更多了', icon: 'none' })
+		return
+	}
+	isLoading.value = true
+	// 计算下一页范围并追加
+	currentPage.value += 1
+	const start = (currentPage.value - 1) * pageSize
+	const end = start + pageSize
+	const nextItems = fullHistory.value.slice(start, end)
+	historyData.value = [...historyData.value, ...nextItems]
+	isLoading.value = false
+}
+
+// 触底自动加载
+onReachBottom(() => {
+	if (hasMore.value) {
+		loadMore()
+	}
+})
 // 删除历史记录（兼容 string | number | undefined 参数）
 const removeHistoryRecord = async (id: string | number | undefined) => {
 	if (!id) {
@@ -66,14 +124,24 @@ const removeHistoryRecord = async (id: string | number | undefined) => {
 	const idStr = String(id);
 	try {
 		console.log('Attempting to remove history record with id:', idStr);
-		const response = await request<IHistoryResponse>(`/draw/history/${idStr}`, {
+		await request(`/draw/history/${idStr}`, {
 			method: 'DELETE',
 		});
 
-		// 从本地数据中移除已删除的记录（基于 _id 字符串比较）
-		console.log('History record removed:', idStr);
-		historyData.value = historyData.value.filter(item => item._id !== idStr);
-		console.log('Updated historyData:', historyData.value);
+		// 从完整数据中移除
+		fullHistory.value = fullHistory.value.filter(item => item._id !== idStr)
+		total.value = fullHistory.value.length
+
+		// 从当前显示列表中移除并补充下一条以保证当前页数量一致（如果有）
+		historyData.value = historyData.value.filter(item => item._id !== idStr)
+		const needCount = currentPage.value * pageSize - historyData.value.length
+		if (needCount > 0) {
+			const start = historyData.value.length
+			const next = fullHistory.value.slice(start, start + needCount)
+			historyData.value = [...historyData.value, ...next]
+		}
+
+		console.log('Updated historyData length:', historyData.value.length);
 		uni.showToast({
 			title: '删除成功',
 			icon: 'success',
@@ -126,7 +194,7 @@ const tabs = ref(['时间轴模式', '相册模式'])
 const option = {
 	path: 'https://chinahu-ai-server.oss-cn-chengdu.aliyuncs.com/aidraw/image/temps/67873d6c232a3c5d52240dd6/empty.json'
 }
-function QieHuan(e) {
+function QieHuan(e: any) {
 	console.log('-----------------------------------', e)
 	currentTabIndex.value = e.index
 
@@ -135,7 +203,7 @@ const show = ref(false);
 const picArry = ref()
 const GalleryPic = ref()
 
-function showGallery(data) {
+function showGallery(data: any) {
 	show.value = true;
 	GalleryPic.value = data;
 	console.log(GalleryPic.value)
@@ -150,7 +218,7 @@ function hideGallery() {
 
 
 
-function linkType(url) {
+function linkType(url: any): number {
 	// 如果输入不是字符串，返回 2（未知类型）
 	if (typeof url !== 'string') return 2;
 
@@ -167,7 +235,7 @@ function linkType(url) {
 	// 都不是，返回 2（未知类型）
 	return 2;
 }
-function handleClick(StringTxt) {
+function handleClick(StringTxt: string) {
 	uni.setClipboardData({
 		data: StringTxt, // 需要设置到剪切板的内容
 		showToast: true, // 是否显示提示，默认为true
@@ -187,8 +255,8 @@ async function downloadVideo(url: string) {
     return;
   }
 
-  try {
-    const downloadResult = await uni.downloadFile({ url });
+		try {
+			const downloadResult = await uni.downloadFile({ url });
 
     if (downloadResult.statusCode !== 200) {
       console.error('下载失败，状态码:', downloadResult.statusCode);
@@ -202,7 +270,7 @@ async function downloadVideo(url: string) {
         filePath: downloadResult.tempFilePath
       });
       uni.showToast({ title: '保存到相册成功', icon: 'success' });
-    } catch (saveErr) {
+		} catch (saveErr: any) {
       // 处理保存失败（可能是权限被拒）
       console.error('保存到相册失败:', saveErr);
       if (saveErr.errMsg.includes('auth deny')) {
@@ -255,10 +323,9 @@ const toHome = () => {
 	  background="transparent"
 	  
 	>
-	  <fui-icon name="arrowleft" size="40" color="#333"></fui-icon>
+	  <fui-icon name="arrowleft" size="80" color="#333"></fui-icon>
 	</fui-nav-bar>
-	<fui-background-image src="@/src/static/Home2 (1).jpgHome2(1).jpg">
-	</fui-background-image>
+	
 
 	<fui-sticky>
 		<fui-tabs style="margin-top: 0%; background-color: transparent;" :tabs="tabs" @change="QieHuan"></fui-tabs>
@@ -289,52 +356,114 @@ const toHome = () => {
 				<template v-slot:right>
 					<!-- 判断是否为图片 -->
 					<view class="fui-custom__wrap" v-if="item.output && item.output.length > 0 && linkType(item.output[0]) == 0">
-						<fui-section title="提示词" :descr="item.params?.positive" descrSize='32'
-							descrColor='#000000'></fui-section>
-						<view class="section__ctn" style="margin-top: 6%;">
-							<view v-for="(pic, picIndex) in item.output">
-								<image @click="showGallery(historyData[index].output)"
-									style="width: 300px;  background-color:transparent;" mode="widthFix" :src="pic"
-									:show-menu-by-longpress='true'>
-								</image>
+						<!-- 可折叠的提示词显示 -->
+						<view class="prompt-section">
+							<view class="prompt-header">
+								<view class="prompt-title">提示词</view>
+								<view v-if="item.params?.positive && item.params?.positive.length > 120" class="prompt-toggle" @click.stop="toggleExpand(item._id)">
+									<tn-icon :name="isExpanded(item._id) ? 'chevron-up' : 'chevron-down'" size="28" color="#465CFF"></tn-icon>
+									<text class="prompt-toggle-text">{{ isExpanded(item._id) ? '收起' : '展开' }}</text>
+								</view>
+							</view>
+							<view class="prompt-content">
+								<text :class="['prompt-text', isExpanded(item._id) ? 'expanded' : 'collapsed']">{{ item.params?.positive || '无提示词' }}</text>
+							</view>
+							<view v-if="item.params?.negative" class="prompt-negative">
+								<view class="prompt-negative-title">负面提示词</view>
+								<text class="prompt-negative-text">{{ item.params.negative }}</text>
+							</view>
+						</view>
+						<view class="image-carousel-container" style="margin-top: 6%;">
+							<swiper 
+								v-if="item.output && item.output.length > 1"
+								class="image-swiper" 
+								:circular="true" 
+								:indicator-dots="true" 
+								:autoplay="false" 
+								:interval="3000"
+								:duration="300"
+								indicator-color="rgba(255, 255, 255, 0.5)"
+								indicator-active-color="#465CFF"
+							>
+								<swiper-item v-for="(pic, picIndex) in item.output" :key="picIndex">
+									<view class="swiper-image-wrapper">
+										<image 
+											@click="showGallery(item.output)"
+											class="carousel-image" 
+											mode="aspectFit" 
+											:src="pic"
+											:show-menu-by-longpress='true'
+										/>
+										<view class="image-index">{{ picIndex + 1 }}/{{ item.output.length }}</view>
+									</view>
+								</swiper-item>
+							</swiper>
+							<view v-else class="single-image-wrapper">
+								<image 
+									@click="showGallery(item.output)"
+									class="single-image" 
+									mode="widthFix" 
+									:src="item.output[0]"
+									:show-menu-by-longpress='true'
+								/>
 							</view>
 						</view>
 
-						<!-- <fui-icon
-							style="margin-top:-11%; background-color:rgba(255, 255, 255, 0.5);; border-radius: 100px;  position: absolute ; margin-left: 480rpx;"
-							color="#ff0000" name="delete" @click="removeHistoryRecord(item._id)"></fui-icon> -->
-						<view class="delete-button" @click="removeHistoryRecord(item._id)"
-							@touchstart="handleDeleteTouchStart" @touchend="handleDeleteTouchEnd">
-							<tn-icon name="delete" size="36"
-								:class="['delete-icon', isDeleting ? 'icon-shake' : '']"></tn-icon>
+						<!-- 现代化操作栏 -->
+						<view class="action-bar">
+							<view class="action-left">
+								<view class="timestamp">{{ item.created_at ? formatDateTime(new Date(item.created_at), 'MM-DD HH:mm') : '--' }}</view>
+							</view>
+							<view class="action-right">
+								<view class="action-button" @click="item.output && item.output.length > 0 && handleClick(item.output[0])">
+									<tn-icon name="copy-fill" size="32" color="#666"></tn-icon>
+								</view>
+								<view class="action-button action-delete" @click="removeHistoryRecord(item._id)">
+									<tn-icon name="delete" size="32" color="#ff4949"></tn-icon>
+								</view>
+							</view>
 						</view>
-
 
 					</view>
 					<!-- 如果是视频的话 -->
 					<view class="fui-custom__wrap" v-else-if="item.output && item.output.length > 0 && linkType(item.output[0]) == 1">
-						<fui-section title="提示词" :descr="item.params?.positive" descrSize='32'
-							descrColor='#000000'></fui-section>
+						<!-- 可折叠的提示词显示（视频分支） -->
+						<view class="prompt-section">
+							<view class="prompt-header">
+								<view class="prompt-title">提示词</view>
+								<view v-if="item.params?.positive && item.params?.positive.length > 120" class="prompt-toggle" @click.stop="toggleExpand(item._id)">
+									<tn-icon :name="isExpanded(item._id) ? 'chevron-up' : 'chevron-down'" size="28" color="#465CFF"></tn-icon>
+									<text class="prompt-toggle-text">{{ isExpanded(item._id) ? '收起' : '展开' }}</text>
+								</view>
+							</view>
+							<view class="prompt-content">
+								<text :class="['prompt-text', isExpanded(item._id) ? 'expanded' : 'collapsed']">{{ item.params?.positive || '无提示词' }}</text>
+							</view>
+							<view v-if="item.params?.negative" class="prompt-negative">
+								<view class="prompt-negative-title">负面提示词</view>
+								<text class="prompt-negative-text">{{ item.params.negative }}</text>
+							</view>
+						</view>
 						<view style="margin-top: 6%;">
 							<video style="width: 100%; height: 390px; background-color:transparent; z-index: 5;" id="myVideo"
 								:src="(item.output && item.output.length>0) ? item.output[0] : ''" controls></video>
 						</view>
-						<!-- <view>
-							<fui-icon
-								style="margin-top:-95%; background-color:rgba(255, 255, 255, 0.5);; border-radius: 100px;  position: absolute ; margin-left: 600rpx;"
-								color="#ff0000" name="delete" @click="removeHistoryRecord(item._id)"></fui-icon>
-							<fui-icon
-								style="margin-top:-85%; background-color:rgba(255, 255, 255, 0.5);; border-radius: 100px;  position: absolute ; margin-left: 600rpx;"
-								color="#e0e0e0" name="pulldown" @click="dowonVideo(item.output[0])"></fui-icon>
 
-						</view> -->
-
-							<view class="video-controls">
-							<view class="control-button download-btn" @click="item.output && item.output.length>0 && downloadVideo(item.output[0])">
-								<tn-icon name="download-simple" size="36"></tn-icon>
+						<!-- 现代化操作栏 -->
+						<view class="action-bar">
+							<view class="action-left">
+								<view class="timestamp">{{ item.created_at ? formatDateTime(new Date(item.created_at), 'MM-DD HH:mm') : '--' }}</view>
 							</view>
-							<view class="control-button delete-btn"  @click="item.output && item.output.length > 0 && downloadVideo(item.output[0])">
-								<tn-icon name="delete" size="36"></tn-icon>
+							<view class="action-right">
+								<view class="action-button" @click="item.output && item.output.length > 0 && handleClick(item.output[0])">
+									<tn-icon name="copy-fill" size="32" color="#666"></tn-icon>
+								</view>
+								<view class="action-button" @click="item.output && item.output.length > 0 && downloadVideo(item.output[0])">
+									<tn-icon name="download-simple" size="32" color="#666"></tn-icon>
+								</view>
+								<view class="action-button action-delete" @click="removeHistoryRecord(item._id)">
+									<tn-icon name="delete" size="32" color="#ff4949"></tn-icon>
+								</view>
 							</view>
 						</view>
 
@@ -343,108 +472,165 @@ const toHome = () => {
 					<view class="fui-custom__wrap" v-else>
 						<scroll-view scroll-y="true" class="scroll-Y">
 
-							<fui-section title="提示词" descrSize='32' descrColor='#000000'
-								:descr="item.params?.positive"></fui-section>
+						<!-- 可折叠的提示词显示（其他分支） -->
+						<view class="prompt-section">
+							<view class="prompt-header">
+								<view class="prompt-title">提示词</view>
+								<view v-if="item.params?.positive && item.params?.positive.length > 120" class="prompt-toggle" @click.stop="toggleExpand(item._id)">
+									<tn-icon :name="isExpanded(item._id) ? 'chevron-up' : 'chevron-down'" size="28" color="#465CFF"></tn-icon>
+									<text class="prompt-toggle-text">{{ isExpanded(item._id) ? '收起' : '展开' }}</text>
+								</view>
+							</view>
+							<view class="prompt-content">
+								<text :class="['prompt-text', isExpanded(item._id) ? 'expanded' : 'collapsed']">{{ item.params?.positive || '无提示词' }}</text>
+							</view>
+							<view v-if="item.params?.negative" class="prompt-negative">
+								<view class="prompt-negative-title">负面提示词</view>
+								<text class="prompt-negative-text">{{ item.params.negative }}</text>
+							</view>
+						</view>
 
-							<!-- <fui-lottie :options="option" action="play"></fui-lottie> -->
-							<view class="fui-item__box">
-
-								<image mode="widthFix"
-									:src="item.params?.image_path_mask || item.params?.image_path_origin || testData"
-									class="fui-logo" :show-menu-by-longpress='true'></image>
-
-
-
+						<!-- 内容区域 -->
+						<view class="content-area">
+							<!-- 仅在有输入图片时显示 - 兼容多种路径格式 -->
+							<view v-if="item.params?.image_path_mask || item.params?.image_path_origin || (item.params as any)?.image_path" class="input-image-wrapper">
+								<image 
+									class="input-image"
+									mode="widthFix"
+									:src="item.params?.image_path_mask || item.params?.image_path_origin || (item.params as any)?.image_path"
+									:show-menu-by-longpress="true"
+								/>
 							</view>
 
-
-							<view>
-								<fui-collapse-item background="transparent ">
-
-									<template v-slot:content>
-										<!-- <fui-copy-text  text="长按复制文本" :value="item.output[0]"></fui-copy-text> -->
-										<view style='margin-left: 5%; margin-top: 5%;   display: flex;'
-											@click="item.output && item.output.length>0 && handleClick(item.output[0])">
-											<text>复制</text>
-
-											<view style='margin-left: 10%;    display: flex;'  @click="removeHistoryRecord(item._id)">
-												<text  >删除</text>
-												<tn-icon name="delete" size="36"></tn-icon>
-											</view>
-										</view>
-
-
-										<view class="fui-descr">{{ (item.output && item.output.length>0) ? item.output[0] : '' }}</view>
-									</template>
-								</fui-collapse-item>
+							<!-- 文本输出内容 -->
+							<view v-if="item.output && item.output.length > 0" class="text-output">
+								<view class="text-content">
+									<text class="output-text">{{ item.output[0] }}</text>
+								</view>
 							</view>
-							<!-- <image @click="showGallery"
-							style="width: 300px; height: 390px; background-color:transparent;" :mode="scaleToFill"
-							:src="item.params?.image_path_mask" :show-menu-by-longpress='true'></image> -->
+						</view>
 
-							<!-- 	<fui-parse-group class="custom-view" :thBgcolor="false">
-							<fui-parse :nodes="StringCont" language="html"></fui-parse>
-						</fui-parse-group> -->
+						<!-- 现代化操作栏 -->
+						<view class="action-bar">
+							<view class="action-left">
+								<view class="timestamp">{{ item.created_at ? formatDateTime(new Date(item.created_at), 'MM-DD HH:mm') : '--' }}</view>
+							</view>
+							<view class="action-right">
+								<view v-if="item.output && item.output.length > 0" class="action-button" @click="handleClick(item.output[0])">
+									<tn-icon name="copy-fill" size="32" color="#666"></tn-icon>
+								</view>
+								<view class="action-button action-delete" @click="removeHistoryRecord(item._id)">
+									<tn-icon name="delete" size="32" color="#ff4949"></tn-icon>
+								</view>
+							</view>
+						</view>
 						</scroll-view>
 					</view>
 				</template>
 			</fui-timeaxis-node>
 		</fui-timeaxis>
+
+		<!-- 加载更多按钮（时间轴模式） -->
+		<view class="load-more-wrap" v-show="hasMore">
+			<button class="load-more-btn" :disabled="isLoading" @click="loadMore">{{ isLoading ? '加载中...' : '加载更多' }}</button>
+		</view>
+
 	</view>
-	<view v-if="currentTabIndex == 1" class="tn-p">
-		<!-- 瀑布流模式 -->
-		<view class="content">
-			<view class="photo-album">
-				<fui-waterfall>
-					<fui-waterfall-item v-for="(item, index) in historyData" :key="index">
-
-						<view v-if="item.output && item.output.length>0 && linkType(item.output[0]) == 0">
-							<view>
-								<image style="width: 200px;  background-color:transparent;" mode="widthFix"
-									:src="(item.output && item.output.length>0) ? item.output[0] : (item.params?.image_path_mask || item.params?.image_path_origin || testData)" :show-menu-by-longpress='true'></image>
-
-							</view>
+	<view v-if="currentTabIndex == 1" class="album-mode">
+		<!-- 相册模式 -->
+		<view class="album-content">
+			<view class="album-grid">
+				<view v-for="(item, index) in historyData" :key="index" class="album-item">
+					
+					<!-- 图片类型的记录 -->
+					<view v-if="item.output && item.output.length > 0 && linkType(item.output[0]) == 0" class="album-card">
+						<view class="album-card-header">
+							<view class="album-card-date">{{ item.created_at ? formatDateTime(new Date(item.created_at), 'MM-DD HH:mm') : '--' }}</view>
+							<view class="album-card-count" v-if="item.output.length > 1">{{ item.output.length }}张</view>
 						</view>
-						<!-- 如果是视频的话 -->
-						<view v-else-if="item.output && item.output.length>0 && linkType(item.output[0]) == 1">
-							<view>
-								<video style="width: 100%; height: 400rpx;" id="myVideo" :src="(item.output && item.output.length>0)?item.output[0]:''"
-									controls></video>
-							</view>
+						
+						<!-- 轮播图显示多张图片 -->
+						<swiper 
+							v-if="item.output.length > 1"
+							class="album-swiper"
+							:circular="false"
+							:indicator-dots="true"
+							:autoplay="false"
+							indicator-color="rgba(255, 255, 255, 0.5)"
+							indicator-active-color="#465CFF"
+						>
+							<swiper-item v-for="(pic, picIndex) in item.output" :key="picIndex">
+								<image 
+									class="album-image" 
+									mode="aspectFill"
+									:src="pic"
+									:show-menu-by-longpress="true"
+									@click="showGallery(item.output)"
+								/>
+							</swiper-item>
+						</swiper>
+						
+						<!-- 单张图片 -->
+						<image 
+							v-else
+							class="album-single-image" 
+							mode="aspectFill"
+							:src="item.output[0]"
+							:show-menu-by-longpress="true"
+							@click="showGallery(item.output)"
+						/>
+						
+						<!-- 提示词预览 -->
+						<view class="album-prompt-preview" v-if="item.params?.positive">
+							<text class="album-prompt-text">{{ item.params.positive.length > 50 ? item.params.positive.substring(0, 50) + '...' : item.params.positive }}</text>
 						</view>
-						<!-- 如果都不是的话 -->
-						<view v-else>
-
-							<view class="fui-item__box">
-								<image :src="item.params?.image_path_mask || item.params?.image_path_origin || testData"
-									class="fui-logo"></image>
-
-							</view>
-							<!-- <fui-collapse-item background="transparent ">
-							<view class="fui-item__box">
-								<image :src="item.params?.image_path_mask || testData " class="fui-logo"></image>
-							
-							</view>
-								<template v-slot:content>
-									
-									<view style='margin-left: 5%; margin-top: 5%;'
-										@click="handleClick(item.output[0])">复制</view>
-									<view class="fui-descr">{{ (item.output && item.output.length>0) ? item.output[0] : '' }}</view>
-								</template>
-							</fui-collapse-item> -->
-							<!-- <fui-card width='300' height='300' :src="item.params?.image_path_mask || testData"  >
-								<scroll-view scroll-y="true" class="scroll-Y">
-								<view class="fui-card__content">{{ (item.output && item.output.length>0) ? item.output[0] : '' }}</view>
-								</scroll-view>
-							</fui-card> -->
-							<!-- <image style=" width: 360rpx; height: 400rpx;background-color:transparent;"
-								:mode="scaleToFill" src="/static/images/component/empty/img_data_3x.png"
-								:show-menu-by-longpress='true'></image> -->
-
+					</view>
+					
+					<!-- 视频类型的记录 -->
+					<view v-else-if="item.output && item.output.length > 0 && linkType(item.output[0]) == 1" class="album-card">
+					<view class="album-card-header">
+						<view class="album-card-date">{{ item.created_at ? formatDateTime(new Date(item.created_at), 'MM-DD HH:mm') : '--' }}</view>
+						<view class="album-card-badge video-badge">视频</view>
+					</view>						<video 
+							class="album-video" 
+							:src="item.output[0]"
+							controls
+							poster=""
+						></video>
+						
+						<view class="album-prompt-preview" v-if="item.params?.positive">
+							<text class="album-prompt-text">{{ item.params.positive.length > 50 ? item.params.positive.substring(0, 50) + '...' : item.params.positive }}</text>
 						</view>
-					</fui-waterfall-item>
-				</fui-waterfall>
-
+					</view>
+					
+					<!-- 其他类型的记录 -->
+					<view v-else class="album-card">
+					<view class="album-card-header">
+						<view class="album-card-date">{{ item.created_at ? formatDateTime(new Date(item.created_at), 'MM-DD HH:mm') : '--' }}</view>
+						<view class="album-card-badge other-badge">其他</view>
+					</view>
+						
+						<!-- 仅在有输入图片时显示占位图 -->
+						<image 
+							v-if="item.params?.image_path_mask || item.params?.image_path_origin || (item.params as any)?.image_path"
+							class="album-placeholder-image"
+							mode="aspectFill"
+							:src="item.params?.image_path_mask || item.params?.image_path_origin || (item.params as any)?.image_path"
+						/>
+						
+						<!-- <view class="album-other-content" v-if="item.output && item.output.length > 0">
+							<text class="album-other-text">{{ item.output[0].length > 60 ? item.output[0].substring(0, 60) + '...' : item.output[0] }}</text>
+						</view> -->
+					</view>
+					
+				</view>
+			</view>
+			
+			<!-- 加载更多按钮（相册模式） -->
+			<view class="album-load-more" v-show="hasMore">
+				<button class="album-load-btn" :disabled="isLoading" @click="loadMore">
+					{{ isLoading ? '加载中...' : '加载更多' }}
+				</button>
 			</view>
 		</view>
 	</view>
@@ -680,5 +866,461 @@ const toHome = () => {
 	align-items: center;
 	justify-content: center;
 	border-radius: 50%;
+}
+
+.load-more-wrap {
+	display: flex;
+	justify-content: center;
+	padding: 20rpx 0;
+}
+
+.load-more-btn {
+	background: #465CFF;
+	color: #fff;
+	border: none;
+	padding: 12rpx 28rpx;
+	border-radius: 8rpx;
+	font-size: 28rpx;
+}
+
+.load-more-btn:disabled {
+	opacity: 0.6;
+}
+
+/* 提示词折叠样式 */
+.prompt-section {
+	padding: 24rpx;
+	margin: 16rpx 0;
+	background: rgba(255, 255, 255, 0.9);
+	border-radius: 16rpx;
+	box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.08);
+	box-sizing: border-box;
+}
+
+.prompt-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 16rpx;
+}
+
+.prompt-title {
+	font-size: 32rpx;
+	font-weight: 600;
+	color: #333;
+}
+
+.prompt-toggle {
+	display: flex;
+	align-items: center;
+	padding: 8rpx 16rpx;
+	background: rgba(70, 92, 255, 0.1);
+	border-radius: 20rpx;
+	cursor: pointer;
+	transition: all 0.3s ease;
+}
+
+.prompt-toggle:active {
+	background: rgba(70, 92, 255, 0.2);
+	transform: scale(0.95);
+}
+
+.prompt-toggle-text {
+	margin-left: 8rpx;
+	font-size: 24rpx;
+	color: #465CFF;
+	font-weight: 500;
+}
+
+.prompt-content {
+	position: relative;
+}
+
+.prompt-text {
+	font-size: 28rpx;
+	color: #666;
+	line-height: 40rpx;
+	word-break: break-all;
+	display: block;
+	transition: all 0.3s ease;
+}
+
+.prompt-text.collapsed {
+	display: -webkit-box;
+	-webkit-line-clamp: 3;
+	line-clamp: 3;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+	position: relative;
+}
+
+.prompt-text.collapsed::after {
+	content: '';
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	width: 60rpx;
+	height: 40rpx;
+	background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.9));
+}
+
+.prompt-text.expanded {
+	display: block;
+}
+
+.prompt-negative {
+	margin-top: 16rpx;
+	padding-top: 16rpx;
+	border-top: 1rpx solid #f0f0f0;
+}
+
+.prompt-negative-title {
+	font-size: 26rpx;
+	font-weight: 600;
+	color: #ff6b6b;
+	margin-bottom: 8rpx;
+}
+
+.prompt-negative-text {
+	font-size: 26rpx;
+	color: #999;
+	line-height: 36rpx;
+	word-break: break-all;
+}
+
+/* 底部加载指示 */
+.bottom-loader {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	padding: 20rpx 0;
+	color: #888;
+}
+.spinner {
+	width: 28rpx;
+	height: 28rpx;
+	border-radius: 50%;
+	border: 4rpx solid rgba(0,0,0,0.1);
+	border-top-color: #465CFF;
+	animation: spin 1s linear infinite;
+	margin-right: 12rpx;
+}
+@keyframes spin {
+	to { transform: rotate(360deg); }
+}
+
+/* 时间轴模式轮播图样式 */
+.image-carousel-container {
+	width: 100%;
+	margin-top: 16rpx;
+}
+
+.image-swiper {
+	width: 100%;
+	height: 400rpx;
+	border-radius: 12rpx;
+	overflow: hidden;
+	box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+}
+
+.swiper-image-wrapper {
+	position: relative;
+	width: 100%;
+	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.carousel-image {
+	width: 100%;
+	height: 100%;
+	border-radius: 12rpx;
+	background: #f8f8f8;
+}
+
+.image-index {
+	position: absolute;
+	top: 16rpx;
+	right: 16rpx;
+	background: rgba(0, 0, 0, 0.6);
+	color: white;
+	padding: 8rpx 16rpx;
+	border-radius: 20rpx;
+	font-size: 24rpx;
+	backdrop-filter: blur(4rpx);
+}
+
+.single-image-wrapper {
+	width: 100%;
+	display: flex;
+	justify-content: center;
+}
+
+.single-image {
+	width: 100%;
+	max-width: 600rpx;
+	border-radius: 12rpx;
+	box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+}
+
+/* 相册模式样式 */
+.album-mode {
+	padding: 20rpx;
+}
+
+.album-content {
+	width: 100%;
+}
+
+.album-grid {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 20rpx;
+}
+
+.album-item {
+	width: 100%;
+}
+
+.album-card {
+	background: white;
+	border-radius: 16rpx;
+	overflow: hidden;
+	box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.08);
+	transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.album-card:active {
+	transform: scale(0.98);
+	box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.12);
+}
+
+.album-card-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 12rpx 16rpx;
+	background: rgba(0, 0, 0, 0.02);
+	border-bottom: 1rpx solid rgba(0, 0, 0, 0.05);
+}
+
+.album-card-date {
+	font-size: 22rpx;
+	color: #999;
+	font-weight: 500;
+}
+
+.album-card-count {
+	font-size: 20rpx;
+	color: #465CFF;
+	background: rgba(70, 92, 255, 0.1);
+	padding: 4rpx 8rpx;
+	border-radius: 8rpx;
+	font-weight: 600;
+}
+
+.album-card-badge {
+	font-size: 20rpx;
+	padding: 4rpx 8rpx;
+	border-radius: 8rpx;
+	font-weight: 600;
+}
+
+.video-badge {
+	color: #ff6b6b;
+	background: rgba(255, 107, 107, 0.1);
+}
+
+.other-badge {
+	color: #ffa726;
+	background: rgba(255, 167, 38, 0.1);
+}
+
+.album-swiper {
+	width: 100%;
+	height: 300rpx;
+}
+
+.album-image {
+	width: 100%;
+	height: 100%;
+}
+
+.album-single-image {
+	width: 100%;
+	height: 300rpx;
+}
+
+.album-video {
+	width: 100%;
+	height: 300rpx;
+	background: #000;
+}
+
+.album-placeholder-image {
+	width: 100%;
+	height: 300rpx;
+	background: #f5f5f5;
+}
+
+.album-prompt-preview {
+	padding: 12rpx 16rpx;
+	background: rgba(0, 0, 0, 0.02);
+}
+
+.album-prompt-text {
+	font-size: 22rpx;
+	color: #666;
+	line-height: 32rpx;
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+
+.album-other-content {
+	padding: 12rpx 16rpx;
+	background: #f8f9fa;
+}
+
+.album-other-text {
+	font-size: 24rpx;
+	color: #666;
+	line-height: 36rpx;
+}
+
+.album-load-more {
+	display: flex;
+	justify-content: center;
+	margin-top: 40rpx;
+	padding: 20rpx 0;
+}
+
+.album-load-btn {
+	background: #465CFF;
+	color: white;
+	border: none;
+}
+
+/* 现代化操作栏样式 */
+.action-bar {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 16rpx 20rpx;
+	background: rgba(0, 0, 0, 0.02);
+	border-top: 1rpx solid rgba(0, 0, 0, 0.05);
+	margin-top: 16rpx;
+}
+
+.action-left {
+	display: flex;
+	align-items: center;
+}
+
+.timestamp {
+	font-size: 22rpx;
+	color: #999;
+	font-weight: 500;
+}
+
+.action-right {
+	display: flex;
+	align-items: center;
+	gap: 16rpx;
+}
+
+.action-button {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 64rpx;
+	height: 64rpx;
+	border-radius: 32rpx;
+	background: rgba(0, 0, 0, 0.04);
+	transition: all 0.3s ease;
+}
+
+.action-button:active {
+	transform: scale(0.95);
+	background: rgba(0, 0, 0, 0.08);
+}
+
+.action-delete {
+	background: rgba(255, 73, 73, 0.1);
+}
+
+.action-delete:active {
+	background: rgba(255, 73, 73, 0.2);
+}
+
+/* 内容区域样式 */
+.content-area {
+	margin: 16rpx 0;
+}
+
+.input-image-wrapper {
+	margin-bottom: 16rpx;
+}
+
+.input-image {
+	width: 100%;
+	border-radius: 12rpx;
+	box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+}
+
+.text-output {
+	background: #f8f9fa;
+	border-radius: 12rpx;
+	padding: 20rpx;
+	margin-top: 12rpx;
+}
+
+.text-content {
+	width: 100%;
+}
+
+.output-text {
+	font-size: 28rpx;
+	line-height: 40rpx;
+	color: #333;
+	word-wrap: break-word;
+	word-break: break-all;
+}
+
+.album-load-btn {
+	padding: 16rpx 32rpx;
+	border-radius: 24rpx;
+	font-size: 28rpx;
+	font-weight: 600;
+	box-shadow: 0 4rpx 12rpx rgba(70, 92, 255, 0.3);
+	transition: all 0.3s ease;
+}
+
+.album-load-btn:disabled {
+	opacity: 0.6;
+	transform: none !important;
+}
+
+.album-load-btn:active {
+	transform: scale(0.95);
+	box-shadow: 0 2rpx 8rpx rgba(70, 92, 255, 0.4);
+}
+
+/* 响应式调整 */
+@media (max-width: 750rpx) {
+	.album-grid {
+		grid-template-columns: 1fr;
+		gap: 16rpx;
+	}
+	
+	.album-swiper,
+	.album-single-image,
+	.album-video,
+	.album-placeholder-image {
+		height: 400rpx;
+	}
 }
 </style>

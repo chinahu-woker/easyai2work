@@ -67,7 +67,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, defineEmits, computed, onMounted, shallowRef } from 'vue'
+import { defineProps, computed, onMounted, shallowRef } from 'vue'
 import { useAppStore } from '@/stores/appStore.ts'
 import { storeToRefs } from 'pinia'
 import type { IWorkFlow } from '@/types'

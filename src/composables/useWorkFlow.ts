@@ -89,6 +89,15 @@ export default function useWorkFlow() {
 	/** 本地绘画任务列表*/
 	const { localTasks } = storeToRefs(useAppStore())
 
+	// safeLocalTasks 避免在 store ref 未初始化时直接访问 .value 导致运行时错误
+	const safeLocalTasks = computed(() => {
+		try {
+			return (localTasks && localTasks.value) ? localTasks.value : []
+		} catch (e) {
+			return []
+		}
+	})
+
 	/** 工作流的参数列表,过滤点产出节点 */
 	const workFlowParamLists = computed<IWorkflowParam[]>(() => {
 		if (!workflow.value || !workflow.value?.params) {
@@ -176,7 +185,7 @@ export default function useWorkFlow() {
 			throw new Error('未登录状态，不允许初始化Websocket')
 		}
 		console.log('socket init execution')
-		if (socketState?.isInitialized && socketState.options?.params?.type === options?.params?.type) {
+		if (socketState?.isInitialized && socketState?.options?.params?.type === options?.params?.type) {
 			console.log('WebSocket is already initialized')
 			return
 		}
@@ -184,7 +193,7 @@ export default function useWorkFlow() {
 			//说明场景不一样，需要重新初始化
 			console.log('WebSocket is already initialized,but scene is different,reinitialize')
 			await closeSocketAsync()
-			socketState.isInitialized = false
+			if (socketState) socketState.isInitialized = false
 		}
 
 		const { params } = options
@@ -299,99 +308,51 @@ export default function useWorkFlow() {
 	//   }
 	// }
 	/** 处理Websocket消息 */
-	const handleSocketMessage = (msg: string, callback?: (messageObj: { type: any; data: any; queue_status: IDrawTaskStatus }) => void) => {
-		// 增强调试，所有消息都打印
-		console.log('WebSocket收到原始消息:', msg, typeof msg);
-		
-		// 先检查消息类型
-		if (typeof msg !== 'string') {
-			console.warn('WebSocket消息不是字符串，类型:', typeof msg, msg);
-			return;
-		}
+	 const handleSocketMessage = (msg: never, callback?: (messageObj: never) => void) => {
+    console.log('原始消息', msg)
+    const msgObj = parseJSONToObject<{ type: never; data: never; queue_status: IDrawTaskStatus }>(
+      msg
+    )
+    if(!msgObj) return;
+    //自定义回调
+    if (callback) {
+      callback(msgObj)
+    }
+    const { queue_status } = msgObj
 
-		// 处理空消息或只包含空白字符的消息
-		const trimMsg = msg.trim();
-		if (!trimMsg) {
-			console.log('WebSocket收到空消息，跳过处理');
-			return;
-		}
-
-		// 处理心跳消息
-		if (trimMsg === 'ping' || trimMsg === 'pong') {
-			console.log('WebSocket收到心跳消息:', trimMsg);
-			return;
-		}
-
-		// 只处理 JSON 格式的消息，非 JSON（如其他控制消息）直接跳过
-		if (!(trimMsg.startsWith('{') || trimMsg.startsWith('['))) {
-			console.log('WebSocket收到非JSON消息，跳过处理:', msg);
-			return;
-		}
-
-		let msgObj;
-		try {
-			msgObj = parseJSONToObject<{ type: any; data: any; queue_status: IDrawTaskStatus }>(msg);
-		} catch (error) {
-			// 这里不再抛出错误，只是记录日志并返回
-			console.warn('WebSocket消息JSON解析失败，跳过处理:', error, msg);
-			return;
-		}
-
-		if (!msgObj) {
-			console.log('WebSocket消息解析结果为空，跳过处理');
-			return;
-		}
-
-		// 自定义回调
-		if (callback) {
-			try {
-				callback(msgObj);
-			} catch (error) {
-				console.error('WebSocket回调函数执行失败:', error);
-			}
-		}
-
-		const { queue_status } = msgObj;
-
-		if (!queue_status) {
-			console.log('WebSocket消息中没有queue_status，跳过任务处理');
-			return;
-		}
-
-		// 从websocket消息中获取output
-		const index = localTasks.value.findIndex(item => item._id === queue_status.task_id);
-		if (index !== -1) {
-			if (typeof queue_status.progress !== 'undefined') localTasks.value[index].progress = queue_status.progress;
-			if (typeof queue_status.queue !== 'undefined') localTasks.value[index].queue = queue_status.queue;
-			if (typeof queue_status.time_remained !== 'undefined')
-				localTasks.value[index].time_remained = queue_status.time_remained;
-			if (queue_status.message) localTasks.value[index].message = queue_status.message;
-		}
-
-		if (queue_status.status === 'started' && index !== -1) {
-			localTasks.value[index].status = 4;
-			localTasks.value[index].message = '任务开始';
-		}
-
-		if (queue_status.status !== 'failed' && index !== -1 && localTasks.value[index].status === 3) {
-			localTasks.value[index].status = 0;
-			localTasks.value[index].message = queue_status.message;
-		}
-
-		if (queue_status.status === 'success' && index !== -1 && localTasks.value[index].status !== 1) {
-			localTasks.value[index].output = queue_status?.data?.output || [];
-			localTasks.value[index].type = queue_status?.data?.type || 'image';
-			localTasks.value[index].status = 1;
-			refreshUserInfo().then();
-		}
-
-		if (queue_status.status === 'failed') {
-			if (index !== -1 && localTasks.value[index].status !== 2) {
-				localTasks.value[index].status = 2;
-				localTasks.value[index].message = queue_status.message;
-			}
-		}
-	};
+    if (!queue_status) {
+      return
+    }
+    // 从websocket消息中获取output
+    const index = localTasks.value.findIndex(item => item._id === queue_status.task_id)
+    if (index !== -1) {
+      if (queue_status.progress) localTasks.value[index].progress = queue_status.progress
+      if (queue_status.queue) localTasks.value[index].queue = queue_status.queue
+      if (queue_status.time_remained !== undefined)
+        localTasks.value[index].time_remained = queue_status.time_remained
+      if (queue_status.message) localTasks.value[index].message = queue_status.message
+    }
+    if (queue_status.status === 'started' && index !== -1) {
+      localTasks.value[index].status = 4
+      localTasks.value[index].message = '任务开始'
+    }
+    if (queue_status.status !== 'failed' && index !== -1 && localTasks.value[index].status === 3) {
+      localTasks.value[index].status = 0
+      localTasks.value[index].message = queue_status.message
+    }
+    if (queue_status.status === 'success' && index !== -1 && localTasks.value[index].status !== 1) {
+      localTasks.value[index].output = queue_status?.data?.output || []
+      localTasks.value[index].type = queue_status?.data?.type || 'image'
+      localTasks.value[index].status = 1
+      refreshUserInfo().then()
+    }
+    if (queue_status.status === 'failed') {
+      if (index !== -1 && localTasks.value[index].status !== 2) {
+        localTasks.value[index].status = 2
+        localTasks.value[index].message = queue_status.message
+      }
+    }
+  }
 	/** 创建任务 */
 	const handleCreateTask = async () => {
 		if (!workflow.value) {

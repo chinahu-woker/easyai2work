@@ -27,6 +27,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { useAppStore } from '@/stores/appStore.ts'
 import { storeToRefs } from 'pinia'
 import type { IWorkFlow } from '@/types'
+import hasAppPermission from '@/composables/usePermissions'
 
 // Props定义
 const props = defineProps({
@@ -55,10 +56,16 @@ onMounted(async () => {
 // 从应用状态管理中解构出工作流数据
 const { workflows_all } = storeToRefs(useAppStore())
 
-// 应用列表 - 只显示公开的应用
+// 应用列表 - 只显示对当前用户可见且组织匹配的应用
+const { user } = storeToRefs(useAppStore())
 const appList = computed<IWorkFlow[]>(() => {
   if (!workflows_all.value?.length) return []
-  return workflows_all.value.filter(app => app.is_public !== false)
+  const userOrgs: string[] = (user.value && Array.isArray((user.value as any).organizations)) ? (user.value as any).organizations : []
+  return workflows_all.value.filter(app => {
+    // 继续保持 is_public 标记优先（明确为 false 时隐藏）
+    if (app.is_public === false) return false
+    return hasAppPermission(app.organizations || [], userOrgs, [])
+  })
 })
 
 // 处理标签点击

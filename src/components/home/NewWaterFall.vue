@@ -4,6 +4,7 @@ import {useAppStore} from "@/stores/appStore.ts";
 import {storeToRefs} from "pinia";
 import {isVideo} from "@/utils/common.ts";
 import type { IWorkFlow } from '@/types';
+import { payWorkProps } from '@/cofigs/data/globalAppData.ts'
 
 // 加载状态
 const isLoading = ref(true)
@@ -66,7 +67,7 @@ const updateItemHeight = (itemId: string, height: number) => {
 
 // 支持通过 prop 指定要显示的标签（默认：热门应用）
 const props = defineProps({
-  showTag: { type: String, default: '热门应用' }
+  showTag: { type: String, default: payWorkProps.showTag }
 })
 
 // 只展示标签包含指定 showTag 的卡片

@@ -211,8 +211,19 @@
 	// }
 
 	function leftClick() {
-		uni.redirectTo({ url: '/pages/index/index' });
-
+		// 优先使用 navigateBack 返回上一页，保持页面缓存
+		const pages = getCurrentPages()
+		if (pages.length > 1) {
+			// 如果有上一页，直接返回
+			uni.navigateBack({
+				delta: 1,
+				animationType: 'pop-out',
+				animationDuration: 200
+			})
+		} else {
+			// 如果没有上一页，则跳转到首页
+			uni.switchTab({ url: '/pages/index/index' })
+		}
 	}
 
 	function linkType(url) {

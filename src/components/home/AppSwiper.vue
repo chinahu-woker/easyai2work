@@ -14,14 +14,18 @@ onLoad(async ()=>{
   pageContent.value=await getPageContent()
 })
 
+// 只取第1到第3张（1-based），即索引0、1、2
 const swiperData=computed(()=>{
-	
-  return pageContent.value?.home_banner.map(item =>{
-    return {
-      url: item.src,
-      title: item.label,
-    }
-  })
+	const arr = pageContent.value?.home_banner || []
+	const result: {url?: string; title?: string}[] = []
+	const indices: number[] = [0,1,2]
+	indices.forEach((i: number) => {
+		const item = arr[i]
+		if (item && item.src) {
+			result.push({ url: item.src, title: item.label })
+		}
+	})
+	return result
 })
 
 </script>
@@ -29,18 +33,18 @@ const swiperData=computed(()=>{
 <template>
   
 
-  	<view style='margin-top: 0%;' >
-  		<swiper easing-function='default' previous-margin='20rpx' next-margin='60rpx'
-  			class="fui-banner__wrap2"  circular :indicator-dots="false" autoplay>
-  			<swiper-item v-for="(item,index) in swiperData" :key="index">
-  				<view class="fui-banner__item2"
-  					:style="{'background-image':'url('+ item.url +')' }">
-  	
-  				</view>
-  				<view class="SwTitle2"> {{item.title}}</view>
-  			</swiper-item>
-  		</swiper>
-  	</view>
+  	<view style='margin-top: 0%;' v-if="swiperData && swiperData.length">
+ 			<swiper easing-function='default' previous-margin='20rpx' next-margin='60rpx'
+ 				class="fui-banner__wrap2"  circular :indicator-dots="false" autoplay>
+ 				<swiper-item v-for="(item,index) in swiperData" :key="index">
+ 					<view class="fui-banner__item2"
+ 						:style="{'background-image':'url('+ item.url +')' }">
+ 			
+ 					</view>
+ 					<view class="SwTitle2"> {{item.title}}</view>
+ 				</swiper-item>
+ 			</swiper>
+ 		</view>
 
 </template>
 

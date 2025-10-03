@@ -2,7 +2,70 @@ export const getBaseURL = () => import.meta.env.VITE_API_URL
 
 export const getOneAPiURL = () => import.meta.env.VITE_CHAT_URL
 
+export const managerBaseUrl = import.meta.env.VITE_MANAGER_API_URL
 export const ChatAPiUrl = () => `${getOneAPiURL()}/v1/chat/completions`
+
+// 扫码登录相关 API
+export const getWeSession = (code: string) => {
+	
+	console.log("managerBaseUrl", managerBaseUrl)
+	if (!managerBaseUrl) {
+		throw new Error('MANAGER_API_URL 未配置，扫码登录不可用')
+	}
+
+	console.debug('[aiChat] getWeSession -> url:', `${managerBaseUrl}/api/auth/wx_session`, 'code:', code)
+
+	return new Promise((resolve, reject) => {
+		uni.request({
+			url: `${managerBaseUrl}/api/auth/wx_session`,
+			method: 'POST',
+			data: { code },
+			header: { 'Content-Type': 'application/json' },
+			success: (res) => {
+				console.debug('[aiChat] getWeSession response:', res)
+				if (res.statusCode === 200 && res.data) {
+					resolve(res.data)
+				} else {
+					reject(new Error('获取登录凭证失败'))
+				}
+			},
+			fail: (err) => {
+				console.debug('[aiChat] getWeSession fail:', err)
+				reject(err)
+			}
+		})
+	})
+}
+
+export const confirmScan = (qrToken: string, weSessionToken: string) => {
+
+	if (!managerBaseUrl) {
+		throw new Error('MANAGER_API_URL 未配置，扫码登录不可用')
+	}
+
+	console.debug('[aiChat] confirmScan -> url:', `${managerBaseUrl}/api/auth/qr_scan`, 'qrToken:', qrToken)
+
+	return new Promise((resolve, reject) => {
+		uni.request({
+			url: `${managerBaseUrl}/api/auth/qr_scan`,
+			method: 'POST',
+			data: { qr_token: qrToken, we_session_token: weSessionToken },
+			header: { 'Content-Type': 'application/json' },
+			success: (res) => {
+				console.debug('[aiChat] confirmScan response:', res)
+				if (res.statusCode === 200 && res.data) {
+					resolve(res.data)
+				} else {
+					reject(new Error('扫码确认失败'))
+				}
+			},
+			fail: (err) => {
+				console.debug('[aiChat] confirmScan fail:', err)
+				reject(err)
+			}
+		})
+	})
+}
 
 // export const PostMask = (token, mask) => {
 // 	return requestTask = uni.request({

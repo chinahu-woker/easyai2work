@@ -36,11 +36,12 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, defineEmits, computed, onMounted, ref } from 'vue'
+import { defineProps,  computed, onMounted, ref } from 'vue'
 import { useAppStore } from '@/stores/appStore.ts'
 import { storeToRefs } from 'pinia'
 import type { IWorkFlow } from '@/types'
-import { iconData } from '@/cofigs/data/globalAppData.ts'
+import { iconData, iconTagName } from '@/cofigs/data/globalAppData.ts'
+import { navigateToApp } from '@/utils/navigation.ts'
 // 定义图标数据接口
 interface IconItem {
   id: string
@@ -49,6 +50,7 @@ interface IconItem {
   action?: string
   matchKeywords?: string[] // 用于匹配应用的关键词
   actionButton?: string // 是否为客服按钮
+  organizations?: string[] // 可选：限制显示的组织 id 列表
 }
 
 // 使用项目中的工作流接口
@@ -66,8 +68,8 @@ onMounted(async () => {
   }
 })
 
-// 从应用状态管理中解构出工作流数据
-const { workflows_all } = storeToRefs(useAppStore())
+// 从 store 获取需要的响应式字段（workflows_all 和 user）
+const { workflows_all, user } = storeToRefs(useAppStore())
 
 // Props 定义
 const props = defineProps({
@@ -96,24 +98,74 @@ const props = defineProps({
 // 事件定义
 const emit = defineEmits(['iconClick', 'appClick'])
 
-// 匹配图标与应用的函数
-const findMatchedApp = (icon: IconItem): AppItem | null => {
+// 匹配图标与应用的函数 - 基于 iconTagName 筛选
+const findMatchedApp = (icon: IconItem, iconIndex: number): AppItem | null => {
   if (!workflows_all.value || workflows_all.value.length === 0) return null
 
-  const keywords = icon.matchKeywords || []
+  // 如果是最后一个图标（穿戴甲定制），使用原有的 matchKeywords 逻辑
+  if (icon.label === '穿戴甲定制') {
+    const keywords = icon.matchKeywords || []
+    for (const app of workflows_all.value) {
+      const titleMatch = keywords.some(keyword =>
+        app.title && app.title.includes(keyword)
+      )
+      const tagsMatch = keywords.some(keyword =>
+        app.tags && app.tags.some((tag: string) => tag.includes(keyword))
+      )
+      if (titleMatch || tagsMatch) {
+        return app
+      }
+    }
+    return null
+  }
 
-  // 查找匹配的应用
+  // 对于其他图标，使用 iconTagName 进行匹配
+  // 查找当前图标索引对应的 iconTagName 配置
+  const tagConfig = iconTagName.find(tag => tag.index === iconIndex)
+  
+  // 如果没有找到对应的标签配置，则使用 matchKeywords 进行匹配
+  if (!tagConfig) {
+    const keywords = icon.matchKeywords || []
+    for (const app of workflows_all.value) {
+      const titleMatch = keywords.some(keyword =>
+        app.title && app.title.includes(keyword)
+      )
+      const tagsMatch = keywords.some(keyword =>
+        app.tags && app.tags.some((tag: string) => tag.includes(keyword))
+      )
+      if (titleMatch || tagsMatch) {
+        return app
+      }
+    }
+    return null
+  }
+
+  // 在应用列表中查找 name 匹配的应用
   for (const app of workflows_all.value) {
-    // 检查 title 匹配
+    
+    // 检查应用名称是否包含标签名称
+    if (app.name && app.name.includes(tagConfig.name)) {
+      return app
+    }
+    // 检查应用标题是否包含标签名称
+    if (app.title && app.title.includes(tagConfig.name)) {
+      return app
+    }
+    // 检查应用标签是否包含标签名称
+    if (app.tags && Array.isArray(app.tags) && app.tags.some((tag: string) => tag.includes(tagConfig.name))) {
+      return app
+    }
+  }
+
+  // 如果通过标签名称没有匹配到应用，则尝试使用 matchKeywords 进行匹配
+  const keywords = icon.matchKeywords || []
+  for (const app of workflows_all.value) {
     const titleMatch = keywords.some(keyword =>
       app.title && app.title.includes(keyword)
     )
-
-    // 检查 tags 匹配
     const tagsMatch = keywords.some(keyword =>
       app.tags && app.tags.some((tag: string) => tag.includes(keyword))
     )
-
     if (titleMatch || tagsMatch) {
       return app
     }
@@ -122,21 +174,35 @@ const findMatchedApp = (icon: IconItem): AppItem | null => {
   return null
 }
 
-// 处理图标列表，添加匹配的应用信息
+// 处理图标列表：
+//  - 添加 matchedApp 字段（与应用匹配）
+//  - 根据 icon.organizations 与 user.organizations 做权限过滤（若 icon 没有 organizations 字段则默认显示）
 const iconList = computed(() => {
-  return props.icons.map(icon => ({
-    ...icon,
-    matchedApp: findMatchedApp(icon)
-  }))
+  // 获取用户组织 id 列表
+  const userOrgs: string[] = (user && user.value && Array.isArray(user.value.organizations)) ? user.value.organizations : []
+
+  return props.icons
+    .map((icon, index) => ({
+      ...icon,
+      matchedApp: findMatchedApp(icon, index)
+    }))
+    .filter(icon => {
+      // 如果 icon 未配置 organizations，则默认可见
+      if (!icon.organizations || !Array.isArray(icon.organizations) || icon.organizations.length === 0) return true
+
+      // 如果用户没有组织信息，则不可见
+      if (!userOrgs || userOrgs.length === 0) return false
+
+      // 判断是否有交集
+      return icon.organizations.some((orgId: string) => userOrgs.includes(orgId))
+    })
 })
 
 // 应用跳转逻辑
 const appStore = useAppStore()
 const handleNavigateToApp = (app: AppItem) => {
   appStore.tabbarIndex = 0 // 清除当前选中的标签栏索引
-  uni.navigateTo({
-    url: `/pages/draw/apps/apps?id=${app._id}`
-  })
+  navigateToApp(app._id)
 }
 
 // 点击事件处理

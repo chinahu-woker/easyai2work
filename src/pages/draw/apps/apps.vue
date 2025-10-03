@@ -82,12 +82,17 @@ const {
 
 // 提供 bindParam 给子组件使用
 provide('bindParam', bindParam)
+// 模板中 bindParam 的键是动态的，TS 在模板类型检查时会抱怨类型不一致，
+// 这里暴露一个 any 别名给模板使用，运行时与 bindParam 共用同一引用
+const bp = bindParam as any;
+// 模板内的类型断言 helper
+const asAny = (v: any) => v as any;
 
 const workflowId = ref('');
 console.log("--------------------------", workFlowParamLists)
 
 onLoad(async () => {
-	const currentPage = getCurrentPages().pop();
+	const currentPage = getCurrentPages().pop() as any;
 	// 检查 currentPage 是否存在
 	if (currentPage) {
 		const query = currentPage.options;
@@ -236,7 +241,19 @@ const seedRef = ref<any[]>([])
 
 // }
 function leftClick() {
-	uni.redirectTo({ url: '/pages/index/index' });
+	// 优先使用 navigateBack 保留上一个页面的状态（如果存在历史栈）
+	try {
+		const pages = getCurrentPages();
+		if (pages && pages.length > 1) {
+			uni.navigateBack({ delta: 1 });
+		} else {
+			// 如果没有历史记录，则回退到首页，但使用 navigateTo 而不是 redirectTo
+			uni.navigateTo({ url: '/pages/index/index' });
+		}
+	} catch (e) {
+		// 兜底方案
+		uni.navigateTo({ url: '/pages/index/index' });
+	}
 
 }
 
@@ -246,7 +263,7 @@ function leftClick() {
 // }
 // 判断默认文件是否为音频
 
-function checkFileType(input) {
+function checkFileType(input: any) {
 	// 定义图片链接的正则表达式
 	const imageRegex = /\.(jpg|jpeg|png|gif|bmp)$/i;
 	// 定义视频链接的正则表达式
@@ -270,7 +287,7 @@ function checkFileType(input) {
 
 }
 
-function handleUploadComplete(result) {
+function handleUploadComplete(result: any) {
 	console.log('图片上传完成:', result);
 	// 可以在这里处理上传完成后的逻辑
 }
@@ -330,58 +347,58 @@ const handleAppChange = (app: any) => {
 					<view v-for="(item, index) in workFlowParamLists" :key='index'>
 
 						<view v-if="handleFindComponentName(item.name) === 'Seed'">
-							<Seed ref="seedRef" :title="item.title" v-model="bindParam[item.name]"
+							<Seed ref="seedRef" :title="item.title" v-model="bp[item.name]"
 								:options="item.attributes" />
 						</view>
 						<view v-else-if="handleFindComponentName(item.name) === 'ImageUploadMore'">
 
-							<ImageUploadMore :title="item.title" v-model="bindParam[item.name]"
+							<ImageUploadMore :title="item.title" v-model="bp[item.name]"
 								:options="item.attributes" />
 
 						</view>
 						<view v-else-if="handleFindComponentName(item.name) === 'ImageUpload'">
 
 							<view v-if="checkFileType(item.param) == 2">
-								<AudioUpload :title="item.title" v-model="bindParam[item.name]"
+								<AudioUpload :title="item.title" v-model="bp[item.name]"
 									:options="item.attributes" />
 							</view>
 
 							<view v-else>
-								<ImageUpload :title="item.title" v-model="bindParam[item.name]"
+								<ImageUpload :title="item.title" v-model="bp[item.name]"
 									:options="item.attributes" />
 							</view>
 						</view>
 						<view v-else-if="handleFindComponentName(item.name) === 'Width'">
-							<Width :title="item.title" v-model="bindParam[item.name]" :options="item.attributes" />
+							<Width :title="item.title" v-model="bp[item.name]" :options="item.attributes" />
 						</view>
 						<view v-else-if="handleFindComponentName(item.name) === 'Height'">
-							<Height :title="item.title" v-model="bindParam[item.name]" :options="item.attributes" />
+							<Height :title="item.title" v-model="bp[item.name]" :options="item.attributes" />
 						</view>
 						<view v-else-if="handleFindComponentName(item.name) === 'Positive'">
-							<Positive :title="item.title" v-model="bindParam[item.name]" :options="item.attributes" />
+							<Positive :title="item.title" v-model="bp[item.name]" :options="item.attributes" />
 						</view>
 						<view v-else-if="handleFindComponentName(item.name) === 'ModeSelect'">
-							<ModeSelect :title="item.title" :workflow_id="workflow._id" v-model="bindParam[item.name]"
+							<ModeSelect :title="item.title" :workflow_id="workflow._id" v-model="bp[item.name]"
 								:options="item.attributes" />
 						</view>
 						<view v-else-if="handleFindComponentName(item.name) === 'CustomSelect'">
-							<CustomSelect :title="item.title" v-model="bindParam[item.name]"
+							<CustomSelect :title="item.title" v-model="bp[item.name]"
 								:options="item.attributes" />
 						</view>
 						<view v-else-if="handleFindComponentName(item.name) === 'Picker'">
-							<Picker :title="item.title" v-model="bindParam[item.name]" :options="item.attributes" />
+							<Picker :title="item.title" v-model="bp[item.name]" :options="item.attributes" />
 						</view>
 						<view v-else-if="handleFindComponentName(item.name) === 'CustomNumberBox'">
-							<CustomNumberBox :title="item.title" v-model="bindParam[item.name]"
+							<CustomNumberBox :title="item.title" v-model="bp[item.name]"
 								:options="item.attributes" />
 						</view>
 						<view v-else-if="handleFindComponentName(item.name) === 'ImageSelectPreview'">
-							<ImageSelectPreview :title="item.title" v-model="bindParam[item.name]" :options="item" />
+							<ImageSelectPreview :title="item.title" v-model="bp[item.name]" :options="item" />
 						</view>
 
 						<view v-else-if="handleFindComponentName(item.name) === 'MoreImageUpload'">
 
-							<MoreImageUpload :title="item.title" v-model="bindParam[item.name]" />
+							<MoreImageUpload :title="item.title" :workflow_id="workflow?._id || ''" v-model="bp[item.name]" />
 
 						</view>
 						<view v-else-if="handleFindComponentName(item.name) === 'VideoUpload'">

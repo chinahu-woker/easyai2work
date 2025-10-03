@@ -122,6 +122,46 @@ $u-info-light: #f4f4f5;
   flex-direction: $direction;
 }
 
+/* ===== Global momentum scroll helpers ===== */
+/* Enable iOS momentum (inertial) scrolling for overflow containers */
+.momentum-scroll,
+.scroll-momentum,
+[data-momentum="true"] {
+  -webkit-overflow-scrolling: touch;
+  overflow: auto;
+}
+
+/* Target common third-party selectors (tnui / project patterns) */
+.thumbnail-nav,
+.thumbnail-scroll-horizontal,
+.input--tn-input,
+.input--data-v-498f5b95,
+.thumbnail-list {
+  -webkit-overflow-scrolling: touch;
+  overflow: auto;
+}
+
+/* Horizontal thumbnails: allow horizontal scroll and hide native scrollbar for better look */
+.thumbnail-scroll-horizontal {
+  white-space: nowrap;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.thumbnail-scroll-horizontal::-webkit-scrollbar {
+  display: none;
+}
+
+/* Utility: make sure scrollable text/description boxes get momentum on iOS */
+.text-scroll,
+.description-scroll {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Small note: 微信小程序在某些原生组件中无法通过样式开启动量滚动（取决于基础库）。若仍不生效，请确保页面使用 <scroll-view> 并在其属性中开启 scroll-with-animation 或 use-some-prop。 */
+
 
 
 

@@ -215,7 +215,7 @@ const graphicDatas = computed(() => {
 
         const mappedItem = {
             id: it._id,
-            avatar: it.user_id?.avatar_url || 'https://static.nailoffice.cn/default-avatar.png',
+            avatar: it.user_id?.avatar_url || 'https://ai-1357282892.cos.ap-shanghai.myqcloud.com/6811db59c58c28287e07e45c/upload/20250521115936505-3434-06.png',
             title: it.user_id?.nickname || it.user_id?.username || '匿名用户',
             username: it.user_id?.nickname || it.user_id?.username || '匿名用户',
             description: formatDateTime(new Date(it.created_at || Date.now())),
@@ -244,7 +244,8 @@ const graphicDatas = computed(() => {
             workflowName: it.workflow_name || it.workflow_title || '', // 工作流名称
             images: (() => {
                 const inputImages: string[] = []
-                const paramsAny = it.params as Record<string, any> | undefined
+                // 添加防御性检查，确保 it.params 是对象类型
+                const paramsAny = (it.params && typeof it.params === 'object') ? it.params as Record<string, any> : undefined
                 
                 // 收集输入图片
                 if (paramsAny) {
@@ -310,6 +311,42 @@ watch(graphicDatas, (newData) => {
         })
     }
 }, { immediate: true })
+
+// 收集图片并通过事件总线发送给其他组件（如任务进度背景）
+const emitCommunityImages = () => {
+    try {
+        const imgs: string[] = []
+        graphicDatas.value.forEach(item => {
+            if (Array.isArray((item as any).images)) {
+                ;(item as any).images.forEach((url: string) => {
+                    if (/\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(url)) {
+                        imgs.push(url)
+                    }
+                })
+            }
+        })
+        const unique = Array.from(new Set(imgs)).slice(0, 60) // 最多取 60 张，供瀑布流循环
+        // 事件派发
+        uni.$emit && uni.$emit('community-images', unique)
+        // 备份到本地缓存，供其他页面首次进入时获取
+        try { uni.setStorageSync && uni.setStorageSync('communityImages', unique) } catch (e) {}
+    } catch (e) {
+        console.warn('emitCommunityImages error', e)
+    }
+}
+
+watch(graphicDatas, (v) => {
+    if (v && v.length) {
+        emitCommunityImages()
+    }
+})
+
+onMounted(() => {
+    // 初次进入如果已经有数据也发一次
+    if (graphicDatas.value && graphicDatas.value.length) {
+        emitCommunityImages()
+    }
+})
 
 // 左列数据（偶数索引）
 const leftColumnData = computed(() => {

@@ -245,6 +245,8 @@ export interface IWorkFlow {
     editor_model?:0|1 //editor_model 0表示创造新内容， 1表示编辑已有内容
     prem_level_min?: number; // 默认为空，表示无需权限层级，有值时表示需要相应的权限层级才可以访问
     cover_mediaSize?: IMediaSize; //默认web封面的媒体尺寸
+    // 前端用于控制加速展示的字段（可选）
+    accelerateType?: string;
 }
 
 /**

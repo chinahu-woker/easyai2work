@@ -73,14 +73,17 @@
       align-items: center;
       margin-top: 4rpx;
       .tag-item {
-        width: fit-content;
-        height: fit-content;
+        display: inline-flex;
+        align-items: center;
         padding: 8rpx 16rpx;
         border-radius: 6rpx;
-
         margin-right: 16rpx;
         font-size: 24rpx;
         line-height: 1;
+        max-width: 360rpx; /* 根据设计调整最大宽度 */
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
     }
     /* 内容标签 end */
@@ -254,7 +257,7 @@
     margin: 20rpx 0;
     
     .tag-item {
-      display: flex;
+      display: inline-flex;
       align-items: center;
       padding: 8rpx 16rpx;
       font-size: 24rpx;
@@ -262,10 +265,24 @@
       background: rgba(var(--tn-color-primary-rgb), 0.1);
       border-radius: 20rpx;
       border: 1rpx solid rgba(var(--tn-color-primary-rgb), 0.2);
-      
+      max-width: 360rpx; /* 防止单个标签过长撑破布局 */
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      vertical-align: middle;
       .tn-icon {
+        flex: 0 0 auto;
         margin-right: 6rpx;
         font-size: 20rpx;
+      }
+      .tag-text {
+        display: inline-block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 260rpx; /* 给文本留出图标和内边距空间 */
+        flex: 1 1 auto;
+        min-width: 0; /* 允许子元素收缩以触发 ellipsis */
       }
     }
   }

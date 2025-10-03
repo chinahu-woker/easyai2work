@@ -5,7 +5,7 @@
     
     <!-- 点击触发选择图片 -->
     <view class="frosted-glass-container" v-if="!imageList_mask || imageList_mask.length === 0">
-	    <!-- 这里可根据实际需求填充内容，比如模拟的图标、文字等 -->
+	    <!-- 无图片时显示占位符 -->
 	    <view class="icon-area">
 	      <view class="circle"></view>
 	      <view class="ring"></view>
@@ -13,14 +13,15 @@
 	    <view class="rect rect-1"></view>
 	    <view class="rect rect-2"></view>
 	  </view>
-	 
     
-    <view v-else  class="edit-trigger">
-      <!-- 有图时循环渲染已上传图片（如果是单图可简化，这里保留原数组逻辑） -->
-      <view  v-for="(image, index) in imageList_mask" :key="index" class="uploaded-list">
+    <view v-else-if="imageList_mask && imageList_mask.length > 0" class="edit-trigger">
+      <!-- 有图时渲染已上传图片 -->
+      <view class="uploaded-list">
         <image 
-         
-          :src="image" 
+          v-for="(image, index) in imageList_mask" 
+          :key="index" 
+          :src="image"
+          v-if="image" 
           class="uploaded-img"
         />
       </view>
@@ -45,7 +46,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineEmits, nextTick, watch ,onMounted} from 'vue';
+import { ref,  nextTick, watch ,onMounted} from 'vue';
 import chjImgEdit from "@/components/chj-imgEdit/chj-imgEdit.vue";
 import MyTitle from "@/components/common/MyTitle.vue";
 import type {ImageUploadCustomFunction, ImageUploadFile,TnImageUploadInstance} from "@tuniao/tnui-vue3-uniapp";
@@ -306,13 +307,14 @@ const getRectPosition = (obj) => {
 /* 触发区域样式：无图时占位置，有图时承载图片 */
 .edit-trigger {
   width: 100%;
-  height: 100%;
+  min-height: 300rpx;
   display: flex;
   align-items: center;
   justify-content: center;
   background-color: #f5f5f5; /* 浅灰底色 */
   border-radius: 8rpx;
   overflow: hidden; /* 防止图片溢出圆角 */
+  padding: 20rpx;
 }
 
 /* 无图占位图样式 */
@@ -322,16 +324,23 @@ const getRectPosition = (obj) => {
   object-fit: contain; /* 保持图标完整 */
 }
 
-/* 已上传图片列表（单图场景也适用） */
+/* 已上传图片列表 */
 .uploaded-list {
   width: 100%;
   height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 .uploaded-img {
-  width: 200rpx;
-  height:200rpx;
-  margin: 0;
-  object-fit: cover; /* 覆盖填充，按需求可改contain */
+  max-width: 200rpx;
+  max-height: 200rpx;
+  width: auto;
+  height: auto;
+  margin: 10rpx;
+  object-fit: contain;
+  border-radius: 8rpx;
 }
 
 /* 编辑弹窗容器 */

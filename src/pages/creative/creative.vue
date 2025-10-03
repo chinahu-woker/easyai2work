@@ -37,7 +37,7 @@ const graphicDatas = computed(()=>{
   return imageData.value.map(item =>{
     return {
       id: item._id,
-      avatar:item.user_id?.avatar_url||'',
+  avatar:item.user_id?.avatar_url||'https://ai-1357282892.cos.ap-shanghai.myqcloud.com/6811db59c58c28287e07e45c/upload/20250521115936505-3434-06.png',
       username:item.user_id?.nickname||item.user_id?.username,
       title:item.options?.workflow_title,
       description:formatDateTime(new Date(item.created_at)),

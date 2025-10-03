@@ -1,11 +1,10 @@
 <template>
   <view>
     <movable-area class="movable-area" :scale-area="false">
-      <movable-view
-          id="movable-view"
-          class="movable-view" :class="!isRemove?'animation-info':''" style="pointer-events: auto;"
-                    @click="clickBtn" @touchstart="touchstart" @touchend="touchend" @change="onChange" direction="all"
-                    inertia="true" :x="btnPositon.x" :y="btnPositon.y" :disabled="disabled" :out-of-bounds="true" :damping="200" :friction="100">
+      <movable-view id="movable-view" class="movable-view" :class="!isRemove ? 'animation-info' : ''"
+        style="pointer-events: auto;" @click="clickBtn" @touchstart="touchstart" @touchend="touchend" @change="onChange"
+        direction="all" inertia="true" :x="btnPositon.x" :y="btnPositon.y" :disabled="disabled" :out-of-bounds="true"
+        :damping="200" :friction="100">
 
         <slot>
           <view class="content-default">
@@ -18,10 +17,10 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, withDefaults, nextTick, watch} from 'vue';
-import {onLoad} from "@dcloudio/uni-app";
+import { reactive, ref, withDefaults, nextTick, watch } from 'vue';
+import { onLoad } from "@dcloudio/uni-app";
 
-interface Props{
+interface Props {
   disabled?: boolean,
   canDocking?: boolean,
   bottomPx?: number,
@@ -33,16 +32,16 @@ const props = withDefaults(defineProps<Props>(), {
   bottomPx: 30,
   rightPx: 0
 })
-const windowWidth=ref(0)
-const windowHeight=ref(0)
-const btnWidth=ref(0)
-const btnHeight=ref(0)
+const windowWidth = ref(0)
+const windowHeight = ref(0)
+const btnWidth = ref(0)
+const btnHeight = ref(0)
 
 /** 按钮位置 */
-const btnPositon =defineModel({
-  default:{
-    x:10000,
-    y:10000
+const btnPositon = defineModel({
+  default: {
+    x: 10000,
+    y: 10000
   }
 })
 const old = reactive({
@@ -56,36 +55,36 @@ const old = reactive({
 // },{
 //   deep:true
 // })
-const  getSysInfo=()=> {
+const getSysInfo = () => {
   let sysInfo = uni.getSystemInfoSync()
   windowWidth.value = sysInfo.windowWidth
   windowHeight.value = sysInfo.windowHeight
   btnPositon.value.x = sysInfo.windowWidth - props.rightPx
-  btnPositon.value.y = sysInfo.windowHeight - props.bottomPx -300
+  btnPositon.value.y = sysInfo.windowHeight - props.bottomPx - 300
 }
-onLoad(()=>{
-  nextTick(()=>{
+onLoad(() => {
+  nextTick(() => {
     getSysInfo()
   })
 })
 
 //移动按钮
-const onChange=(e)=> {
+const onChange = (e) => {
   old.x = e.detail.x
   old.y = e.detail.y
 }
 const isRemove = ref(true)
 //开始移动
-const touchstart=(e)=> {
+const touchstart = (e) => {
   isRemove.value = true
 }
 //结束移动
-const touchend=(e)=> {
+const touchend = (e) => {
   if (props.canDocking && old.x !== undefined) {
     btnPositon.value.x = old.x
     btnPositon.value.y = old.y
     let bWidth = (windowWidth.value - btnWidth.value) / 2
-    console.log('bwidth',bWidth)
+    console.log('bwidth', bWidth)
     if (btnPositon.value.x <= 0 || (btnPositon.value.x >= 0 && btnPositon.value.x <= bWidth)) {
       nextTick(res => {
         btnPositon.value.x = 0
@@ -94,7 +93,7 @@ const touchend=(e)=> {
       nextTick(res => {
         // 靠右边缘
         btnPositon.value.x = windowWidth.value -
-            btnWidth.value
+          btnWidth.value
       })
     }
     isRemove.value = false
@@ -106,7 +105,7 @@ const emit = defineEmits(['clickBtn'])
 //点击按钮
 // 点击按钮
 const clickBtn = () => {
-  emit('clickBtn',null);
+  emit('clickBtn', null);
 };
 
 </script>
@@ -122,7 +121,7 @@ const clickBtn = () => {
   justify-content: center;
 }
 
-.content-default{
+.content-default {
   width: 100rpx;
   height: 100rpx;
   background: linear-gradient(360deg, $u-primary-dark 0%, $u-primary 100%);
@@ -150,6 +149,4 @@ const clickBtn = () => {
   z-index: 999999 !important;
   pointer-events: none;
 }
-
-
 </style>

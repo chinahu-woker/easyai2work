@@ -66,7 +66,6 @@ export const useAppStore = defineStore('app', () => {
     user,
     localTasks,
     showPay,
-    showExecuting, // 添加missing的showExecuting
     tabbarIndex,
     home_tagActiveIndex,
     home_tagsList,

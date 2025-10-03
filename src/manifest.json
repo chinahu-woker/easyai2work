@@ -55,14 +55,14 @@
                 "oauth" : {
                     "univerify" : {},
                     "weixin" : {
-                        "appid" : "wx7f23a6398e533203",
+                        "appid" : "wx90df38cbf12ac50a",
                         "UniversalLinks" : ""
                     }
                 },
                 "payment" : {
                     "weixin" : {
                         "__platform__" : [ "android" ],
-                        "appid" : "wx7f23a6398e533203",
+                        "appid" : "wx90df38cbf12ac50a",
                         "UniversalLinks" : ""
                     }
                 }
@@ -113,7 +113,7 @@
     "quickapp" : {},
     /* 小程序特有相关 */
     "mp-weixin" : {
-        "appid" : "wx7f23a6398e533203",
+        "appid" : "wx90df38cbf12ac50a",
         "setting" : {
             "urlCheck" : false,
             "es6" : true,
@@ -135,5 +135,8 @@
     "uniStatistics" : {
         "enable" : false
     },
-    "vueVersion" : "3"
+    "vueVersion" : "3",
+    "mp-xhs" : {
+        "appid" : "68d20295131b9b00019e9cb1"
+    }
 }

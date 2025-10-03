@@ -1,1155 +1,431 @@
 <template>
-
-	<!-- <view class="fuiNavBar">
-		<fui-nav-bar custom background='transparent'>
-			<view class="fui-search__box ">
-				<fui-tabs class="tabs_class" direction='column' color='#ACB0D0' :isSlider='false'
-					selectedColor='#17135F' :tabs="dynamicTabbarData" scale='1.5' @change="changeHomePage" :center="false"
-					:short="true" :scroll='false' itemPadding="25" :current="pageindex" size='28' fontWeight='900'
-					background='transparent'></fui-tabs>
-			</view>
-		</fui-nav-bar>
-
-
-	</view> -->
-	<fui-background-image :src="backGroundImage">
-	</fui-background-image>
-	<view v-show="pageindex == 0" style="margin-top: 15%;">
-
-		<Newhead />
-
-		<NewIcon style="margin-bottom: 5%;margin-top: 0%;" />
-
-		<AppSwiper style="margin-top: 5%;" />
-
-		<up-gap height="10"></up-gap>
-		<!--  搜索-->
-		<!-- <Search /> -->
-
-		<up-gap height="10"></up-gap>
-		<!-- <AppTags /> -->
-
-		<!-- <AppWaterFall /> -->
-		 <NewCommunity  />
-		 <view style="height: 80rpx;">	</view>
-		
-
-	</view>
-	<view v-show="pageindex == 1" style="margin-top: 150rpx;">
-		<AppSwiper   />
-
-		<NewStore  />
-		<NewPayWork   />
-		<!-- <NewWaterFall /> -->
-	</view>
-	<!-- <view v-show="pageindex == 2">
-		 
-		<view style="background: red; color: white; padding: 20rpx; margin: 20rpx; text-align: center;">
-			调试：当前页面索引 {{ pageindex }}，正在显示社区组件
-		</view>
-		<NewCommunity />
-	</view> -->
-	<view v-show="pageindex == 2">
-
-
-
-		<BaseLayout>
-
-
-			<view style="margin-top: 15%;">
-				<!-- <MyNavbar /> -->
-				<up-status-bar />
-				<view class="u-flex u-row-right" style="width: 100%;">
-					<view class="camera u-flex u-row-center">
-					</view>
-				</view>
-				<view class=" trans_back u-flex u-flex-y-center u-flex-around user-box u-p-l-30 u-p-r-20 u-p-b-30">
-					<view class="u-m-r-10" @click="handleLogin">
-						<up-avatar :src="user.avatar_url" size="80">
-						</up-avatar>
-						<view v-if="!isLogin" class="tn-text-center tn-text-sm tn-gray-dark_text"
-							style="position: relative;bottom: 0;">点击登录</view>
-					</view>
-					<view class="u-flex-1">
-						<view v-if="isLogin" class="u-font-18 u-p-b-10 tn-text">昵称：{{ user.nickname }}</view>
-						<view v-else class="u-font-18 u-p-b-10 tn-gray-dark_text">未登录</view>
-						<!--        会员信息-->
-						<view>
-							<UserMemberInfo></UserMemberInfo>
-						</view>
-						<!--        完善用户信息-->
-						<view v-if="isLogin" class="tn-text-xs tn-gray-dark_text">余额：{{ user.balance }}</view>
-						<GetUserInfoPopup />
-
-					</view>
-
-					<view class="u-m-l-10 u-p-10" @click='toEmpty'>
-						<up-icon name="scan" color="#969799" size="28"></up-icon>
-					</view>
-					<view class="u-m-l-10 u-p-10" @click='toEmpty'>
-						<up-icon name="arrow-right" color="#969799" size="28"></up-icon>
-					</view>
-				</view>
-
-				<!-- <view class="u-m-t-20">
-						<up-cell-group class="trans_back">
-							<up-cell icon="rmb-circle" title="算力充值" @click="showPay=true" :border='false'> </up-cell>
-						</up-cell-group>
-					</view> -->
-				<image @click="img2pay"
-					style="width: 675rpx; margin-bottom: -1%; height: 160rpx; background-color: transparent; display:inline-block; box-sizing:border-box; position:relative; margin-left:5%;"
-					mode="scaleToFill"
-					src="https://chinahu-ai-server.oss-cn-chengdu.aliyuncs.com/67873d6c232a3c5d52240dd6/upload/20250703230841666-banner.png">
-				</image>
-				<view class="u-m-t-20" style="border-color: transparent; margin-left: 5%; margin-right: 5%;">
-					<up-cell-group color='#fff' :border="false" class="trans_back">
-						<!--        <up-cell icon="star" title="收藏(暂未开放)"></up-cell>-->
-
-
-
-						<view v-if="isLogin"
-							style=" margin-top:5% ; color: #000000; height: 100%; background: radial-gradient(circle, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.1)); border-radius: 10px 10px 10px 10px; height: 120rpx; ">
-							<up-cell :border='false' @click="handleGotoHistory">
-								<template #icon>
-									<up-icon size="30"
-										name="https://chinahu-ai-server.oss-cn-chengdu.aliyuncs.com/Iconly_Glass_Gallery.png"></up-icon>
-								</template>
-								<template #title>
-									<text class="u-cell-text" style='color: #000000;'>绘图历史</text>
-								</template>
-							</up-cell>
-						</view>
-
-						<view
-							style=" margin-top:5% ;color: #000000; height: 100%;  background: radial-gradient(circle, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.1));  border-radius: 10px 10px 10px 10px;">
-							<button
-								style="background-color: transparent; margin: 0; padding: 0; text-align: left; border-color: transparent;"
-								open-type="contact">
-								<up-cell :border="false">
-									<template #icon>
-										<up-icon size="30"
-											name="https://chinahu-ai-server.oss-cn-chengdu.aliyuncs.com/Iconly_Glass_Chat.png"></up-icon>
-									</template>
-									<template #title>
-										<text class="u-cell-text" style='color: #000000;'>联系客服</text>
-									</template>
-								</up-cell>
-							</button>
-						</view>
-						<view v-if="isLogin"
-							style=" margin-top:5% ; color: #000000; height: 100%;  background: radial-gradient(circle, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.1)); border-radius: 10px 10px 10px 10px; height: 120rpx; ">
-							<up-cell :border='false' @click="handleLoginOut">
-								<template #icon>
-									<up-icon size="30"
-										name="https://chinahu-ai-server.oss-cn-chengdu.aliyuncs.com/Iconly_Glass_Home.png"></up-icon>
-								</template>
-								<template #title>
-									<text class="u-cell-text" style='color: #000000;'>退出登录</text>
-								</template>
-							</up-cell>
-
-						</view>
-						<view v-if='role'
-							style=" margin-top:5% ; color: #000000; height: 100%;  background: radial-gradient(circle, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.1)); border-radius: 10px 10px 10px 10px; height: 120rpx; ">
-							<up-cell :border='false' @click="ToConsole">
-								<template #icon>
-									<up-icon size="30"
-										name="https://chinahu-ai-server.oss-cn-chengdu.aliyuncs.com/Iconly_Glass_Setting.png"></up-icon>
-								</template>
-								<template #title>
-									<text class="u-cell-text" style='color: #000000;'>管理台</text>
-								</template>
-							</up-cell>
-
-						</view>
-						<!--        <up-cell icon="coupon" title="卡券(暂未开放)"></up-cell>-->
-						<!--        <up-cell icon="heart" title="关注(暂未开放)"></up-cell>-->
-					</up-cell-group>
-					<!-- 	<button open-type="share">分享到微信</button> -->
-				</view>
-
-
-			</view>
-		</BaseLayout>
-
-	</view>
-	<PaymentPopup />
-	<fui-tabbar class="fui-wrap" :tabBar="dynamicTabbarData" :current="pageindex" @click="changeHomePage" selectedColor="#8350FA" ></fui-tabbar>
-
-
+  <!-- 背景图片容器 -->
+  <view class="background-container" :style="containerStyle"></view>
+  
+  <!-- 内容容器 -->
+  <view class="new-index-container">
+    <!-- 动态页面渲染器 -->
+    <scroll-view 
+      scroll-y 
+      class="content-scroll-view"
+    >
+      <!-- 使用v-show替代组件的重新创建，保持组件状态 -->
+      <view  v-for="(pageType, index) in pageTypes" :key="pageType" v-show="currentPageIndex === index">
+        <dynamic-page-renderer :page-type="pageType" />
+      </view>
+    </scroll-view>
+    
+    <!-- 底部导航栏 -->
+    <view class="tabbar-container">
+      <view 
+        v-for="(item, index) in safeFilteredTabbarData" 
+        :key="index"
+        class="tabbar-item"
+        :class="{ active: currentPageIndex === index }"
+        @click="handleTabClick(index)"
+      >
+        <image 
+          :src="currentPageIndex === index ? item.selectedIconPath : item.iconPath" 
+          class="tabbar-icon"
+          mode="aspectFit"
+        />
+        <text class="tabbar-text">{{ item.text }}</text>
+      </view>
+    </view>
+  </view>
 </template>
 
 <script setup lang="ts">
-import MyNavbar from "@/components/common/MyNavbar.vue";
+import { ref, computed, onMounted, watchEffect, watch, getCurrentInstance, nextTick } from 'vue'
+import { onLoad, onShow } from '@dcloudio/uni-app'
+import { useAppStore } from '@/stores/appStore'
+import { storeToRefs } from 'pinia'
+import DynamicPageRenderer from '@/components/DynamicPageRenderer.vue'
+import { globalTabbarData, pageComponents, dynamicComponentRules } from '@/cofigs/data/globalAppData'
+import pagesGlobalData from '@/cofigs/data/pagesGlobalData.json'
 
-// 在非微信环境（如 H5）中避免直接引用 wx 导致的编译/运行时错误
-declare const wx: any;
-
-import GetUserInfoPopup from "@/components/GetUserInfoPopup.vue";
-import {
-	creatOrder,
-	getLoginInfo,
-	getOrderInfoById,
-	getPrePay,
-	getProductList,
-	isLogin,
-	loginByUsername,
-	loginByWechatCode,
-	loginOut,
-	refreshUserInfo,
-	saveLoginInfo
-} from "@/composables/useCommon.ts";
-import BaseLayout from '@/layouts/BaseLayout.vue'
-import Newhead from "@/components/home/Newhead.vue";
-import NewIcon from "@/components/home/NewIcon.vue";
-import NewWaterFall from "@/components/home/NewWaterFall.vue";
-import NewStore from "@/components/home/NewStore.vue";
-import NewPayWork from "@/components/home/NewPayWork.vue";
-import NewCommunity from "@/components/home/NewCommunity.vue";
-import { onShareAppMessage, onShareTimeline } from '@dcloudio/uni-app'
-import { globalAppData, tabbarData ,backGroundImage } from '@/cofigs/data/globalAppData.ts'
-import { getShareData, clearShareData } from '@/utils/shareManager'
-
-import TnIcon from '@tuniao/tnui-vue3-uniapp/components/icon/src/icon.vue'
-import { onLoad, onReady, onShow } from "@dcloudio/uni-app";
-
-// import useWorkFlow from "@/composables/useWorkFlow.ts";
-import useWorkFlow from "@/composables/useWorkFlow";
-
-import UserMemberInfo from "@/components/home/UserMemberInfo.vue";
-import { ref, onMounted, onUnmounted, computed, watch, nextTick, onActivated } from 'vue'
-import { request } from "@/utils/request.ts";
-import type { IDrawHistoryItem } from "@/types";
-import { formatDateTime } from "@/utils/common.ts";
-import AppSwiper from "@/components/home/AppSwiper.vue";
-import Search from "@/components/home/Search.vue";
-import AppTags from "@/components/home/AppTags.vue";
-import AppWaterFall from "@/components/home/AppWaterFall.vue";
-import Home from "@/pages/home/home.vue";
-import Creative from "@/pages/creative/creative.vue";
-import TaskExcuting from "@/components/common/TaskExcuting.vue";
-import BottomNavigation from "@/components/BottomNavigation.vue";
-import History from "@/pages/history/history.vue";
-import { storeToRefs } from "pinia";
-import { useAppStore } from "@/stores/appStore.ts";
-import { EventType } from "@/types/event.types.ts";
-import { on } from "@/utils/emitter.ts";
-import PaymentPopup from "@/components/home/PaymentPopup.vue";
-import fuiBackgroundImage from "@/components/firstui/fui-background-image/fui-background-image.vue";
-import { getModelList, getUserKey, getUserToken, getUserInfo, ChatAPiUrl } from "@/composables/aiChat.ts";
-
-// import { TextEncoder, TextDecoder } from 'text-decoding'
-// global.TextEncoder = TextEncoder
-// global.TextDecoder = TextDecoder
-onLoad((options: any = {}) => {
-	if (options && options.pageindex) {
-		pageindex.value = parseInt(options.pageindex)
-	}
-});
-// 分享
-onShareAppMessage((res: any) => {
-	const inviteCode = useAppStore().user.my_invite_code
-	
-	// 检查是否有特定的分享数据
-	const shareData = getShareData()
-	if (shareData) {
-		// 清除已使用的分享数据
-		clearShareData()
-		
-		return {
-			title: shareData.title,
-			path: `${shareData.path}&inviteCode=${inviteCode}`,
-			imageUrl: shareData.imageUrl || ''
-		}
-	}
-	
-	// 如果是从社区页面分享，使用自定义分享内容
-	if (pageindex.value === 2 && res.from === 'button') {
-		return {
-			title: '发现一个很棒的美甲设计！快来看看吧~',
-			path: `/pages/index/index?pageindex=2&inviteCode=${inviteCode}`,
-			imageUrl: '' // 这里可以设置分享图片
-		}
-	}
-	
-	// 默认分享内容
-	return {
-		title: globalAppData.share.appInfo,
-		path: `/pages/index/index?inviteCode=${inviteCode}`,
-	}
-})
-
-// 朋友圈
-onShareTimeline(() => {
-	const inviteCode = useAppStore().user.my_invite_code
-	
-	// 检查是否有特定的分享数据
-	const shareData = getShareData()
-	if (shareData) {
-		// 清除已使用的分享数据
-		clearShareData()
-		
-		return {
-			title: shareData.title,
-			path: `${shareData.path}&inviteCode=${inviteCode}`
-		}
-	}
-	
-	// 如果是社区页面，使用特定的朋友圈分享内容
-	if (pageindex.value === 2) {
-		return {
-			title: 'NAILOFFICE-AI | 精美美甲设计分享',
-			path: `/pages/index/index?pageindex=2&inviteCode=${inviteCode}`,
-		}
-	}
-	
-	return {
-		title: globalAppData.share.appInfo,
-		path: `/pages/index/index?inviteCode=${inviteCode}`,
-	}
-})
-function ToConsole() {
-	uni.navigateTo({
-		url: '/pages/console/console'
-	})
-
+// 定义类型
+interface TabbarItem {
+  text: string
+  tabText: string
+  iconPath: string
+  selectedIconPath: string
+  organizations?: string[]
 }
 
-
-const role = ref(false)
-const roltList = ['manager', 'admin']
-function Kongzhitai() {
-	if (!isLogin.value) {
-		role.value = false
-		return 0
-	}
-	else {
-		const UserInfor: any = uni.getStorageSync('userInfo') || {};
-		// 兼容性检查：确保 role 存在且为数组或可索引的字符串
-		let hasRole = false;
-		if (UserInfor && UserInfor.role) {
-			if (Array.isArray(UserInfor.role) && UserInfor.role.length > 0) {
-				hasRole = roltList.includes(UserInfor.role[0]);
-			} else if (typeof UserInfor.role === 'string' && UserInfor.role.length > 0) {
-				// 某些实现可能将 role 存为字符串
-				hasRole = roltList.includes(UserInfor.role);
-			}
-		}
-		console.log("361---userInfo---------------", UserInfor, 'hasRole=', hasRole)
-		role.value = !!hasRole;
-	}
-
-
-}
-Kongzhitai()
-
-// 当页面被激活或显示时也重新计算 role，确保登录/登出后 UI 及时刷新
-onShow(() => {
-	Kongzhitai()
-})
-
-// 当组件被 keep-alive 激活（例如从其他页面返回）时也触发
-onActivated(() => {
-	Kongzhitai()
-})
-
-// 监听登录状态或用户信息变化（来自 store）以重新计算 role
+// 状态管理
 const appStore = useAppStore()
-watch(() => appStore.user, () => {
-	Kongzhitai()
-}, { deep: true })
-
-// ---------------------------AIChat  Page------------------------------
-
-let items = ref('')
-
-
-
-function copyText(text: any) {
-
-	uni.setClipboardData({
-		data: text,
-		success: () => {
-			console.log('复制成功');
-			// 可以在这里给用户提示
-			uni.showToast({
-				title: '复制成功',
-				icon: 'none'
-			});
-		},
-		fail: (err) => {
-			console.error('复制失败', err);
-			// 处理错误情况
-			uni.showToast({
-				title: '复制失败，请稍后再试',
-				icon: 'none'
-			});
-		}
-	});
-}
-// --------------------------------------------------------------------------------------
-
-let isNavigating = false
-function goToEntire(id: any) {
-	if (isNavigating) return
-	isNavigating = true
-
-	uni.navigateTo({
-		url: `/pages/drawLike/alike?id=${id}`,
-		complete: () => {
-			isNavigating = false
-		}
-	})
-}
-// --------------------------------------------------------------------------------------
-async function chatAiGetToken() {
-	const requestTask = ref()
-	const userInfo = ref()
-	// 获取 用户信息
-
-	await getUserToken().then(res => {
-		// console.log('获取到的getUserToken信息:', res.data);
-		requestTask.value = res.data
-	}).catch(err => {
-		console.error('获取getUserToken失败:', err);
-	});
-	console.log('getUserToken执行完毕');
-	// console.log('获取到的requestTask信息:', requestTask.value);
-	await getUserInfo(requestTask.value).then(res => {
-		// console.log('获取到的getUserInfo信息:', res.data);
-		userInfo.value = res.data
-	}).catch(err => {
-		console.error('获取getUserInfo失败:', err);
-	});
-	console.log('getUserInfo执行完毕');
-	await getModelList(requestTask.value.token).then(res => {
-		// console.log('获取到的getUserInfo信息:', res.data);
-		modelList.value = res.data
-		chooseModel.value = res.data[0]
-	}).catch(err => {
-		console.error('获取getModelList失败:', err);
-	});
-	console.log('getModelList执行完毕');
-	await getUserKey(userInfo.value, requestTask.value.refresh_token).then(res => {
-		console.log('获取到的getUserKey信息:', res.data);
-		userkey.value = res.data.key
-	}).catch(err => {
-		console.error('获取getUserKey失败:', err);
-	});
-	console.log('getUserKey执行完毕');
-}
-
-
-function chooseImage() {
-	uni.showToast({
-		icon: "error",
-		title: '您没有输入',
-		duration: 2000
-	});
-}
-
-// 初始化 modelList 为一个空数组
-const popup = ref(false)
-const modelList = ref([]);
-const chooseModel = ref('')
-
-function change(e: any) {
-	// 选择模型
-	popup.value = false
-	chooseModel.value = e.value
-}
-function cancel() { popup.value = false }
-function popupMth() {
-	if (!isLogin.value) {
-		uni.showToast({
-			icon: "error",
-			title: '您还没有登录',
-			duration: 2000
-		});
-		return 0
-	}
-
-
-	popup.value = true
-}
-// 定义 fetchData 函数
-
-
-const content = ref('')
-const msgList = ref([{
-	"content": "你好我是Ai聊天助手，有什么问题问我吧！(温馨提示：点击消息可以复制哦)",
-	"role": "system"
-},
-
-])
-
-
-const userkey = ref('')
-const StreamRequest = (content: any) => {
-
-	return new Promise((resolve, reject) => {
-		const requestTask = uni.request({
-
-			url: ChatAPiUrl(), // 请求地址
-			method: "POST",
-
-			data: {
-				"messages": content,
-				"model": chooseModel.value,
-				"stream": true,
-				"features": {
-					"thinking_enabled": false
-				}
-			},
-			dataType: "json",
-			header: {
-				'Authorization': 'Bearer sk-' + userkey.value
-			},
-			responseType: 'text',
-			enableChunked: true, // 开启流传输
-			success: (res) => {
-				resolve(res);
-				// console.log('请求成功', res);
-				// uni.parseStreamData(res.data)
-			}, // 请求成功回调
-			fail: (err) => {
-				reject(err);
-				uni.showToast({
-					icon: "error",
-					title: '请求失败',
-					duration: 2000
-				});
-				console.log('请求失败', err);
-			} // 请求失败回调
-		});
-
-		// 监听进度更新事件（兼容不同平台）
-		if (requestTask && typeof (requestTask as any).onChunkReceived === 'function') {
-			(requestTask as any).onChunkReceived((chunk: any) => {
-				try {
-					let arrayBuffer: any = chunk.data;
-					// 微信小程序环境：使用 wx 提供的转换方法
-					if (typeof wx !== 'undefined' && wx.arrayBufferToBase64 && wx.base64ToArrayBuffer) {
-						const base64 = wx.arrayBufferToBase64(chunk.data);
-						arrayBuffer = wx.base64ToArrayBuffer(base64);
-					} else {
-						// 浏览器/H5 环境：chunk.data 通常就是 ArrayBuffer 或带 buffer 的视图
-						if (chunk.data && chunk.data.buffer) {
-							arrayBuffer = chunk.data.buffer;
-						}
-					}
-
-					// TextDecoder 在部分环境可用
-					const decoder: any = (typeof TextDecoder !== 'undefined') ? new TextDecoder() : { decode: (b: any) => String.fromCharCode(...Array.from(new Uint8Array(b))) };
-					const text = (typeof TextDecoder !== 'undefined') ? decoder.decode(arrayBuffer, { stream: true }) : decoder.decode(arrayBuffer);
-					// 交给统一的处理函数
-					handleStreamData(text);
-				} catch (error) {
-					console.error('处理数据块失败', error);
-				}
-			});
-		} else {
-			// 某些平台可能不支持流式回调，记录警告并回退到 success 的处理方式
-			console.warn('当前平台不支持 onChunkReceived，流式响应可能不可用。');
-		}
-		if (requestTask && typeof (requestTask as any).onHeadersReceived === 'function') {
-			(requestTask as any).onHeadersReceived(() => {
-				console.log('请求完成');
-			});
-		}
-	});
-}
-const msg = ref('')
-function handleStreamData(responseText: any) {
-	const messages = ('' + responseText).split('\n').filter((line: any) => line.startsWith('data:'));
-	for (const message of messages) {
-		// console.log('-----message---------',message)
-		if (message.trim() === 'data: [DONE]') {
-			msgStatu.value = true
-			return;
-		}
-		try {
-			const data = JSON.parse(message.substring(5).trim()); // 去掉 'data:' 前缀并解析 JSON
-			if (data.choices && data.choices[0] && data.choices[0].delta && data.choices[0].delta.content) {
-				msg.value += data.choices[0].delta.content;
-			}
-		} catch (error) {
-			console.log('解析错误:', error);
-		}
-	}
-	const index = msgList.value.length - 1
-	msgList.value[index].content = msg.value
-	items.value = "items-" + (msgList.value.length - 1)
-	msgStatu.value = false
-
-}
-const msgStatu = ref(true)
-function msgSend() {
-	if (!isLogin.value) {
-		uni.showToast({
-			icon: "error",
-			title: '您还没有登录',
-			duration: 2000
-		});
-		return 0
-	}
-
-	// console.log(chooseModel.value)
-	if (chooseModel.value == undefined) {
-		uni.showToast({
-			icon: "error",
-			title: '您没有选择模型',
-			duration: 2000
-		});
-		return 0
-	}
-	if (msgStatu.value != true) {
-		uni.showToast({
-			icon: "error",
-			title: '请等待消息结束',
-			duration: 2000
-		});
-		return 0
-	}
-
-	msgList.value.push(
-		{
-			"content": content.value,
-			"role": "user"
-		}
-	)
-	content.value = ''
-	StreamRequest(msgList.value)
-	msgList.value.push({
-		"content": '',
-		"role": "system"
-	})
-	msg.value = ''
-	console.log(msgList.value)
-}
-
-
-
-// -----------------------------------------
-onReady(() => {
-
-	socketInit()
-	on(EventType.PAY_SUCCESS, ({ order_id }) => handlePayMessage(order_id))
-	wode_loging()
-	// chatAiGetToken()
-
-
-
-
-
-})
-onMounted(() => {
-	// 社区数据已移至 NewCommunity 组件中处理
+const { user } = storeToRefs(appStore)
+// 本地计算登录状态（store 中未直接提供 isLogin）
+const isLogin = computed(() => {
+  try {
+    return user && user.value && Object.keys(user.value).length > 0
+  } catch (e) {
+    return false
+  }
 })
 
-onUnmounted(() => {
-	// 清理当前组件资源
-})
-function img2pay() {
-	// pageindex.value = 3
-	console.log('点击支付')
-	showPay.value = true
-}
+// 当前页面索引
+const currentPageIndex = ref(0)
 
-const fuiNavBar_class = ref('fuiNavBar')
-
-function changeStyle(e: any) {
-	// console.log("changeStyle-----------------", e)
-	if (e.isFixed == false) {
-		fuiNavBar_class.value = "fuiNavBar"
-	}
-	else {
-		fuiNavBar_class.value = "fuiNavBar_isTrue"
-	}
-
-}
-// ------------------------------------------------------
-const { tabbarIndex } = storeToRefs(useAppStore())
-const pageindex = ref(0)
-const changeHomePage = (payload: any) => {
-	// payload 可能是数字或带 index 字段的对象，兼容两者
-	const idx = typeof payload === 'number' ? payload : (payload && payload.index !== undefined ? payload.index : payload)
-	pageindex.value = Number(idx) || 0;
-	if (pageindex.value == 2) {
-		// chatAiGetToken()
-	}
-	console.log('index', pageindex.value);
-};
-
-
-const name_value = ref('我的')
-function wode_loging() {
-	if (!isLogin.value) {
-		name_value.value = '登录'
-	}
-	else {
-		name_value.value = '我的'
-
-	}
-}
-// ---------------------------------------------------------
-
-// 创建带有动态数据的 tabbarData
-const dynamicTabbarData = computed(() => {
-	return tabbarData.map((item, index) => {
-		// 为每个 tab 项添加 onClick 事件
-		const newItem = { ...item, onClick: tabbarIndex }
-		
-		// 动态设置最后一个项的 text
-		if (index === tabbarData.length - 1) {
-			newItem.text = name_value.value
-		}
-		
-		return newItem
-	})
+// 安全访问过滤后的导航栏数据
+const safeFilteredTabbarData = computed(() => {
+  try {
+    return Array.isArray(filteredTabbarData?.value) ? filteredTabbarData.value : []
+  } catch (error) {
+    console.warn('Error accessing filteredTabbarData:', error)
+    return []
+  }
 })
 
-
-
-
-
-
-// -------------------------------------------------------
-
-function toEmpty() {
-	uni.navigateTo({
-		url: '/pages/Empty/Empty'
-	})
-}
-const { user } = storeToRefs(useAppStore())
-const show = ref(true)
-const pic = ref('')
-function handleGotoHistory() {
-	uni.navigateTo({
-		url: '/pages/history/history_fui/history_fui'
-	})
-}
-const handleLogin = async () => {
-	uni.navigateTo({
-		url: "/pages/login/login"
-	})
-	// 	if (isLogin.value) {
-	// 		return
-	// 	}
-	// 	uni.showLoading({
-	// 		title: '正在登录...',
-	// 		mask: true
-	// 	})
-	// 	//获取平台信息
-	// 	const { uniPlatform } = uni.getSystemInfoSync()
-
-	// 	if (uniPlatform !== 'web') {
-	// 		// 非开发者工具环境，执行登录操作
-	// 		handleLoginByWechat()
-
-	// 	} else {
-	// 		// console.log('dev')
-	// 		// 开发者工具环境，模拟登录 todo
-	// 		const user = await loginByUsername({
-	// 			username: 'test456',
-	// 			password: '123456'
-	// 		})
-	// 		saveLoginInfo(user)
-	// 		uni.hideLoading()
-	// 	}
-	// 	// chatAiGetToken()
-	// 	name_value.value = '我的'
-	// 	Kongzhitai()
-	// 	 uni.reLaunch({ url: '/pages/index/index' });
-	// 	 uni.showLoading({
-	// 	 title: '加载中'
-	// 	 });
-
-
-}
-/** 通过微信登录 */
-const handleLoginByWechat = () => {
-	uni.login({
-		success: async function ({ code }) {
-			const result = await loginByWechatCode(code)
-			saveLoginInfo(result)
-			uni.hideLoading()
-			console.log("------------result--------", result)
-			uni.setStorageSync('refreshToken', result.refresh_token)
-
-
-		},
-		fail: function (err) {
-			uni.showToast({
-				title: '登录错误',
-				icon: 'none'
-			})
-		}
-	})
-	// chatAiGetToken()
-
-}
-const { socketInit } = useWorkFlow()
-
-const handlePayMessage = async (order_id: string) => {
-	// 监听到支付成功事件
-	console.log('收到支付成功消息', order_id)
-	//查询订单支付状态进行复核
-	const order = await getOrderInfoById(order_id)
-	if (order[0] && order[0].order_status === 1) {
-		uni.showToast({
-			title: '支付成功',
-			icon: 'none'
-		})
-		refreshUserInfo()
-	}
-}
-const handleLoginOut = () => {
-	uni.showLoading({
-		title: '正在退出登录...',
-		mask: true
-	})
-
-	loginOut()
-
-	uni.hideLoading()
-	role.value = false
-	uni.showToast({
-		title: '退出成功',
-		icon: 'none'
-	})
-	name_value.value = '登录'
+// 处理标签点击事件，增加一层防御性包装
+const handleTabClick = (index: number) => {
+  try {
+    // 确保索引在安全的导航栏数据范围内
+    const safeData = safeFilteredTabbarData.value
+    if (index >= 0 && index < safeData.length) {
+      switchPage(index)
+    } else {
+      console.warn('Tab index out of bounds:', index)
+    }
+  } catch (error) {
+    console.error('Error in handleTabClick:', error)
+  }
 }
 
+// 检查用户是否有访问指定页面的权限
+const checkPagePermission = (pageConfig: TabbarItem) => {
+  try {
+    // 如果页面没有配置 organizations 或为空数组，表示所有人都可以访问
+    if (!pageConfig.organizations || !Array.isArray(pageConfig.organizations) || pageConfig.organizations.length === 0) {
+      return true
+    }
 
-/** 支付 **/
-const { showPay } = storeToRefs(useAppStore())
+    const requiredOrgs = pageConfig.organizations
+
+    // 如果 organizations 包含 "None"，表示未登录用户也可以访问
+    if (requiredOrgs.includes("None")) {
+      return true
+    }
+
+    // 如果用户未登录，且没有 "None" 权限，无法访问有权限要求的页面
+    // 添加更多的防御性检查
+    if (!isLogin || !isLogin.value) {
+      return false
+    }
+    
+    if (!user || !user.value) {
+      return false
+    }
+    
+    if (!Array.isArray(user.value.organizations)) {
+      return false
+    }
+
+    const userOrgs = user.value.organizations
+
+    // 检查用户的组织ID列表是否与页面要求的组织ID有交集
+    return userOrgs.some((userOrgId: string) => requiredOrgs.includes(userOrgId))
+  } catch (e) {
+    console.error('检查页面权限时出错:', e)
+    return false
+  }
+}
+
+// 过滤后的导航栏数据（根据权限）
+const filteredTabbarData = computed(() => {
+  // 添加防止无限循环的条件判断
+  if (!globalTabbarData) {
+    console.warn('globalTabbarData is not defined, returning empty array')
+    return []
+  }
+  const tabbarData = Array.isArray(globalTabbarData) ? globalTabbarData : []
+  
+  // 深拷贝避免直接修改全局配置对象
+  const arr = tabbarData.map((item: TabbarItem) => ({ ...item }))
+
+  // 过滤掉用户没有权限访问的页面
+  const filtered = arr.filter((item: TabbarItem) => {
+    return checkPagePermission(item)
+  })
+
+  // 未登录时，确保有登录入口：将最后一项改为登录页
+  if (isLogin && !isLogin.value && filtered.length > 0) {
+    const lastIndex = filtered.length - 1
+    filtered[lastIndex] = {
+      ...filtered[lastIndex],
+      text: '登录',
+      tabText: 'login'
+    }
+  } else if (isLogin && isLogin.value && filtered.length > 0) {
+    // 已登录时，最后一项显示为"我的"
+    const lastIndex = filtered.length - 1
+    filtered[lastIndex] = {
+      ...filtered[lastIndex],
+      text: '我的',
+      tabText: 'profile'
+    }
+  }
+
+  return filtered
+})
+
+// 获取所有页面类型
+const pageTypes = computed(() => {
+  try {
+    // 确保 filteredTabbarData 存在
+    if (!filteredTabbarData) {
+      console.warn('filteredTabbarData is not defined')
+      return ['home']
+    }
+    
+    // 确保 filteredTabbarData.value 是数组
+    const tabbarData = Array.isArray(filteredTabbarData.value) ? filteredTabbarData.value : []
+    
+    // 提取所有页面的tabText
+    return tabbarData.map(tab => tab.tabText || 'home')
+  } catch (error) {
+    console.error('Error in pageTypes:', error)
+    return ['home']
+  }
+})
+
+// 容器样式，使用 pagesGlobalData 中的背景图片
+const containerStyle = computed(() => {
+  const backgroundImage = pagesGlobalData?.backGroundImage || 'https://chinahu-ai-server.oss-cn-chengdu.aliyuncs.com/aidraw/image/temps/67873d6c232a3c5d52240dd6/Home2.jpg'
+  return {
+    backgroundImage: `url(${backgroundImage})`,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center top',
+    backgroundRepeat: 'no-repeat',
+    backgroundAttachment: 'scroll', // 改为scroll提高性能
+    width: '100%',
+    height: '100vh',
+    position: 'fixed',
+    top: '0',
+    left: '0',
+    zIndex: '-1',
+    transform: 'translateZ(0)', // 启用硬件加速
+    willChange: 'transform' // 提示浏览器该元素将会变化
+  }
+})
+
+// 获取当前页面类型
+const currentPageType = computed(() => {
+  try {
+    // 确保 pageTypes 存在且是数组
+    const types = Array.isArray(pageTypes.value) ? pageTypes.value : ['home']
+    
+    // 确保 currentPageIndex 存在
+    if (!currentPageIndex) {
+      console.warn('currentPageIndex is not defined')
+      return 'home'
+    }
+    
+    // 确保 currentPageIndex.value 在有效范围内
+    const index = Math.min(Math.max(0, currentPageIndex.value), types.length - 1)
+    
+    return types[index] || 'home'
+  } catch (error) {
+    console.error('Error in currentPageType:', error)
+    return 'home'
+  }
+})
+
+// 切换页面
+const switchPage = (index: number) => {
+  try {
+    // 确保 filteredTabbarData 存在
+    if (!filteredTabbarData) {
+      console.warn('filteredTabbarData is not defined')
+      return
+    }
+    
+    // 确保 filteredTabbarData.value 是数组
+    const tabbarData = Array.isArray(filteredTabbarData.value) ? filteredTabbarData.value : []
+    
+    // 确保 index 在有效范围内
+    if (index < 0 || index >= tabbarData.length) {
+      console.warn('无效的页面索引:', index)
+      return
+    }
+    
+    // 如果点击的是登录页且用户未登录
+    if (isLogin && !isLogin.value && index === tabbarData.length - 1) {
+      uni.navigateTo({
+        url: "/pages/login/login"
+      })
+      return
+    }
+    
+    // 确保 currentPageIndex 存在
+    if (currentPageIndex) {
+      // 使用 nextTick 确保DOM更新完成后再切换页面
+      nextTick(() => {
+        currentPageIndex.value = index
+      })
+    }
+    
+    // 确保 currentPageType 存在
+    const pageType = currentPageType && currentPageType.value ? currentPageType.value : 'unknown'
+    
+    console.log('切换到页面:', {
+      index,
+      type: pageType,
+      text: tabbarData[index]?.text
+    })
+  } catch (error) {
+    console.error('切换页面时发生错误:', error)
+  }
+}
+
+// 页面加载时的处理
+onLoad((options: any = {}) => {
+  // 处理页面索引参数
+  if (options && options.pageindex) {
+    const targetIndex = parseInt(options.pageindex)
+    // 延迟设置页面索引，等待 filteredTabbarData 计算完成
+    setTimeout(() => {
+      // 添加防御性检查
+      if (filteredTabbarData && filteredTabbarData.value && Array.isArray(filteredTabbarData.value)) {
+        if (targetIndex >= 0 && targetIndex < filteredTabbarData.value.length) {
+          currentPageIndex.value = targetIndex
+        }
+      }
+    }, 100)
+  }
+  
+  // 设置页面类型，供子组件获取
+  const instance = getCurrentInstance()
+  if (instance && instance.proxy) {
+    ;(instance.proxy as any).type = 'home'
+  }
+})
+
+// 监听页面索引变化，更新页面类型
+watch(() => currentPageIndex.value, (newIndex) => {
+  const instance = getCurrentInstance()
+  if (instance && instance.proxy) {
+    // 根据当前索引设置页面类型
+    const pageType = pageTypes.value[newIndex] || 'home'
+    ;(instance.proxy as any).type = pageType
+    console.log(`页面类型已更新为: ${pageType}`)
+  }
+})
+
+// 页面显示时的处理
+onShow(() => {
+  console.log('页面显示，当前页面索引:', currentPageIndex.value)
+})
+
+// 监听登录状态变化
+watch(() => isLogin.value, (newLoginStatus) => {
+  console.log('登录状态变化:', newLoginStatus)
+  // 确保 filteredTabbarData.value 是数组
+  const tabbarData = Array.isArray(filteredTabbarData.value) ? filteredTabbarData.value : []
+  
+  // 如果当前页面索引超出了新的导航栏范围，重置到首页
+  if (currentPageIndex.value >= tabbarData.length) {
+    currentPageIndex.value = 0
+  }
+})
+
+// 监听导航栏数据变化
+// 移除 deep: true 配置以防止响应式依赖循环
+watch(() => filteredTabbarData.value, (newData, oldData) => {
+  // 确保 newData 是数组
+  const tabbarData = Array.isArray(newData) ? newData : []
+  
+  // 如果导航栏配置改变了（通常是权限变化导致），需要检查当前页面索引是否仍然有效
+  if (oldData && Array.isArray(oldData) && tabbarData.length !== oldData.length) {
+    // 如果当前页面索引超出了新的导航栏范围，重置到首页
+    if (currentPageIndex.value >= tabbarData.length) {
+      console.log('页面索引超出范围，重置到首页')
+      currentPageIndex.value = 0
+    }
+  }
+})
 </script>
-<style scoped lang="scss">
-.scroll-Y {
-	margin-top: -11%;
-	height: 1200rpx;
+
+<style scoped>
+.background-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  z-index: -1;
 }
 
-.fui-custom__wrap {
-	width: 100%;
-	height: 520rpx;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	background-color: #EDEDED;
+.new-index-container {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding-top: 100rpx;
+  overflow: hidden;
+  background-color: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transform: translateZ(0);
+  will-change: transform;
 }
 
-.AITool {
-	margin-right: 24rpx;
-	height: 72rpx;
-	/* #ifndef APP-NVUE */
-	display: flex;
-	flex-shrink: 0;
-	/* #endif */
-	align-items: center;
-	justify-content: center;
-	/* #ifdef H5 */
-	cursor: pointer;
-	/* #endif */
-
-
+.content-scroll-view {
+  flex: 1;
+  width: 100%;
+  height: calc(100vh - 100rpx);
+  overflow-y: auto;
+  box-sizing: border-box;
+  background-color: transparent;
+  -webkit-overflow-scrolling: touch;
+  transform: translateZ(0);
+  will-change: transform;
 }
 
-.image-data {
-	width: calc(100% - 20rpx);
-	margin: 10rpx;
-
-	.image {
-		width: 100%;
-		height: auto;
-	}
+.tabbar-container {
+  width: 100%;
+  height: 100rpx;
+  background-color: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-top: 1rpx solid rgba(240, 240, 240, 0.3);
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  z-index: 999;
 }
 
-// ---------------------------------
-page {
-	background-color: #ededed;
+.tabbar-item {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 10rpx 0;
 }
 
-.camera {
-	width: 54px;
-	height: 44px;
-
-	&:active {
-		background-color: #ededed;
-	}
+.tabbar-item.active {
+  color: #7041ed;
 }
 
-.user-box {
-	background-color: #fff;
+.tabbar-icon {
+  width: 48rpx;
+  height: 48rpx;
+  margin-bottom: 4rpx;
 }
 
-.u-cell-group {
-	background-color: #fff;
+.tabbar-text {
+  font-size: 24rpx;
+  color: #666666;
 }
 
-.fui-search__box {
-
-	background: transparent;
-	width: 450rpx;
-	height: 48px;
-	margin-left: -0%;
-	margin-top: -5%;
-	box-sizing: border-box;
-
-	border-radius: 0px;
-	display: flex;
-	align-items: center;
-	justify-content: left;
-
-}
-
-.fuiNavBar_isTrue {
-	width: 100%;
-	padding: 24rpx;
-	box-sizing: border-box;
-	display: flex;
-
-	background: #F8F8F8;
-	color: #465CFF;
-	font-weight: bold;
-
-}
-
-.fuiNavBar {
-
-
-
-	// text-align: center;
-	margin-top: 5%;
-	margin-bottom: 2%;
-}
-
-.trans_back {
-	background-color: transparent;
-	border: transparent;
-
-}
-
-.tabs_class {
-	width: 537rpx;
-	display: flex;
-	display: border-box;
-}
-
-// .fui-wrap {
-// 	background-color: transparent;
-// 	padding-bottom: 108rpx;
-// }
-
-.fui-chat__box {
-	margin-top: 2%;
-	width: 100%;
-	padding: 48rpx 24rpx 0;
-	box-sizing: border-box;
-	white-space: pre-wrap;
-	word-break: break-word;
-}
-
-.fui-chat__item {
-	width: 100%;
-	display: flex;
-	padding-right: 96rpx;
-	margin-bottom: 148rpx;
-	box-sizing: border-box;
-	overflow: hidden;
-	white-space: pre-wrap;
-	word-break: break-word;
-}
-
-.fui-chat__content {
-	margin-left: 24rpx;
-	background-color: #fff;
-	padding: 20rpx 24rpx;
-	box-sizing: border-box;
-	border-radius: 0 32rpx 32rpx 32rpx;
-	font-size: 32rpx;
-	text-align: justify;
-	display: flex;
-	align-items: center;
-	white-space: pre-wrap;
-	word-break: break-word;
-	/* overflow: hidden; */
-	position: relative;
-}
-
-.fui-chat__left .fui-chat__content::after {
-	content: '';
-	position: absolute;
-	left: -43rpx;
-	top: 0;
-	width: 44rpx;
-	height: 44rpx;
-	background-color: #fff;
-	clip-path: polygon(45% 0, 100% 0, 100% 45%);
-}
-
-.fui-chat__left .fui-chat__content::before {
-	content: '';
-	position: absolute;
-	left: -42rpx;
-	top: 3rpx;
-	width: 42rpx;
-	height: 42rpx;
-	background-color: #EDEDED;
-	z-index: 2;
-	border-radius: 50%;
-}
-
-.fui-chat__content text {
-	max-width: 100%;
-	white-space: pre-wrap;
-	word-break: break-word;
-}
-
-.fui-chat__right {
-	padding-left: 96rpx;
-	padding-right: 0;
-	flex-direction: row-reverse;
-}
-
-
-.fui-chat__right .fui-chat__content {
-	margin-left: 0;
-	margin-right: 24rpx;
-	border-radius: 32rpx 0 32rpx 32rpx;
-	background-color: #465CFF;
-	color: #fff;
-
-}
-
-.fui-chat__right .fui-chat__content::after {
-	content: '';
-	position: absolute;
-	right: -43rpx;
-	top: 0;
-	width: 44rpx;
-	height: 44rpx;
-	background-color: #465CFF;
-	clip-path: polygon(0 0, 45% 0, 0 45%);
-}
-
-.fui-chat__right .fui-chat__content::before {
-	content: '';
-	position: absolute;
-	right: -42rpx;
-	top: 3rpx;
-	width: 42rpx;
-	height: 42rpx;
-	background-color: #EDEDED;
-	z-index: 2;
-	border-radius: 50%;
-}
-
-.fui-chatbar__wrap {
-	/* #ifndef APP-NVUE */
-	width: 100%;
-	display: flex;
-	/* #endif */
-	padding: 6px 24rpx;
-	flex-direction: row;
-	align-items: flex-end;
-	justify-content: space-between;
-	background: #f8f8f8;
-	box-sizing: border-box;
-}
-
-.fui-chatbar__input-box {
-	/* #ifndef APP-NVUE */
-	width: 100%;
-	display: flex;
-	/* #endif */
-	flex-direction: row;
-	flex: 1;
-	position: relative;
-	border-radius: 40rpx;
-	box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 8rpx;
-}
-
-.fui-chatbar__input {
-	/* #ifndef APP-NVUE || MP-ALIPAY || MP-QQ */
-	width: 100%;
-	min-height: 32rpx;
-	box-sizing: content-box;
-	padding: 20rpx 40rpx;
-	/* #endif */
-	/* #ifdef MP-ALIPAY || MP-QQ */
-	line-height: 1;
-	min-height: 72rpx;
-	/* #endif */
-	flex: 1;
-	/* #ifdef APP-NVUE */
-	height: 72rpx;
-	padding: 16rpx 20rpx;
-	/* #endif */
-	border-radius: 40rpx;
-	font-size: 32rpx;
-	background: #fff;
-}
-
-.fui-chatbar__icon-box {
-	height: 72rpx;
-	/* #ifndef APP-NVUE */
-	display: flex;
-	flex-shrink: 0;
-	/* #endif */
-	align-items: center;
-	justify-content: center;
-	/* #ifdef H5 */
-	cursor: pointer;
-	/* #endif */
-
-}
-
-.fui-chatbar__icon-box_left {
-	height: 72rpx;
-	/* #ifndef APP-NVUE */
-	display: flex;
-	flex-shrink: 0;
-	/* #endif */
-	align-items: center;
-	justify-content: center;
-	/* #ifdef H5 */
-	cursor: pointer;
-	/* #endif */
-
-}
-
-.fui-chatbar__icon-box image {
-	width: 68rpx;
-	height: 68rpx;
-	flex-shrink: 0;
-}
-
-.fui-chatbar__icon-box:active {
-	opacity: .5;
-}
-
-.fui-chatbar__send-box {
-	padding-left: 24rpx;
-}
-
-
-
-.fui-chatbar__fixed {
-	/* margin-top: 20%; */
-	margin-bottom: 0%;
-	position: fixed;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	z-index: 10;
-}
-
-.fui-wrap {
-	/* #ifndef APP-NVUE */
-	padding-bottom: constant(safe-area-inset-bottom);
-	padding-bottom: env(safe-area-inset-bottom);
-	/* #endif */
+.tabbar-item.active .tabbar-text {
+  color: #7041ed;
 }
 </style>
