@@ -1,4 +1,9 @@
 <template class="carousel-container">
+  <!-- 骨架屏加载状态 -->
+  <SkeletonScreen v-if="isDataLoading && !draw_data.data?.output" />
+  
+  <!-- 实际内容 -->
+  <template v-else>
   <fui-nav-bar background="transparent" :title="draw_data.data?.options?.workflow_title" @leftClick="leftClick">
     <fui-icon name="arrowleft"></fui-icon>
     <view class="nav-right" slot="right">
@@ -13,7 +18,7 @@
 
       <swiper-item :key="index" class="carousel-item" v-for="(item, index) in (draw_data.data?.output || [])">
         <template v-if="getItemType(item) === 'image'">
-          <image class="carousel-image" :src="item" mode="aspectFill" @click="previewImage(item)" />
+          <image class="carousel-image" :src="item" mode="aspectFill" @click="previewImage(item)" :lazy-load="true" :webp="true" :fade-show="true" />
         </template>
         <template v-else>
           <view class="video-wrapper">
@@ -39,7 +44,10 @@
         <image v-if="getItemType(item) === 'image'" 
                :src="item"
                class="thumbnail" 
-               mode="aspectFill" />
+               mode="aspectFill"
+               :lazy-load="true"
+               :webp="true"
+               :fade-show="true" />
                
         <!-- 视频缩略图 -->
         <view v-else class="video-thumbnail">
@@ -47,8 +55,11 @@
           <image :src="getThumbnailUrl(item)" 
                  class="thumbnail" 
                  mode="aspectFill"
+                 :lazy-load="true"
+                 :webp="true"
+                 :fade-show="true"
                  @error="onThumbnailError" />
-          <!-- 视频图标覆盖层 -->
+          <!-- 视频图标覆�层 -->
           <view class="video-thumbnail-overlay">
             <fui-icon name="play" color="#fff" size="16"></fui-icon>
           </view>
@@ -166,7 +177,7 @@
       </up-button> -->
     </view>
   </view>
-
+  </template>
 </template>
 
 <script setup lang="ts">
@@ -181,6 +192,8 @@ import {
 import { storeToRefs } from "pinia";
 import { globalAppData } from "@/cofigs/data/globalAppData.ts";
 import { getShareData, clearShareData } from "@/utils/shareManager";
+import SkeletonScreen from "@/components/common/SkeletonScreen.vue";
+
 const { user } = storeToRefs(useAppStore())
 // 在 script setup 顶部添加
 interface CommentItem {
@@ -409,51 +422,81 @@ const draw_data = ref<{
 });
 
 const detailId = ref<string>('')
+const recordId = ref<string>('')
+const isDataLoading = ref(false)
 
 onLoad(async (params) => {
+  // 显示骨架屏/加载状态
+  uni.showLoading({
+    title: '加载中...',
+    mask: false  // 不阻塞用户操作
+  })
+  
   try {
-    // 验证参数
-    if (!params?.id) {
+    if (params?.id) {
+      recordId.value = params.id
+      detailId.value = params.id
+      
+      // 优先从缓存获取数据（快速显示）
+      const cachedData = uni.getStorageSync(`alike_${params.id}`)
+      if (cachedData && cachedData.data) {
+        draw_data.value = cachedData
+        uni.hideLoading()
+      }
+      
+      // 异步加载最新数据
+      await loadDetailData(params.id)
+    } else {
       throw new Error('缺少必要参数：id')
     }
+  } catch (error) {
+    console.error('页面加载失败:', error)
+    uni.hideLoading()
+    uni.showToast({
+      title: '加载失败，请重试',
+      icon: 'none'
+    })
+  }
+})
+
+// 提取数据加载逻辑
+async function loadDetailData(id: string) {
+  if (isDataLoading.value) return
+  isDataLoading.value = true
+  
+  try {
+    console.log('加载详情数据:', id, user.value)
+    const res: any = await getdetail(user.value, id)
     
-    // 保存 id 供后续使用
-    detailId.value = params.id
-    console.log('设置detailId:', detailId.value)
-    
-    // 加载数据
-    console.log('id:', params.id, user.value, draw_data)
-    await getdetail(user.value, params.id).then((res: any) => {
-      console.log('获取到的getUserKey信息:', res.data);
+    if (res && res.data) {
+      console.log('获取到的详情信息:', res.data)
       draw_data.value = res.data || { data: {} }
       
-      // 确保数据加载后也设置了一次detailId，作为备用
+      // 缓存数据以便下次快速显示
+      uni.setStorageSync(`alike_${id}`, res.data)
+      
+      // 确保 detailId 设置正确
       if (!detailId.value && res.data?.data?._id) {
         detailId.value = res.data.data._id
-        console.log('从数据中设置detailId:', detailId.value)
       }
-    }).catch(err => {
-      console.error('获取getUserKey失败:', err);
-      draw_data.value = { data: {} }
-      // 显示错误提示，但不跳转页面
-      uni.showToast({
-        title: '数据加载失败，请刷新重试',
-        icon: 'none',
-        duration: 2000
-      })
-    })
-
+      
+      uni.hideLoading()
+    } else {
+      throw new Error('数据格式错误')
+    }
   } catch (err) {
     console.error('数据加载失败:', err)
-    // 显示错误提示，但不跳转页面
+    uni.hideLoading()
     uni.showToast({
-      title: '参数错误，请重试',
+      title: '数据加载失败，请刷新重试',
       icon: 'none',
       duration: 2000
     })
+    draw_data.value = { data: {} }
+  } finally {
+    isDataLoading.value = false
   }
-  // fetchAndSaveUserNames()
-})
+}
 // ===================================================
 // 定义需要显示的字段
 const visibleParams = ['positive', 'width', 'height', 'seed']

@@ -30,7 +30,18 @@
     { "path": "pages/history/history_fui/history_fui", "style": { "navigationBarTitleText": "" } },
     { "path": "pages/draw/draw_info/draw_info", "style": { "navigationBarTitleText": "" } },
     { "path": "pages/console/console", "style": { "navigationBarTitleText": "" } },
-    { "path": "pages/drawLike/alike", "style": { "navigationBarTitleText": "作品详情" } },
+    { 
+      "path": "pages/drawLike/alike", 
+      "style": { 
+        "navigationBarTitleText": "作品详情",
+        "enablePullDownRefresh": false,
+        "backgroundTextStyle": "dark",
+        "app-plus": {
+          "animationType": "slide-in-right",
+          "animationDuration": 200
+        }
+      } 
+    },
     { "path": "pages/login/login", "style": { "navigationBarTitleText": "" } },
   { "path": "pages/login/Qr_login", "style": { "navigationBarTitleText": "扫码登录" } },
     { "path": "pages/login/register", "style": { "navigationBarTitleText": "" } },

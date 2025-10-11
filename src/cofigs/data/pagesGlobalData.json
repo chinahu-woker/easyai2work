@@ -120,9 +120,13 @@
     ],
     "filterMode": "any"
   },
+  "aiTeamProps": {
+    "title": "推荐-AI应用",
+    "filterMode": "single"
+  },
   "payWorkProps": {
     "title": "应用",
-    "showTag": "付费应用"
+    "showTag": "高级应用"
   },
   "loginInfoIcons": {
     "scanIcon": "scan",
@@ -152,6 +156,14 @@
           }
         },
         {
+          "id": "home-message",
+          "component": "HorizontalAnnouncement",
+          "props": {},
+          "style": {
+            "marginBottom": "20rpx"
+          }
+        },
+        {
           "id": "home-swiper",
           "component": "NewSwiper",
           "props": {},
@@ -169,7 +181,7 @@
             "marginBottom": "30rpx"
           }
         },
-       
+        
         {
           "id": "profile-community",
           "component": "NewCommunity",
@@ -273,6 +285,12 @@
       },
       {
         "componentId": "home-icons",
+        "conditions": {
+          "userStatus": "all"
+        }
+      },
+      {
+        "componentId": "home-message",
         "conditions": {
           "userStatus": "all"
         }

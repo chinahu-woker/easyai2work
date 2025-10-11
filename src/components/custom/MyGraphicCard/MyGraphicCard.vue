@@ -169,7 +169,7 @@
 						<swiper-item v-for="(item, index) in images" :key="`${index}-${item}`" :class="[ns.e('swiper-item')]">
 							<!-- 图片 -->
 							<view v-if="linkType(item) == 0" @tap.stop="previewImageHandle(index)" style="width: 100%; height: 100%; position: relative;">
-								<!-- 主图片 -->
+								<!-- 主图片 - 添加安卓优化 -->
 								<image 
 									class="swiper-image" 
 									mode="aspectFill" 
@@ -177,6 +177,8 @@
 									style="width: 100%; height: 100%; border-radius: 12rpx;"
 									:show-menu-by-longpress="false"
 									:lazy-load="true"
+									:webp="true"
+									:fade-show="true"
 									@load="onImageLoad"
 									@error="onImageError">
 								</image>

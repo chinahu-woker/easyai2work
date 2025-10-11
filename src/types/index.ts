@@ -677,6 +677,63 @@ export interface IMiniProgramContent {
 }
 
 /**
+ * 全局页面内容配置
+ */
+export interface IPageContent {
+    _id: string;
+    page_content: {
+        home_logo_dark?: string;
+        home_logo_light?: string;
+        home_baner_logo?: string;
+        home_baner_background_dark?: string;
+        home_baner_content_1?: string;
+        home_baner_content_2?: string;
+        home_baner_content_3?: string;
+        home_baner_content_4?: string;
+        home_baner_content_5?: string;
+        home_baner_button2_route?: string;
+        home_baner_button2_hidden?: boolean;
+        home_toolbar_hidden?: boolean;
+        slider_wechat_official_qrcode?: string;
+        slider_contact_email?: string;
+        service_url?: string;
+        home_foot_beian_icp?: string;
+        home_foot_beian_gongan?: string;
+        mainSlider_serviceCard_show?: boolean;
+        website_title?: string;
+        seo_description?: string;
+        seo_keywords?: string;
+        home_navigation?: Array<{
+            icon: string;
+            title: string;
+            value: string;
+            route: string;
+        }>;
+        home_style_version?: string;
+        home_announcements?: string;
+        home_favicon?: string;
+        home_search_position?: string;
+        disabled_app_detail?: boolean;
+        disabled_work_detail?: boolean;
+        search_recommend_words?: string[];
+        light_theme?: any;
+        service_agreement?: string;
+        privacy_policy?: string;
+        about_us?: string;
+        miniProgramContent?: IMiniProgramContent;
+    };
+    operation_config?: any;
+    selectedLoginMode?: string[];
+    dingTalkLoginConfig?: any;
+    wechatLoginConfig?: any;
+    llmConfig?: any;
+    entConfig?: any;
+    defaultLoginMode?: string;
+    loginConfig?: any;
+    isCommercial?: boolean;
+}
+
+/**
  * 首页banner
  * @property src 图片链接
  * @property href 点击后跳转的链接
@@ -711,6 +768,82 @@ export const enum IWebsocketSceneType {
 export interface IWebSocketParams {
     type: IWebsocketSceneType;
     data?: { scene_str: string }
+}
+
+/**
+ * 消息通知
+ * @property _id 消息ID
+ * @property title 消息标题
+ * @property content 消息内容
+ * @property type 消息类型
+ * @property is_read 是否已读
+ * @property created_at 创建时间
+ * @property updated_at 更新时间
+ * @property user_id 接收者用户ID
+ * @property sender_id 发送者ID
+ * @property priority 优先级
+ * @property action_url 操作链接
+ * @property action_text 操作按钮文本
+ */
+export interface IMessage {
+    _id: string;
+    title: string;
+    content: string;
+    type: MessageType;
+    is_read: boolean;
+    created_at: number;
+    updated_at?: number;
+    user_id: string;
+    sender_id?: string;
+    priority?: MessagePriority;
+    action_url?: string;
+    action_text?: string;
+    expire_at?: number; // 过期时间
+}
+
+/**
+ * 消息类型枚举
+ */
+export enum MessageType {
+    SYSTEM = 'system', // 系统通知
+    ACTIVITY = 'activity', // 活动通知
+    UPDATE = 'update', // 更新通知
+    REMINDER = 'reminder', // 提醒通知
+    PROMOTION = 'promotion', // 推广通知
+    SECURITY = 'security', // 安全通知
+}
+
+/**
+ * 消息优先级枚举
+ */
+export enum MessagePriority {
+    LOW = 'low', // 低优先级
+    NORMAL = 'normal', // 普通优先级
+    HIGH = 'high', // 高优先级
+    URGENT = 'urgent', // 紧急
+}
+
+/**
+ * 消息列表响应
+ */
+export interface IMessageListResponse {
+    messages: IMessage[];
+    total: number;
+    unread_count: number;
+    has_more: boolean;
+    page: number;
+    page_size: number;
+}
+
+/**
+ * 消息统计信息
+ */
+export interface IMessageStats {
+    total: number;
+    unread: number;
+    by_type: {
+        [key in MessageType]?: number;
+    };
 }
 
 

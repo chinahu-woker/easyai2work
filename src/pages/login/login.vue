@@ -255,7 +255,7 @@ const handleLoginByWechat = () => {
 				const userInfo = {
 					...result,
 					// 如果没有头像，设置默认头像
-					avatar_url: result.avatar_url || 'https://ai-1357282892.cos.ap-shanghai.myqcloud.com/6811db59c58c28287e07e45c/upload/20250521115936505-3434-06.png',
+					avatar_url: result.avatar_url || 'https://chinahu-ai-server.oss-cn-chengdu.aliyuncs.com/2025-10-11/67873d6c232a3c5d52240dd6/upload/20251011181545902-Group923.png',
 					// 如果没有昵称，使用用户名或设置默认昵称
 					nickname: result.nickname || result.username || '微信用户'
 				}

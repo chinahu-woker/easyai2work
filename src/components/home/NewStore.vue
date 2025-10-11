@@ -5,7 +5,7 @@ import {storeToRefs} from "pinia";
 import {isVideo} from "@/utils/common.ts";
 import type { IWorkFlow } from '@/types';
 import type { PropType } from 'vue';
-import { storeProps } from '@/cofigs/data/globalAppData.ts';
+import { storeProps, aiTeamProps } from '@/cofigs/data/globalAppData.ts';
 
 // 加载状态
 const isLoading = ref(true)
@@ -57,11 +57,11 @@ const filteredResultCache = shallowRef(new Map<string, IWorkFlow[]>())
 
 // 支持通过 prop 指定要显示的标签（默认：AI团队）
 const props = defineProps({
-  showTag: { type: String, default: storeProps.showTag },
-  // 支持多标签筛选，可以传入标签数组，默认为三种主要标签
-  showTags: { type: Array as PropType<string[]>, default: () => storeProps.showTags },
+  showTag: { type: String, default: "AI团队" },
+  // 支持多标签筛选，可以传入标签数组，默认为AI团队标签
+  showTags: { type: Array as PropType<string[]>, default: () => ["AI团队"] },
   // 筛选模式：'any' 匹配任一标签，'all' 匹配所有标签，'single' 单标签匹配
-  filterMode: { type: String as PropType<'any' | 'all' | 'single'>, default: storeProps.filterMode }
+  filterMode: { type: String as PropType<'any' | 'all' | 'single'>, default: aiTeamProps.filterMode }
 })
 
 // 当前标签
@@ -195,7 +195,7 @@ const handleNavigate = (item: IWorkFlow) => {
   <!-- 标题栏 -->
   <view class="title-bar">
     <view class="title-section">
-      <text class="title-text">AI团队</text>
+      <text class="title-text">{{ aiTeamProps.title }}</text>
       <!-- 内容轮播进度指示器 -->
       <view v-if="showApps.length > 3" class="content-progress">
         <view 
@@ -231,7 +231,7 @@ const handleNavigate = (item: IWorkFlow) => {
         <view v-if="showApps.length > 0" class="top-layout" :class="{ transitioning: isContentTransitioning }" :key="currentTag + '-' + currentAppIndex">
           <view class="top-grid">
             <view v-if="topApps[0]" class="tile left-large" @click="handleNavigate(topApps[0])">
-              <image v-if="!isVideo(topApps[0].cover)" :src="topApps[0].cover" mode="aspectFill" class="tile-image"/>
+              <image v-if="!isVideo(topApps[0].cover)" :src="topApps[0].cover" mode="aspectFill" class="tile-image" :lazy-load="true" :webp="true" :fade-show="true"/>
               <video v-else :src="topApps[0].cover" autoplay loop muted object-fit="cover" class="tile-video"/>
               <view class="tile-overlay">
                 <view class="tile-label">{{ topApps[0].title || topApps[0].name || '应用' }}</view>
@@ -243,7 +243,7 @@ const handleNavigate = (item: IWorkFlow) => {
 
             <view class="right-column">
               <view v-if="topApps[1]" class="tile right-top" @click="handleNavigate(topApps[1])">
-                <image v-if="!isVideo(topApps[1].cover)" :src="topApps[1].cover" mode="aspectFill" class="tile-image"/>
+                <image v-if="!isVideo(topApps[1].cover)" :src="topApps[1].cover" mode="aspectFill" class="tile-image" :lazy-load="true" :webp="true" :fade-show="true"/>
                 <video v-else :src="topApps[1].cover" autoplay loop muted object-fit="cover" class="tile-video"/>
                 <view class="tile-overlay">
                   <view class="tile-label">{{ topApps[1].title || topApps[1].name || '应用' }}</view>
@@ -254,7 +254,7 @@ const handleNavigate = (item: IWorkFlow) => {
               </view>
 
               <view v-if="topApps[2]" class="tile right-bottom" @click="handleNavigate(topApps[2])">
-                <image v-if="!isVideo(topApps[2].cover)" :src="topApps[2].cover" mode="aspectFill" class="tile-image"/>
+                <image v-if="!isVideo(topApps[2].cover)" :src="topApps[2].cover" mode="aspectFill" class="tile-image" :lazy-load="true" :webp="true" :fade-show="true"/>
                 <video v-else :src="topApps[2].cover" autoplay loop muted object-fit="cover" class="tile-video"/>
                 <view class="tile-overlay">
                   <view class="tile-label">{{ topApps[2].title || topApps[2].name || '应用' }}</view>

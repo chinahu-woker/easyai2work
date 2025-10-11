@@ -8,7 +8,11 @@ import type {
   User,
   IMember,
   IMiniProgramContent,
+  IPageContent,
   IWorkFlow,
+  IMessage,
+  IMessageListResponse,
+  IMessageStats,
 } from '@/types'
 import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
@@ -66,4 +70,34 @@ export const getApps = () => request<IWorkFlow[]>('workflow/getAllWorkflowApps/m
 
 /** 页面配置相关 */
 /** 获取页面配置信息 */
-export const getPageContent = () => request<IMiniProgramContent>(`content/mp/content`)
+export const getPageContent = () => request<IPageContent>(`content/mp/content`)
+
+/** 消息通知相关 */
+/** 获取消息列表 */
+export const getMessageList = (page = 1, pageSize = 10, type?: string) =>
+  request<IMessageListResponse>(`api/content/messages?page=${page}&pageSize=${pageSize}${type ? `&type=${type}` : ''}`)
+
+/** 获取消息统计信息 */
+export const getMessageStats = () => request<IMessageStats>('api/content/messages/stats')
+
+/** 标记消息为已读 */
+export const markMessageAsRead = (messageId: string) =>
+  request<boolean>(`api/content/messages/${messageId}/read`, { method: 'POST' })
+
+/** 批量标记消息为已读 */
+export const markMultipleMessagesAsRead = (messageIds: string[]) =>
+  request<boolean>('api/content/messages/mark-read', {
+    method: 'POST',
+    data: { messageIds }
+  })
+
+/** 删除消息 */
+export const deleteMessage = (messageId: string) =>
+  request<boolean>(`api/content/messages/${messageId}`, { method: 'DELETE' })
+
+/** 清空所有已读消息 */
+export const clearReadMessages = () =>
+  request<boolean>('api/content/messages/clear-read', { method: 'DELETE' })
+
+/** 获取内容配置（包含公告等消息信息） */
+export const getContentConfig = () => request<any>('/content')

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import TnSwiper from '@tuniao/tnui-vue3-uniapp/components/swiper/src/swiper.vue'
 import {ref, computed, onMounted} from 'vue'
-import type {IBanner, IMiniProgramContent} from "@/types";
+import type {IBanner, IMiniProgramContent, IPageContent} from "@/types";
 import {getPageContent} from "@/composables/useCommon.ts";
 import {onLoad, onShow} from "@dcloudio/uni-app";
 import { useAppStore } from '@/stores/appStore.ts'
@@ -16,9 +16,14 @@ const props = defineProps({
 
 const currentSwiperIndex = ref(0)
 const isRefreshing = ref(false)
+const isLoading = ref(false)
+const errorMessage = ref('')
 
-const pageContent=ref<IMiniProgramContent>();
+const pageContent=ref<IMiniProgramContent | null>(null);
+const fullPageContent=ref<IPageContent | null>(null);
 const appStore = useAppStore();
+
+// 移除默认轮播图数据 - 只从接口获取
 
 // 获取当前页面类型
 const getCurrentPageType = () => {
@@ -32,8 +37,9 @@ const getCurrentPageType = () => {
     const pages = getCurrentPages()
     if (pages.length > 0) {
       const currentPage = pages[pages.length - 1]
-      // 假设页面类型存储在页面实例的type属性中
-      return currentPage.type || 'home'
+      // 使用更安全的方式获取页面类型
+      // @ts-ignore - uniapp页面实例可能包含自定义属性
+      return currentPage.type || currentPage.route?.split('/')?.[1] || 'home'
     }
     return 'home'
   } catch (error) {
@@ -57,38 +63,85 @@ const fetchPageContent = async (forceRefresh = false) => {
   const currentCacheKey = getCacheKey();
   
   try {
+    isLoading.value = true;
+    errorMessage.value = '';
+    
     // 如果不是强制刷新，先尝试从缓存获取
     if (!forceRefresh) {
-      const cachedData = uni.getStorageSync(currentCacheKey);
-      if (cachedData) {
-        const { data, timestamp } = JSON.parse(cachedData);
-        // 检查缓存是否过期
-        if (Date.now() - timestamp < CACHE_EXPIRY) {
-          pageContent.value = data;
-          console.log('使用缓存数据');
-          return;
+      try {
+        const cachedData = uni.getStorageSync(currentCacheKey);
+        if (cachedData) {
+          const { data, timestamp } = JSON.parse(cachedData);
+          // 检查缓存是否过期
+          if (Date.now() - timestamp < CACHE_EXPIRY) {
+            pageContent.value = data;
+            console.log('使用缓存数据:', data);
+            return;
+          } else {
+            console.log('缓存已过期，将获取新数据');
+          }
         }
+      } catch (cacheError) {
+        console.error('读取缓存失败:', cacheError);
       }
     }
     
     // 缓存不存在或已过期，从服务器获取新数据
     console.log('从服务器获取新数据');
-    pageContent.value = await getPageContent();
+    fullPageContent.value = await getPageContent();
+    
+    // 验证响应数据
+    if (!fullPageContent.value) {
+      throw new Error('服务器返回空数据');
+    }
+    
+    console.log('[轮播图] API返回的完整数据:', fullPageContent.value);
+    
+    // 尝试多种可能的数据路径
+    let miniProgramData = null;
+    
+    // 路径1: fullPageContent.page_content.miniProgramContent (标准结构)
+    if (fullPageContent.value.page_content?.miniProgramContent) {
+      miniProgramData = fullPageContent.value.page_content.miniProgramContent;
+      console.log('[轮播图] 使用路径1: page_content.miniProgramContent');
+    }
+    // 路径2: fullPageContent 直接就是 miniProgramContent (缓存或简化返回)
+    else if ((fullPageContent.value as any).home_banner && Array.isArray((fullPageContent.value as any).home_banner)) {
+      miniProgramData = fullPageContent.value as any;
+      console.log('[轮播图] 使用路径2: 数据本身就是 miniProgramContent');
+    }
+    
+    if (!miniProgramData || !miniProgramData.home_banner || !Array.isArray(miniProgramData.home_banner)) {
+      console.warn('[轮播图] 无法找到有效的轮播图数据');
+      pageContent.value = {
+        home_banner: []
+      };
+    } else {
+      // 直接使用 miniProgramContent 数据
+      pageContent.value = miniProgramData;
+      console.log('[轮播图] 数据加载成功，数量:', miniProgramData.home_banner.length);
+    }
     
     // 将新数据存入缓存
-    uni.setStorageSync(currentCacheKey, JSON.stringify({
-      data: pageContent.value,
-      timestamp: Date.now()
-    }));
+    try {
+      uni.setStorageSync(currentCacheKey, JSON.stringify({
+        data: pageContent.value,
+        timestamp: Date.now()
+      }));
+      console.log('数据已缓存:', pageContent.value);
+    } catch (saveError) {
+      console.error('保存缓存失败:', saveError);
+    }
   } catch (error) {
     console.error('获取页面内容失败:', error);
-    // 如果请求失败，尝试使用缓存数据（即使已过期）
-    const cachedData = uni.getStorageSync(currentCacheKey);
-    if (cachedData) {
-      const { data } = JSON.parse(cachedData);
-      pageContent.value = data;
-      console.log('请求失败，使用过期缓存数据');
-    }
+    errorMessage.value = '数据加载失败，请稍后重试';
+    
+    // 不再使用缓存回退，直接显示错误状态以便用户重试
+    pageContent.value = {
+      home_banner: []
+    };
+  } finally {
+    isLoading.value = false;
   }
 }
 
@@ -114,23 +167,46 @@ onMounted(async ()=>{
 // 提供手动刷新的方法
 const refreshData = async () => {
   isRefreshing.value = true;
+  errorMessage.value = '';
   await fetchPageContent(true);
   setTimeout(() => {
     isRefreshing.value = false;
   }, 1000);
 };
 
-// 只取第1到第3张（1-based），即索引0、1、2
+// 取所有轮播图数据,不限制数量
 const swiperData=computed(()=>{
-  const arr = pageContent.value?.home_banner || []
+  // 确保pageContent.value不为null或undefined
+  if (!pageContent.value) {
+    console.log('pageContent.value为null或undefined，返回空数组');
+    return [];
+  }
+  
+  // 确保home_banner是数组
+  if (!Array.isArray(pageContent.value.home_banner)) {
+    console.log('home_banner不是数组:', pageContent.value.home_banner, '返回空数组');
+    return [];
+  }
+  
+  const arr = pageContent.value.home_banner;
+  console.log('处理轮播数据，原始数组长度:', arr.length);
+  console.log('原始轮播数据:', arr);
+  
+  // 如果服务器返回的数据为空数组，直接返回空
+  if (arr.length === 0) {
+    console.log('服务器返回空轮播数据');
+    return [];
+  }
+  
+  // 处理所有有效的轮播图项
   const result: {url?: string; title?: string}[] = []
-  const indices: number[] = [0,1,2]
-  indices.forEach((i: number) => {
-    const item = arr[i]
+  arr.forEach((item: IBanner) => {
     if (item && item.src) {
-      result.push({ url: item.src, title: item.label })
+      result.push({ url: item.src, title: item.label || '' })
     }
   })
+  
+  console.log('处理后的轮播数据:', result);
   return result
 })
 
@@ -138,18 +214,42 @@ const swiperData=computed(()=>{
 
 <template>
   	<view style='margin-top: 0%;'>
- 			<swiper v-if="swiperData && swiperData.length" easing-function='default' previous-margin='20rpx' next-margin='60rpx'
- 				class="fui-banner__wrap2"  circular :indicator-dots="false" autoplay>
+ 			<!-- 显示轮播图 -->
+ 			<swiper v-if="!isLoading && swiperData && swiperData.length" 
+				easing-function='default' 
+				previous-margin='30rpx' 
+				next-margin='30rpx'
+ 				class="fui-banner__wrap2"  
+				circular 
+				:indicator-dots="true"
+				indicator-color="rgba(255, 255, 255, 0.5)"
+				indicator-active-color="#ffffff"
+				autoplay 
+				:interval="3000"
+				:duration="500">
  				<swiper-item v-for="(item,index) in swiperData" :key="index">
  					<view class="fui-banner__item2"
  						:style="{'background-image':'url('+ item.url +')' }">
  			
  					</view>
- 					<view class="SwTitle2"> {{item.title}}</view>
  				</swiper-item>
  			</swiper>
- 			<view v-else class="loading-container">
-				<text>加载中...</text>
+ 			
+			<!-- 加载状态 -->
+ 			<view v-else-if="isLoading" class="loading-container">
+				<text>加载轮播图中...</text>
+			</view>
+			
+			<!-- 空状态 - 当数据加载完成但没有轮播图时 -->
+			<view v-else-if="!isLoading && (!swiperData || swiperData.length === 0)" class="empty-container">
+				<text>暂无轮播图</text>
+				<button @click="refreshData" class="retry-button">重新加载</button>
+			</view>
+			
+			<!-- 错误状态 -->
+			<view v-else-if="errorMessage && !isRefreshing" class="error-container">
+				<text>{{errorMessage}}</text>
+				<button @click="refreshData" class="retry-button">重试</button>
 			</view>
   	</view>
 </template>
@@ -158,15 +258,17 @@ const swiperData=computed(()=>{
 	.fui-banner__wrap2 {
 		background-color: transparent;
 		align-items: center;
-		/* 设计稿 750, 直接 100% 占满容器，左右留 24rpx 内边距可由外层决定 */
-		width: 800rpx;
-		height: 260rpx; /* 略增高度，避免被圆角裁切感过重 */
-		padding: 0 24rpx;
+		width: 100%;
+		height: 280rpx;
+		padding: 0;
 		box-sizing: border-box;
 	}
+	
 	.fui-banner__item2 {
 		background-size: cover;
 		background-position: center;
+		background-repeat: no-repeat;
+		width: 100%;
 		height: 100%;
 		color: #FFFFFF;
 		display: flex;
@@ -174,8 +276,7 @@ const swiperData=computed(()=>{
 		justify-content: center;
 		font-size: 34rpx;
 		font-weight: 600;
-		border-radius: 28rpx;
-		margin-left: 0;
+		border-radius: 24rpx;
 		box-shadow: 0 8rpx 24rpx rgba(0,0,0,0.15);
 		overflow: hidden;
 	}
@@ -197,12 +298,43 @@ const swiperData=computed(()=>{
 	
 	// }
 
-	.loading-container {
+	.loading-container, .error-container, .empty-container {
 		display: flex;
+		flex-direction: column;
 		justify-content: center;
 		align-items: center;
 		height: 260rpx;
 		background-color: #f5f5f5;
 		border-radius: 28rpx;
+		color: #666;
+		font-size: 28rpx;
+	}
+	
+	.error-container {
+		background-color: #fef0f0;
+		color: #f56c6c;
+	}
+	
+	.empty-container {
+		background-color: #f9f9f9;
+		color: #999;
+	}
+	
+	.retry-button {
+		margin-top: 20rpx;
+		padding: 10rpx 30rpx;
+		background-color: #007aff;
+		color: white;
+		border-radius: 30rpx;
+		font-size: 24rpx;
+		border: none;
+	}
+	
+	.error-container .retry-button {
+		background-color: #f56c6c;
+	}
+	
+	.empty-container .retry-button {
+		background-color: #999;
 	}
 </style>

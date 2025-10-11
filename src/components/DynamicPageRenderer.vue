@@ -37,6 +37,9 @@
       <block v-else-if="componentConfig.component === 'NewLoginInfo'">
         <NewLoginInfo v-bind="getComponentProps(componentConfig)" :page-type="pageType" />
       </block>
+      <block v-else-if="componentConfig.component === 'HorizontalAnnouncement'">
+        <HorizontalAnnouncement v-bind="getComponentProps(componentConfig)" :page-type="pageType" />
+      </block>
       <block v-else>
         <view class="component-placeholder">
           组件 {{ componentConfig.component }} 未找到
@@ -72,6 +75,7 @@ import NewPayWork from '@/components/home/NewPayWork.vue'
 import UserMemberInfo from '@/components/home/UserMemberInfo.vue'
 import NewCommunity from '@/components/home/NewCommunity.vue'
 import NewLoginInfo from '@/components/home/NewLoginInfo.vue'
+import HorizontalAnnouncement from '@/components/home/HorizontalAnnouncement.vue'
 
 // 定义类型
 interface ComponentConfig {
@@ -105,7 +109,8 @@ const props = defineProps<{
 
 // 状态管理
 const appStore = useAppStore()
-const { user, isLogin } = storeToRefs(appStore)
+const { user } = storeToRefs(appStore)
+const isLogin = computed(() => !!user.value && !!user.value._id)
 
 // 页面布局样式
 const pageLayoutStyle = computed(() => {
@@ -116,7 +121,7 @@ const pageLayoutStyle = computed(() => {
     padding: pageConfig.layout.padding,
     backgroundColor: pageConfig.layout.backgroundColor,
     width: '100%',
-    boxSizing: 'border-box'
+    boxSizing: 'border-box' as const
   }
 })
 
@@ -268,7 +273,7 @@ const getComponentStyle = (componentConfig: ComponentConfig) => {
   return {
     ...componentConfig.style,
     width: '100%',
-    boxSizing: 'border-box'
+    boxSizing: 'border-box' as const
   }
 }
 

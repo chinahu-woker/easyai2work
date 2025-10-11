@@ -8,6 +8,9 @@
     <scroll-view 
       scroll-y 
       class="content-scroll-view"
+      :enable-back-to-top="true"
+      :scroll-with-animation="false"
+      :enable-passive="true"
     >
       <!-- 使用v-show替代组件的重新创建，保持组件状态 -->
       <view  v-for="(pageType, index) in pageTypes" :key="pageType" v-show="currentPageIndex === index">
@@ -198,15 +201,12 @@ const containerStyle = computed(() => {
     backgroundSize: 'cover',
     backgroundPosition: 'center top',
     backgroundRepeat: 'no-repeat',
-    backgroundAttachment: 'scroll', // 改为scroll提高性能
     width: '100%',
     height: '100vh',
     position: 'fixed',
     top: '0',
     left: '0',
-    zIndex: '-1',
-    transform: 'translateZ(0)', // 启用硬件加速
-    willChange: 'transform' // 提示浏览器该元素将会变化
+    zIndex: '-1'
   }
 })
 
@@ -355,6 +355,7 @@ watch(() => filteredTabbarData.value, (newData, oldData) => {
   width: 100%;
   height: 100vh;
   z-index: -1;
+  /* 移除可能导致重绘的属性 */
 }
 
 .new-index-container {
@@ -364,11 +365,18 @@ watch(() => filteredTabbarData.value, (newData, oldData) => {
   flex-direction: column;
   padding-top: 100rpx;
   overflow: hidden;
-  background-color: rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  transform: translateZ(0);
-  will-change: transform;
+  /* 安卓优化：使用纯色背景替代毛玻璃效果 */
+  background-color: rgba(255, 255, 255, 0.85);
+  /* iOS保留毛玻璃效果 */
+}
+
+/* iOS设备使用毛玻璃 */
+@supports (backdrop-filter: blur(8px)) or (-webkit-backdrop-filter: blur(8px)) {
+  .new-index-container {
+    background-color: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
 }
 
 .content-scroll-view {
@@ -379,17 +387,15 @@ watch(() => filteredTabbarData.value, (newData, oldData) => {
   box-sizing: border-box;
   background-color: transparent;
   -webkit-overflow-scrolling: touch;
-  transform: translateZ(0);
-  will-change: transform;
+  /* 移除硬件加速相关属性，减少安卓端重绘 */
 }
 
 .tabbar-container {
   width: 100%;
   height: 100rpx;
-  background-color: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border-top: 1rpx solid rgba(240, 240, 240, 0.3);
+  /* 安卓优化：使用纯色背景 */
+  background-color: rgba(255, 255, 255, 0.95);
+  border-top: 1rpx solid rgba(240, 240, 240, 0.5);
   display: flex;
   flex-direction: row;
   justify-content: space-around;
@@ -398,6 +404,16 @@ watch(() => filteredTabbarData.value, (newData, oldData) => {
   bottom: 0;
   left: 0;
   z-index: 999;
+  box-shadow: 0 -2rpx 8rpx rgba(0, 0, 0, 0.05);
+}
+
+/* iOS设备使用毛玻璃 */
+@supports (backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px)) {
+  .tabbar-container {
+    background-color: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
 }
 
 .tabbar-item {
@@ -408,6 +424,12 @@ watch(() => filteredTabbarData.value, (newData, oldData) => {
   justify-content: center;
   align-items: center;
   padding: 10rpx 0;
+  /* 优化点击响应 */
+  transition: opacity 0.2s ease;
+}
+
+.tabbar-item:active {
+  opacity: 0.7;
 }
 
 .tabbar-item.active {
@@ -418,6 +440,8 @@ watch(() => filteredTabbarData.value, (newData, oldData) => {
   width: 48rpx;
   height: 48rpx;
   margin-bottom: 4rpx;
+  /* 优化图片渲染 */
+  image-rendering: -webkit-optimize-contrast;
 }
 
 .tabbar-text {

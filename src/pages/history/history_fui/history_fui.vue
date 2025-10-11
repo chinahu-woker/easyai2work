@@ -393,6 +393,9 @@ const toHome = () => {
 											mode="aspectFit" 
 											:src="pic"
 											:show-menu-by-longpress='true'
+											:lazy-load="true"
+											:webp="true"
+											:fade-show="true"
 										/>
 										<view class="image-index">{{ picIndex + 1 }}/{{ item.output.length }}</view>
 									</view>
@@ -405,6 +408,9 @@ const toHome = () => {
 									mode="widthFix" 
 									:src="item.output[0]"
 									:show-menu-by-longpress='true'
+									:lazy-load="true"
+									:webp="true"
+									:fade-show="true"
 								/>
 							</view>
 						</view>

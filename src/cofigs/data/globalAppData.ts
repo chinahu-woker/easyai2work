@@ -7,6 +7,7 @@ export const backGroundImage = pagesGlobalDataJson.backGroundImage
 export const HeadProps = pagesGlobalDataJson.HeadProps
 export const iconData = pagesGlobalDataJson.iconData
 export const storeProps = pagesGlobalDataJson.storeProps
+export const aiTeamProps = pagesGlobalDataJson.aiTeamProps
 export const payWorkProps = pagesGlobalDataJson.payWorkProps
 export const loginInfoIcons = pagesGlobalDataJson.loginInfoIcons
 export const organizations = pagesGlobalDataJson.organizations_store || []
