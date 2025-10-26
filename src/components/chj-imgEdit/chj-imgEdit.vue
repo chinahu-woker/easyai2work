@@ -534,12 +534,16 @@ export default {
 					// 获取遮罩图路径（绘制路径透明，其余部分纯色）
 					const maskFilePath = await this.createTransparentMask();
 					
+					console.log('confirm方法 - 原图路径:', this.path);
+					console.log('confirm方法 - 遮罩路径:', maskFilePath);
+					
 					// 返回原图和遮罩图路径
-					const emitData = { 
+					const emitData = {
 						originPath: this.path,  // 原图路径
 						maskPath: maskFilePath  // 遮罩图路径（绘制路径透明，其余部分纯色）
 					}
 					
+					console.log('confirm方法 - 发送数据:', emitData);
 					this.$emit('confirm', emitData);
 					this.show = false;
 					uni.hideLoading();
@@ -552,43 +556,61 @@ export default {
 		},
 		// 创建透明遮罩（绘制路径为透明，其余部分为纯色）
 		async createTransparentMask() {
-  return new Promise((resolve, reject) => {
-    const query = uni.createSelectorQuery().in(this);
-    query.select('#chj_imgEdit_canvas').boundingClientRect((data) => {
-      if (!data) {
-        reject('未找到画布元素');
-        return;
-      }
-      const { width, height } = data;
-      // 先导出用户路径
-      uni.canvasToTempFilePath({
-        canvasId: 'chj_imgEdit_canvas',
-        width, height,
-        destWidth: width, destHeight: height,
-        success: (res) => {
-          // 1. 先填充纯色
-          const maskCtx = uni.createCanvasContext('mask_process_canvas', this);
-          maskCtx.setFillStyle('#FFFFFF'); // 遮罩色
-          maskCtx.fillRect(0, 0, width, height);
-          // 2. destination-out 用户路径
-          maskCtx.globalCompositeOperation = 'destination-out';
-          maskCtx.drawImage(res.tempFilePath, 0, 0, width, height);
-          // 3. draw 一次，必须 reserve=false
-          maskCtx.draw(false, () => {
-            // 4. 导出遮罩
-            uni.canvasToTempFilePath({
-              canvasId: 'mask_process_canvas',
-              width, height,
-              destWidth: width, destHeight: height,
-              success: (maskRes) => resolve(maskRes.tempFilePath),
-              fail: () => resolve(res.tempFilePath)
-            }, this);
-          });
-        },
-        fail: (err) => reject('导出遮罩失败：' + err.errMsg)
-      }, this);
-    }).exec();
-  });
+		return new Promise((resolve, reject) => {
+		  const query = uni.createSelectorQuery().in(this);
+		  query.select('#chj_imgEdit_canvas').boundingClientRect((data) => {
+		    if (!data) {
+		      reject('未找到画布元素');
+		      return;
+		    }
+		    const { width, height } = data;
+		    console.log('创建遮罩，画布尺寸:', { width, height });
+		    
+		    // 先导出用户路径
+		    uni.canvasToTempFilePath({
+		      canvasId: 'chj_imgEdit_canvas',
+		      width, height,
+		      destWidth: width, destHeight: height,
+		      success: (res) => {
+		        console.log('用户绘制路径导出成功:', res.tempFilePath);
+		        
+		        // 1. 先填充纯色
+		        const maskCtx = uni.createCanvasContext('mask_process_canvas', this);
+		        maskCtx.setFillStyle('#FFFFFF'); // 遮罩色
+		        maskCtx.fillRect(0, 0, width, height);
+		        
+		        // 2. destination-out 用户路径
+		        maskCtx.globalCompositeOperation = 'destination-out';
+		        maskCtx.drawImage(res.tempFilePath, 0, 0, width, height);
+		        
+		        // 3. draw 一次，必须 reserve=false
+		        maskCtx.draw(false, () => {
+		          console.log('遮罩画布绘制完成');
+		          
+		          // 4. 导出遮罩
+		          uni.canvasToTempFilePath({
+		            canvasId: 'mask_process_canvas',
+		            width, height,
+		            destWidth: width, destHeight: height,
+		            success: (maskRes) => {
+		              console.log('遮罩导出成功:', maskRes.tempFilePath);
+		              resolve(maskRes.tempFilePath);
+		            },
+		            fail: (err) => {
+		              console.error('遮罩导出失败:', err);
+		              // 失败时返回原始路径
+		              resolve(res.tempFilePath);
+		            }
+		          }, this);
+		        });
+		      },
+		      fail: (err) => {
+		        console.error('导出用户路径失败：', err);
+		        reject('导出遮罩失败：' + err.errMsg);
+		      }
+		    }, this);
+		  }).exec();
+		});
 },
 		// 创建遮罩的备选方案
 		createMaskFallback(tempFilePath, width, height, resolve) {

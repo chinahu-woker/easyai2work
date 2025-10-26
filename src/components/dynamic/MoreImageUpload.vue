@@ -1,10 +1,10 @@
 <template>
-  <view class="image-editor-container" @click="onClick">
+  <view class="image-editor-container">
     <!-- 显示标题 -->
     <MyTitle :title="title"></MyTitle>
     
     <!-- 点击触发选择图片 -->
-    <view class="frosted-glass-container" v-if="!imageList_mask || imageList_mask.length === 0">
+    <view class="frosted-glass-container" v-if="!imageList_mask || imageList_mask.length === 0" @click="onClick">
 	    <!-- 无图片时显示占位符 -->
 	    <view class="icon-area">
 	      <view class="circle"></view>
@@ -14,16 +14,26 @@
 	    <view class="rect rect-2"></view>
 	  </view>
     
-    <view v-else-if="imageList_mask && imageList_mask.length > 0" class="edit-trigger">
+    <view v-else-if="imageList_mask && imageList_mask.length > 0" class="edit-trigger" @click="onClick">
       <!-- 有图时渲染已上传图片 -->
       <view class="uploaded-list">
-        <image 
-          v-for="(image, index) in imageList_mask" 
-          :key="index" 
-          :src="image"
-          v-if="image" 
-          class="uploaded-img"
-        />
+        <view class="image-grid">
+          <view 
+            v-for="(image, index) in previewImages" 
+            :key="index"
+            class="image-item"
+          >
+            <view class="image-label">{{ index === 0 ? '遮罩图' : '原图' }}</view>
+            <image
+              :src="image"
+              class="uploaded-img"
+              mode="aspectFill"
+              @load="onImageLoad"
+              @error="onImageError"
+            />
+          </view>
+        </view>
+        <view class="edit-hint">点击重新编辑</view>
       </view>
     </view>
 
@@ -46,28 +56,24 @@
 </template>
 
 <script setup lang="ts">
-import { ref,  nextTick, watch ,onMounted} from 'vue';
+import { ref, nextTick, watch, onMounted, computed, inject, type Ref } from 'vue';
 import chjImgEdit from "@/components/chj-imgEdit/chj-imgEdit.vue";
 import MyTitle from "@/components/common/MyTitle.vue";
 import type {ImageUploadCustomFunction, ImageUploadFile,TnImageUploadInstance} from "@tuniao/tnui-vue3-uniapp";
 import { uploadFile} from "@/utils/request.ts";
+import type { IDynamicOptions } from "@/types";
 // 自定义事件
-const emit = defineEmits(['update:modelValue']);
 
 // 状态管理
 const show = ref(false);
 const imagePath = ref('');
-const chjImgEditRef = ref(null);
+const chjImgEditRef = ref<any>(null);
 const isComponentReady = ref(false); 
       // 存储已上传图片，改用数组更通用
 const placeholderImg = ref('/static/placeholder.png'); // 无图占位图，需自行放置资源
 const ediIcon = '/static/graffiti.png';
-const modelValue = defineModel({
-  default: () => ({
-    "advance_onlineEdit_origin": '',
-    "advance_onlineEdit_mask": ''
-  })
-})
+const modelValue = defineModel<string>({ default: '' })
+const bindParam = inject<Ref<Record<string, any>> | undefined>('bindParam');
 interface Props{
   title?:string;
   workflow_id:string
@@ -76,22 +82,67 @@ interface Props{
 const props = withDefaults(defineProps<Props>(),{
   title:'遮罩绘制',
 })
+const maskValue = computed(() => {
+  const mask = bindParam?.value?.advance_onlineEdit_mask;
+  return typeof mask === 'string' ? mask : '';
+});
+
+const updatePreview = (origin: string, mask: string) => {
+  console.log('=== updatePreview 详细调试 ===');
+  console.log('origin 参数:', origin, '类型:', typeof origin);
+  console.log('mask 参数:', mask, '类型:', typeof mask);
+  const list: string[] = [];
+  if (mask) {
+    console.log('✅ 添加 mask:', mask);
+    list.push(mask);
+  } else {
+    console.log('❌ mask 为空');
+  }
+  if (origin) {
+    console.log('✅ 添加 origin:', origin);
+    list.push(origin);
+  } else {
+    console.log('❌ origin 为空');
+  }
+  imageList_mask.value = list;
+  console.log('最终 imageList_mask.value:', imageList_mask.value);
+  console.log('数组长度:', list.length);
+};
+
 // 监听组件挂载
 onMounted(() => {
-  // 初始化时将对象转换为适合本地展示的格式
-  if (modelValue.value['advance_onlineEdit_mask']) {
-    imageList_mask.value = [modelValue.value['advance_onlineEdit_mask'],modelValue.value['advance_onlineEdit_origin']];
-  }
+  console.log('📦 MoreImageUpload 挂载');
+  updatePreview(modelValue.value, maskValue.value);
 })
 
-// 监听本地数据变化同步到父组件
-watch(modelValue, (newVal) => {
-  if (newVal['advance_onlineEdit_mask']) {
-    imageList_mask.value = [newVal['advance_onlineEdit_mask'],newVal['advance_onlineEdit_origin']];
-  }
-}, { deep: true })
+watch([modelValue, maskValue], ([origin, mask]) => {
+  console.log('=== watch 触发 ===');
+  console.log('modelValue (origin) 完整URL:', origin);
+  console.log('maskValue (mask) 完整URL:', mask);
+  console.log('origin 长度:', origin?.length, '是否为空:', !origin);
+  console.log('mask 长度:', mask?.length, '是否为空:', !mask);
+  updatePreview(origin, mask);
+})
 // 选择图片逻辑
 const onClick = async () => {
+  // 如果已有图片，提示用户是否重新编辑
+  if (imageList_mask.value.length > 0) {
+    uni.showModal({
+      title: '提示',
+      content: '是否重新选择图片进行编辑？',
+      success: async (res) => {
+        if (res.confirm) {
+          await selectAndEditImage();
+        }
+      }
+    });
+    return;
+  }
+  
+  await selectAndEditImage();
+};
+
+const selectAndEditImage = async () => {
   try {
     const res = await uni.chooseImage({
       count: 1,
@@ -159,7 +210,11 @@ const waitForComponentReady = async () => {
     console.warn('等待组件超时');
   }
 };
-const  imageList_mask = ref([])
+const  imageList_mask = ref<string[]>([])
+const previewImages = computed(() => {
+  const filtered = imageList_mask.value.filter((item): item is string => Boolean(item));
+  return filtered;
+})
 
 
 // const confirm = async (emtData) => {
@@ -189,8 +244,92 @@ const  imageList_mask = ref([])
 
 
 // 取消回调
+const tryParseJSON = (value: string) => {
+  try {
+    return JSON.parse(value);
+  } catch (error) {
+    return value;
+  }
+};
 
-const confirm = async (emtData) => {
+const extractUrlFromPayload = (payload: unknown, key: string): string => {
+  if (!payload) {
+    return '';
+  }
+
+  // 如果是字符串，直接返回
+  if (typeof payload === 'string') {
+    const parsed = tryParseJSON(payload);
+    if (parsed === payload) {
+      return parsed;
+    }
+    return extractUrlFromPayload(parsed, key);
+  }
+
+  // 如果是可解析为 JSON 的字符串
+  if (typeof payload === 'object' && payload !== null) {
+    const queue: any[] = [payload];
+    const visited = new Set<any>();
+
+    while (queue.length > 0) {
+      const current = queue.shift();
+      if (!current || typeof current !== 'object' || visited.has(current)) {
+        continue;
+      }
+      visited.add(current);
+
+      // 直接命中目标 key
+      const direct = current[key];
+      if (typeof direct === 'string' && direct) {
+        return direct;
+      }
+
+      // 通用字段命中
+      const genericKeys = ['url', 'path', 'fileUrl', 'value'];
+      for (const genericKey of genericKeys) {
+        const candidate = current[genericKey];
+        if (typeof candidate === 'string' && candidate) {
+          return candidate;
+        }
+        if (typeof candidate === 'object' && candidate) {
+          queue.push(candidate);
+        }
+      }
+
+      // data / result / response 内递归查找
+      const nestedKeys = ['data', 'result', 'response'];
+      for (const nestedKey of nestedKeys) {
+        const nested = current[nestedKey];
+        if (!nested) {
+          continue;
+        }
+        if (typeof nested === 'string' && nested) {
+          const parsed = tryParseJSON(nested);
+          if (typeof parsed === 'string') {
+            return parsed;
+          }
+          queue.push(parsed);
+          continue;
+        }
+        queue.push(nested);
+      }
+    }
+  }
+
+  return '';
+};
+
+const normalizeUploadResult = (payloads: unknown[], key: string): string => {
+  for (const payload of payloads) {
+    const url = extractUrlFromPayload(payload, key);
+    if (url) {
+      return url;
+    }
+  }
+  return '';
+};
+
+const confirm = async (emtData: { originPath?: string; maskPath?: string; [key: string]: any }) => {
   console.log('编辑确认，返回数据:', emtData);
   try {
     // 假设chj-imgEdit返回包含原图和遮罩图路径的对象
@@ -199,30 +338,39 @@ const confirm = async (emtData) => {
     if (!originPath || !maskPath) {
       throw new Error('缺少原图或遮罩图路径');
     }
-
-    // 分别上传原图和遮罩图，使用与ImageUpload.vue一致的上传逻辑
-    const [originResult, maskResult] = await Promise.all([
-       uploadFile<string>(originPath),
+    // 分别上传原图和遮罩图
+    const [originResponse, maskResponse] = await Promise.all([
+      uploadFile<string>(originPath),
       uploadFile<string>(maskPath)
     ]);
-    const uploadResults = await Promise.all([originResult, maskResult]);
-    console.log("uploadResults", uploadResults);
 
-    // 构建符合要求的对象结构
-    // 关键修改：使用工作流参数定义的name作为键名
-    const result = {
-      // 替换为工作流中定义的参数name（示例：originUrl和maskUrl）
-      "advance_onlineEdit_origin": originResult,
-      "advance_onlineEdit_mask": maskResult
-    };
+    const originUrl = normalizeUploadResult([originResponse, maskResponse], 'advance_onlineEdit_origin');
+    const maskUrl = normalizeUploadResult([maskResponse, originResponse], 'advance_onlineEdit_mask');
 
-    // 更新modelValue为对象类型（需同步修改modelValue定义）
-    modelValue.value = result;
-    console.log('上传成功，结果:', result);
+    if (typeof originUrl !== 'string' || typeof maskUrl !== 'string' || !originUrl || !maskUrl) {
+      throw new Error('上传结果缺少文件地址');
+    }
+
+    // 缓存展示使用遮罩在前、原图在后
+    imageList_mask.value = [maskUrl, originUrl];
+
+    modelValue.value = originUrl;
+    if (bindParam?.value) {
+      bindParam.value.advance_onlineEdit_mask = maskUrl;
+    }
+    
+    // 确保更新预览
+    await nextTick();
+    updatePreview(originUrl, maskUrl);
+    
+    console.log('上传成功，结果:', modelValue.value);
+    console.log('imageList_mask.value:', imageList_mask.value);
+    console.log('previewImages:', previewImages.value);
+    
     uni.showToast({ title: '上传成功', icon: 'success' });
-  } catch (error) {
+  } catch (error: any) {
     console.error('图片上传失败:', error);
-    uni.showToast({ title: '上传失败: ' + error.message, icon: 'error' });
+    uni.showToast({ title: '上传失败: ' + (error?.message || ''), icon: 'error' });
   }
   show.value = false;
 };
@@ -233,13 +381,23 @@ const cancel = () => {
 };
 
 // 获取线条长度
-const getLineLength = (length) => {
+const getLineLength = (length: number) => {
   console.log('线条长度:', length + 'px');
 };
 
 // 获取矩形位置
-const getRectPosition = (obj) => {
+const getRectPosition = (obj: Record<string, any>) => {
   console.log('矩形位置:', obj);
+};
+
+// 图片加载成功处理
+const onImageLoad = (e: any) => {
+  console.log('✅ 图片加载成功');
+};
+
+// 图片加载失败处理
+const onImageError = (e: any) => {
+  console.error('❌ 图片加载失败:', e.detail);
 };
 </script>
 
@@ -304,17 +462,18 @@ const getRectPosition = (obj) => {
   padding: 20rpx;
 }
 
-/* 触发区域样式：无图时占位置，有图时承载图片 */
+/* 触发区域样式:无图时占位置,有图时承载图片 */
 .edit-trigger {
   width: 100%;
   min-height: 300rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #f5f5f5; /* 浅灰底色 */
-  border-radius: 8rpx;
-  overflow: hidden; /* 防止图片溢出圆角 */
-  padding: 20rpx;
+  background-color: #ffffff;
+  border-radius: 12rpx;
+  overflow: visible;
+  padding: 30rpx;
+  box-sizing: border-box;
 }
 
 /* 无图占位图样式 */
@@ -329,18 +488,67 @@ const getRectPosition = (obj) => {
   width: 100%;
   height: 100%;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  flex-wrap: wrap;
 }
+
+.image-grid {
+  display: flex;
+  gap: 20rpx;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 20rpx;
+}
+
+.image-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10rpx;
+  width: 200rpx;
+}
+
+.image-label {
+  font-size: 22rpx;
+  color: #666;
+  font-weight: 500;
+  padding: 4rpx 12rpx;
+  background-color: #f0f0f0;
+  border-radius: 20rpx;
+}
+
 .uploaded-img {
-  max-width: 200rpx;
-  max-height: 200rpx;
-  width: auto;
-  height: auto;
-  margin: 10rpx;
-  object-fit: contain;
+  width: 200rpx !important;
+  height: 200rpx !important;
+  object-fit: cover;
   border-radius: 8rpx;
+  border: 2rpx solid #e0e0e0;
+  background-color: #fff;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+  display: block;
+}
+
+.no-image-placeholder {
+  width: 150rpx;
+  height: 150rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f0f0f0;
+  border-radius: 8rpx;
+  color: #999;
+  font-size: 24rpx;
+}
+
+.edit-hint {
+  font-size: 24rpx;
+  color: #999;
+  text-align: center;
+  padding: 8rpx 16rpx;
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 20rpx;
 }
 
 /* 编辑弹窗容器 */
