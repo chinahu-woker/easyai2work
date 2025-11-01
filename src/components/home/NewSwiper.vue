@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import TnSwiper from '@tuniao/tnui-vue3-uniapp/components/swiper/src/swiper.vue'
 import {ref, computed, onMounted} from 'vue'
 import type {IBanner, IMiniProgramContent, IPageContent} from "@/types";
 import {getPageContent} from "@/composables/useCommon.ts";
@@ -118,8 +117,9 @@ const fetchPageContent = async (forceRefresh = false) => {
       };
     } else {
       // 直接使用 miniProgramContent 数据
-      pageContent.value = miniProgramData;
-      console.log('[轮播图] 数据加载成功，数量:', miniProgramData.home_banner.length);
+      const plainData = JSON.parse(JSON.stringify(miniProgramData));
+      pageContent.value = plainData;
+      console.log('[轮播图] 数据加载成功，数量:', plainData.home_banner.length);
     }
     
     // 将新数据存入缓存
@@ -175,47 +175,56 @@ const refreshData = async () => {
 };
 
 // 取所有轮播图数据,不限制数量
-const swiperData=computed(()=>{
-  // 确保pageContent.value不为null或undefined
-  if (!pageContent.value) {
+const swiperData = computed(() => {
+  const content = pageContent.value;
+  if (!content) {
     console.log('pageContent.value为null或undefined，返回空数组');
     return [];
   }
-  
-  // 确保home_banner是数组
-  if (!Array.isArray(pageContent.value.home_banner)) {
-    console.log('home_banner不是数组:', pageContent.value.home_banner, '返回空数组');
-    return [];
-  }
-  
-  const arr = pageContent.value.home_banner;
-  console.log('处理轮播数据，原始数组长度:', arr.length);
-  console.log('原始轮播数据:', arr);
-  
-  // 如果服务器返回的数据为空数组，直接返回空
-  if (arr.length === 0) {
+
+  const bannerSource = Array.isArray((content as any).home_banner)
+    ? (content as any).home_banner
+    : [];
+
+  if (bannerSource.length === 0) {
     console.log('服务器返回空轮播数据');
     return [];
   }
-  
-  // 处理所有有效的轮播图项
-  const result: {url?: string; title?: string}[] = []
-  arr.forEach((item: IBanner) => {
-    if (item && item.src) {
-      result.push({ url: item.src, title: item.label || '' })
+
+  const result: { url: string; title?: string; href?: string }[] = [];
+  bannerSource.forEach((item: IBanner | Record<string, any> | string) => {
+    const candidate = typeof item === 'string' ? { src: item } : item;
+    const url =
+      (candidate as any)?.src ||
+      (candidate as any)?.url ||
+      (candidate as any)?.image ||
+      (candidate as any)?.imageUrl ||
+      (candidate as any)?.cover ||
+      (candidate as any)?.pic ||
+      (candidate as any)?.bannerUrl;
+
+    if (!url) {
+      console.warn('[轮播图] 跳过无效 banner 项:', candidate);
+      return;
     }
-  })
-  
+
+    result.push({
+      url,
+      title: (candidate as any)?.label || (candidate as any)?.title || '',
+      href: (candidate as any)?.href || (candidate as any)?.link || ''
+    });
+  });
+
   console.log('处理后的轮播数据:', result);
-  return result
-})
+  return result;
+});
 
 </script>
 
 <template>
   	<view style='margin-top: 0%;'>
  			<!-- 显示轮播图 -->
- 			<swiper v-if="!isLoading && swiperData && swiperData.length" 
+      <swiper v-if="!isLoading && swiperData && swiperData.length" 
 				easing-function='default' 
 				previous-margin='30rpx' 
 				next-margin='30rpx'
@@ -227,12 +236,17 @@ const swiperData=computed(()=>{
 				autoplay 
 				:interval="3000"
 				:duration="500">
- 				<swiper-item v-for="(item,index) in swiperData" :key="index">
- 					<view class="fui-banner__item2"
- 						:style="{'background-image':'url('+ item.url +')' }">
- 			
- 					</view>
- 				</swiper-item>
+        <swiper-item v-for="(item,index) in swiperData" :key="index">
+          <view class="fui-banner__item2">
+            <image
+              :src="item.url"
+              class="banner-image"
+              mode="aspectFill"
+              :lazy-load="true"
+              show-menu-by-longpress
+            />
+          </view>
+        </swiper-item>
  			</swiper>
  			
 			<!-- 加载状态 -->
@@ -264,22 +278,20 @@ const swiperData=computed(()=>{
 		box-sizing: border-box;
 	}
 	
-	.fui-banner__item2 {
-		background-size: cover;
-		background-position: center;
-		background-repeat: no-repeat;
-		width: 100%;
-		height: 100%;
-		color: #FFFFFF;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		font-size: 34rpx;
-		font-weight: 600;
-		border-radius: 24rpx;
-		box-shadow: 0 8rpx 24rpx rgba(0,0,0,0.15);
-		overflow: hidden;
-	}
+  .fui-banner__item2 {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 24rpx;
+    overflow: hidden;
+    box-shadow: 0 8rpx 24rpx rgba(0,0,0,0.15);
+  }
+
+  .banner-image {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
 	// .SwTitle2 {
 	// 	font-size: 20px;
 	// 	margin-top: 4%;

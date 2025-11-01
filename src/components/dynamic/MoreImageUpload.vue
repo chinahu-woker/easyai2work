@@ -23,7 +23,10 @@
             :key="index"
             class="image-item"
           >
-            <view class="image-label">{{ index === 0 ? '遮罩图' : '原图' }}</view>
+            <view class="image-label">
+              <text>{{ index === 0 ? '遮罩' : '原图' }}</text>
+              <text v-if="imageSize(image)" class="image-size">{{ imageSize(image) }}</text>
+            </view>
             <image
               :src="image"
               class="uploaded-img"
@@ -105,6 +108,15 @@ const updatePreview = (origin: string, mask: string) => {
     console.log('❌ origin 为空');
   }
   imageList_mask.value = list;
+  const cached: Record<string, { width: number; height: number }> = {};
+  list.forEach((src) => {
+    const cache = imageInfoMap.value[src];
+    if (cache) {
+      cached[src] = cache;
+    }
+  });
+  imageInfoMap.value = cached;
+  list.forEach(fetchImageInfo);
   console.log('最终 imageList_mask.value:', imageList_mask.value);
   console.log('数组长度:', list.length);
 };
@@ -210,11 +222,40 @@ const waitForComponentReady = async () => {
     console.warn('等待组件超时');
   }
 };
-const  imageList_mask = ref<string[]>([])
+const imageList_mask = ref<string[]>([]);
+const imageInfoMap = ref<Record<string, { width: number; height: number }>>({});
+const pendingImageInfo = new Set<string>();
 const previewImages = computed(() => {
   const filtered = imageList_mask.value.filter((item): item is string => Boolean(item));
   return filtered;
 })
+
+const fetchImageInfo = async (src: string) => {
+  if (!src || imageInfoMap.value[src] || pendingImageInfo.has(src)) return;
+  pendingImageInfo.add(src);
+  try {
+    const info = await new Promise<{ width: number; height: number }>((resolve, reject) => {
+      uni.getImageInfo({
+        src,
+        success: ({ width, height }) => resolve({ width, height }),
+        fail: (err) => reject(err)
+      });
+    });
+    imageInfoMap.value = {
+      ...imageInfoMap.value,
+      [src]: info
+    };
+  } catch (error) {
+    console.error('获取图片信息失败:', error);
+  } finally {
+    pendingImageInfo.delete(src);
+  }
+};
+
+const imageSize = (src: string) => {
+  const info = imageInfoMap.value[src];
+  return info ? `${info.width}×${info.height}` : '';
+};
 
 
 // const confirm = async (emtData) => {
@@ -511,12 +552,20 @@ const onImageError = (e: any) => {
 }
 
 .image-label {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
   font-size: 22rpx;
   color: #666;
   font-weight: 500;
   padding: 4rpx 12rpx;
   background-color: #f0f0f0;
   border-radius: 20rpx;
+}
+
+.image-size {
+  font-size: 20rpx;
+  color: #999;
 }
 
 .uploaded-img {

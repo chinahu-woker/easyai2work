@@ -308,16 +308,16 @@ export default function useWorkFlow() {
 	//   }
 	// }
 	/** 处理Websocket消息 */
-	 const handleSocketMessage = (msg: never, callback?: (messageObj: never) => void) => {
-    console.log('原始消息', msg)
-    const msgObj = parseJSONToObject<{ type: never; data: never; queue_status: IDrawTaskStatus }>(
-      msg
-    )
-    if(!msgObj) return;
-    //自定义回调
-    if (callback) {
-      callback(msgObj)
-    }
+	 const handleSocketMessage = (msg: any, callback?: (messageObj: any) => void) => {
+	   console.log('原始消息', msg)
+	   const msgObj = parseJSONToObject<{ type: any; data: any; queue_status: IDrawTaskStatus }>(
+	     msg
+	   )
+	   if(!msgObj) return;
+	   //自定义回调
+	   if (callback) {
+	     callback(msgObj)
+	   }
     const { queue_status } = msgObj
 
     if (!queue_status) {
@@ -326,11 +326,17 @@ export default function useWorkFlow() {
     // 从websocket消息中获取output
     const index = localTasks.value.findIndex(item => item._id === queue_status.task_id)
     if (index !== -1) {
-      if (queue_status.progress) localTasks.value[index].progress = queue_status.progress
-      if (queue_status.queue) localTasks.value[index].queue = queue_status.queue
+      // 确保进度值能够正确触发响应式更新
+      if (queue_status.progress !== undefined) {
+        localTasks.value[index].progress = Number(queue_status.progress)
+      }
+      if (queue_status.queue !== undefined) localTasks.value[index].queue = queue_status.queue
       if (queue_status.time_remained !== undefined)
         localTasks.value[index].time_remained = queue_status.time_remained
       if (queue_status.message) localTasks.value[index].message = queue_status.message
+      
+      // 强制触发响应式更新
+      localTasks.value = [...localTasks.value]
     }
     if (queue_status.status === 'started' && index !== -1) {
       localTasks.value[index].status = 4

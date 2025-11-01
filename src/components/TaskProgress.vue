@@ -834,20 +834,62 @@ async function pollRefreshOnShow() {
 // 	try { refreshLocalTasksFromServer(); } catch (e) { /* ignore */ }
 // });
 
+const simpleLinkRegex = /^(?:https?:\/\/|\/\/)[^\s]+$/i;
+
 function checkContent(str: any) {
-	// 使用正则表达式判断是否是链接
-	const linkRegex = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
-	if (linkRegex.test(str)) {
-		return 1; // 是链接
-	} else {
-		return 2; // 是文本
+	if (typeof str !== 'string') {
+		return 2;
 	}
+
+	const trimmed = str.trim();
+	if (!trimmed) {
+		return 2;
+	}
+
+	// 直接检测 dataURL 或 blob
+	if (trimmed.startsWith('data:image') || trimmed.startsWith('blob:')) {
+		return 1;
+	}
+
+	const canUseURL = typeof URL === 'function';
+
+	if (canUseURL) {
+		try {
+			new URL(trimmed);
+			return 1;
+		} catch (_err) {
+			// ignore and try decoded string
+		}
+		try {
+			const decoded = decodeURIComponent(trimmed);
+			new URL(decoded);
+			return 1;
+		} catch (_err) {
+			// fall through to regex check
+		}
+	}
+
+	return simpleLinkRegex.test(trimmed) ? 1 : 2;
 }
 function judgeContent(input: any) {
 	// 定义图片链接的正则表达式
-	const imageRegex = /\.(jpg|jpeg|png|gif|bmp)$/i;
+	const imageRegex = /\.(jpg|jpeg|png|gif|bmp|webp|svg)$/i;
 	// 定义视频链接的正则表达式
-	const videoRegex = /\.(mp4|avi|mov|mkv|flv|wmv)$/i;
+	const videoRegex = /\.(mp4|avi|mov|mkv|flv|wmv|webm)$/i;
+
+	const normalized = (() => {
+		if (typeof input !== 'string') {
+			return '';
+		}
+		try {
+			return decodeURIComponent(input);
+		} catch (err) {
+			return input;
+		}
+	})();
+
+	const pathForMatch = normalized.split(/[?#]/)[0];
+	const linkType = checkContent(normalized);
 
 	// 检查内容是否为空
 	if (!input) {
@@ -855,24 +897,24 @@ function judgeContent(input: any) {
 		return 0; // 内容为空
 	}
 	// 检查内容是否为图片链接
-	if (checkContent(input) == 1) {
-		if (imageRegex.test(input)) {
+	if (linkType === 1) {
+		if (imageRegex.test(pathForMatch)) {
 			console.log('judgeContent - 是图片:', input)
 			return 1; // 是图片链接
 		}
 		// 检查内容是否为视频链接
-		else if (videoRegex.test(input)) {
+		else if (videoRegex.test(pathForMatch)) {
 			console.log('judgeContent - 是视频:', input)
 			return 2; // 是视频链接
 		}
 	}
 	// 如果不是图片或视频链接，则认为是文本
-	if (checkContent(input) == 2) {
+	if (linkType !== 1) {
 		console.log('judgeContent - 是文本:', input)
 		return 3; // 是文本
 	}
-	console.log('judgeContent - 未知类型:', input)
-	return 0;
+	console.log('judgeContent - 未知类型，按文本处理:', input)
+	return 3;
 }
 
 // 获取当前输出的内容类型
@@ -1175,7 +1217,7 @@ const formatTime = (timestamp: string | number) => {
 					<view class="output-section">
 						<!-- 加载状态 -->
 						<LoadingState v-if="currentTask && currentTask.status === 4"
-							:progress="currentTask.progress || 0" />
+							:progress="Number(currentTask.progress) || 0" />
 						<!-- 新增：后端已完成但图片未返回，显示等待动画 -->
 						<view v-else-if="isWaitingForImage" class="waiting-image-state">
 							<TnIcon name="starry" size="80" color="#007AFF" class="waiting-progress-icon" />
@@ -1262,13 +1304,13 @@ const formatTime = (timestamp: string | number) => {
 										<!-- 圆形进度环（进行中） -->
 										<view v-if="task.status === 4" class="circle-wrapper">
 											<view class="circle-bg"></view>
-											<view class="circle-mask" :style="{ '--p': clampProgress(task.progress || 0) }"></view>
+											<view class="circle-mask" :style="{ '--p': clampProgress(Number(task.progress) || 0) }"></view>
 										</view>
 										<!-- 条形进度条 -->
 										<!-- <view v-if="task.status === 4" class="linear-bar">
 											<view class="linear-fill" :style="{ width: clampProgress(task.progress || 0) + '%' }"></view>
 										</view> -->
-										<text v-if="task.status === 4 && typeof task.progress === 'number'" class="progress-text-small">{{ clampProgress(task.progress) }}%</text>
+										<text v-if="task.status === 4 && typeof task.progress === 'number'" class="progress-text-small">{{ clampProgress(Number(task.progress)) }}%</text>
 										<text v-else-if="task.status === 4" class="progress-text-small">生成中</text>
 										<text v-else-if="task.status === 2" class="progress-text-small error">失败</text>
 										<text v-else class="progress-text-small ">加载中</text>

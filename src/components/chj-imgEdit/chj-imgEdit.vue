@@ -556,62 +556,98 @@ export default {
 		},
 		// 创建透明遮罩（绘制路径为透明，其余部分为纯色）
 		async createTransparentMask() {
-		return new Promise((resolve, reject) => {
-		  const query = uni.createSelectorQuery().in(this);
-		  query.select('#chj_imgEdit_canvas').boundingClientRect((data) => {
-		    if (!data) {
-		      reject('未找到画布元素');
-		      return;
-		    }
-		    const { width, height } = data;
-		    console.log('创建遮罩，画布尺寸:', { width, height });
-		    
-		    // 先导出用户路径
-		    uni.canvasToTempFilePath({
-		      canvasId: 'chj_imgEdit_canvas',
-		      width, height,
-		      destWidth: width, destHeight: height,
-		      success: (res) => {
-		        console.log('用户绘制路径导出成功:', res.tempFilePath);
-		        
-		        // 1. 先填充纯色
-		        const maskCtx = uni.createCanvasContext('mask_process_canvas', this);
-		        maskCtx.setFillStyle('#FFFFFF'); // 遮罩色
-		        maskCtx.fillRect(0, 0, width, height);
-		        
-		        // 2. destination-out 用户路径
-		        maskCtx.globalCompositeOperation = 'destination-out';
-		        maskCtx.drawImage(res.tempFilePath, 0, 0, width, height);
-		        
-		        // 3. draw 一次，必须 reserve=false
-		        maskCtx.draw(false, () => {
-		          console.log('遮罩画布绘制完成');
-		          
-		          // 4. 导出遮罩
-		          uni.canvasToTempFilePath({
-		            canvasId: 'mask_process_canvas',
-		            width, height,
-		            destWidth: width, destHeight: height,
-		            success: (maskRes) => {
-		              console.log('遮罩导出成功:', maskRes.tempFilePath);
-		              resolve(maskRes.tempFilePath);
-		            },
-		            fail: (err) => {
-		              console.error('遮罩导出失败:', err);
-		              // 失败时返回原始路径
-		              resolve(res.tempFilePath);
-		            }
-		          }, this);
-		        });
-		      },
-		      fail: (err) => {
-		        console.error('导出用户路径失败：', err);
-		        reject('导出遮罩失败：' + err.errMsg);
-		      }
-		    }, this);
-		  }).exec();
-		});
-},
+			try {
+				const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+				const [{ width: imageWidth, height: imageHeight }, canvasRect] = await Promise.all([
+					this.imgInfo(this.path),
+					this.getNodeInfo('#chj_imgEdit_canvas')
+				]);
+				const rawCanvasWidth = canvasRect && typeof canvasRect.width === 'number' ? canvasRect.width : imageWidth;
+				const rawCanvasHeight = canvasRect && typeof canvasRect.height === 'number' ? canvasRect.height : imageHeight;
+				const canvasWidth = Math.max(Math.round(rawCanvasWidth), 1);
+				const canvasHeight = Math.max(Math.round(rawCanvasHeight), 1);
+				const drawingFullPath = await new Promise((resolve, reject) => {
+					uni.canvasToTempFilePath({
+						canvasId: 'chj_imgEdit_canvas',
+						x: 0,
+						y: 0,
+						width: canvasWidth,
+						height: canvasHeight,
+						destWidth: canvasWidth,
+						destHeight: canvasHeight,
+						fileType: 'png',
+						success: (res) => resolve(res.tempFilePath),
+						fail: (err) => reject(err)
+					}, this);
+				});
+				let sourceX = 0;
+				let sourceY = 0;
+				let sourceWidth = canvasWidth;
+				let sourceHeight = canvasHeight;
+				let destWidth = canvasWidth;
+				let destHeight = canvasHeight;
+				const hasBgPosition = !this.isAllCanvas && this.bgPosition && typeof this.bgPosition.x === 'number' && typeof this.bgPosition.y === 'number' && typeof this.bgPosition.width === 'number' && typeof this.bgPosition.height === 'number';
+				if (hasBgPosition) {
+					const safeX = clamp(this.bgPosition.x, 0, canvasWidth);
+					const safeY = clamp(this.bgPosition.y, 0, canvasHeight);
+					const maxWidth = Math.max(canvasWidth - safeX, 0.5);
+					const maxHeight = Math.max(canvasHeight - safeY, 0.5);
+					const safeWidth = clamp(this.bgPosition.width, 0.5, maxWidth);
+					const safeHeight = clamp(this.bgPosition.height, 0.5, maxHeight);
+					sourceX = safeX;
+					sourceY = safeY;
+					sourceWidth = safeWidth;
+					sourceHeight = safeHeight;
+					const displayWidth = this.bgPosition.width || safeWidth;
+					const displayHeight = this.bgPosition.height || safeHeight;
+					const scaleX = imageWidth > 0 && displayWidth > 0 ? imageWidth / displayWidth : 1;
+					const scaleY = imageHeight > 0 && displayHeight > 0 ? imageHeight / displayHeight : 1;
+					destWidth = Math.max(Math.round(safeWidth * (scaleX || 1)), 1);
+					destHeight = Math.max(Math.round(safeHeight * (scaleY || 1)), 1);
+				}
+				const captureWidth = Math.max(Math.round(sourceWidth), 1);
+				const captureHeight = Math.max(Math.round(sourceHeight), 1);
+				return await new Promise((resolve) => {
+					const maskCtx = uni.createCanvasContext('mask_process_canvas', this);
+					maskCtx.clearRect(0, 0, captureWidth, captureHeight);
+					maskCtx.setFillStyle('#FFFFFF');
+					maskCtx.fillRect(0, 0, captureWidth, captureHeight);
+					maskCtx.globalCompositeOperation = 'destination-out';
+					maskCtx.drawImage(
+						drawingFullPath,
+						sourceX,
+						sourceY,
+						sourceWidth,
+						sourceHeight,
+						0,
+						0,
+						captureWidth,
+						captureHeight
+					);
+					maskCtx.globalCompositeOperation = 'source-over';
+					maskCtx.draw(false, () => {
+						uni.canvasToTempFilePath({
+							canvasId: 'mask_process_canvas',
+							x: 0,
+							y: 0,
+							width: captureWidth,
+							height: captureHeight,
+							destWidth,
+							destHeight,
+							fileType: 'png',
+							success: (maskRes) => resolve(maskRes.tempFilePath),
+							fail: (err) => {
+								console.error('遮罩导出失败:', err);
+								resolve(drawingFullPath);
+							}
+						}, this);
+					});
+				});
+			} catch (error) {
+				console.error('创建遮罩失败:', error);
+				return await this.canvasGetImagePath('chj_imgEdit_canvas');
+			}
+		},
 		// 创建遮罩的备选方案
 		createMaskFallback(tempFilePath, width, height, resolve) {
 			// 创建遮罩canvas上下文
@@ -844,7 +880,8 @@ export default {
 			await this.clearCanvas(this.ctx_bg);
 			await this.clearCanvas(this.ctx);
 			await this.clearCanvas(this.ctx_save);
-			await this.drawImageToCenter(this.ctx_bg, '#chj_imgEdit_canvas_bg', tempFilePath, false);
+			await this.drawImageToCenter(this.ctx_bg, '#chj_imgEdit_canvas_bg', tempFilePath, false, true);
+			this.path = tempFilePath;
 			this.textList = [];
 			this.drawText();
 			this.history_list = [];

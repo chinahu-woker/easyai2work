@@ -140,20 +140,61 @@ onShow(() => {
 	}
 })
 
+const simpleLinkRegex = /^(?:https?:\/\/|\/\/)[^\s]+$/i;
+
 function checkContent(str: any) {
-	// 使用正则表达式判断是否是链接
-	const linkRegex = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
-	if (linkRegex.test(str)) {
-		return 1; // 是链接
-	} else {
-		return 2; // 是文本
+	if (typeof str !== 'string') {
+		return 2;
 	}
+
+	const trimmed = str.trim();
+	if (!trimmed) {
+		return 2;
+	}
+
+	if (trimmed.startsWith('data:image') || trimmed.startsWith('blob:')) {
+		return 1;
+	}
+
+	const canUseURL = typeof URL === 'function';
+
+	if (canUseURL) {
+		try {
+			new URL(trimmed);
+			return 1;
+		} catch (_err) {
+			// ignore and try decoded string
+		}
+		try {
+			const decoded = decodeURIComponent(trimmed);
+			new URL(decoded);
+			return 1;
+		} catch (_err) {
+			// fall through
+		}
+	}
+
+	return simpleLinkRegex.test(trimmed) ? 1 : 2;
 }
 function judgeContent(input: any) {
 	// 定义图片链接的正则表达式
-	const imageRegex = /\.(jpg|jpeg|png|gif|bmp)$/i;
+	const imageRegex = /\.(jpg|jpeg|png|gif|bmp|webp|svg)$/i;
 	// 定义视频链接的正则表达式
-	const videoRegex = /\.(mp4|avi|mov|mkv|flv|wmv)$/i;
+	const videoRegex = /\.(mp4|avi|mov|mkv|flv|wmv|webm)$/i;
+
+	const normalized = (() => {
+		if (typeof input !== 'string') {
+			return '';
+		}
+		try {
+			return decodeURIComponent(input);
+		} catch (err) {
+			return input;
+		}
+	})();
+
+	const pathForMatch = normalized.split(/[?#]/)[0];
+	const linkType = checkContent(normalized);
 
 	// 检查内容是否为空
 	if (!input) {
@@ -161,24 +202,24 @@ function judgeContent(input: any) {
 		return 0; // 内容为空
 	}
 	// 检查内容是否为图片链接
-	if (checkContent(input) == 1) {
-		if (imageRegex.test(input)) {
+	if (linkType === 1) {
+		if (imageRegex.test(pathForMatch)) {
 			console.log('judgeContent - 是图片:', input)
 			return 1; // 是图片链接
 		}
 		// 检查内容是否为视频链接
-		else if (videoRegex.test(input)) {
+		else if (videoRegex.test(pathForMatch)) {
 			console.log('judgeContent - 是视频:', input)
 			return 2; // 是视频链接
 		}
 	}
 	// 如果不是图片或视频链接，则认为是文本
-	if (checkContent(input) == 2) {
+	if (linkType !== 1) {
 		console.log('judgeContent - 是文本:', input)
 		return 3; // 是文本
 	}
-	console.log('judgeContent - 未知类型:', input)
-	return 0;
+	console.log('judgeContent - 未知类型，按文本处理:', input)
+	return 3;
 }
 
 // 获取当前输出的内容类型
@@ -190,12 +231,45 @@ const currentContentType = computed(() => {
 })
 
 // 当前任务的参数信息
-const currentTaskParams = computed(() => {
+const currentTaskParams = computed<Record<string, unknown>>(() => {
 	if (!currentTask.value || !currentTask.value.params) {
 		return {};
 	}
-	return currentTask.value.params;
+	return currentTask.value.params as Record<string, unknown>;
 })
+
+const currentTaskParamEntries = computed<[string, unknown][]>(() => {
+	return Object.entries(currentTaskParams.value ?? {}) as [string, unknown][];
+})
+
+const isLongString = (value: unknown): value is string => typeof value === 'string' && value.length > 50;
+
+const getTruncatedValue = (value: unknown): string => {
+	if (typeof value === 'string') {
+		return `${value.substring(0, 50)}...`;
+	}
+	return String(value ?? '');
+};
+
+const formatParamValue = (value: unknown): string => {
+	if (typeof value === 'string') {
+		return value;
+	}
+	if (Array.isArray(value)) {
+		return value.join(', ');
+	}
+	if (typeof value === 'number' || typeof value === 'boolean') {
+		return String(value);
+	}
+	if (value && typeof value === 'object') {
+		try {
+			return JSON.stringify(value);
+		} catch (_err) {
+			return '[object]';
+		}
+	}
+	return '';
+};
 
 /*保存到相册*/
 const handleSave = () => {
@@ -390,8 +464,8 @@ const formatTime = (timestamp: string | number) => {
 
 						<!-- 文本类型 -->
 						<view v-else-if="currentContentType === 3" class="text-output">
-							<view class="reference-image" v-if="currentTaskParams.image_path_origin">
-								<image class="ref-img" mode="aspectFill" :src="currentTaskParams.image_path_origin" />
+							<view class="reference-image" v-if="currentTaskParams['image_path_origin']">
+								<image class="ref-img" mode="aspectFill" :src="String(currentTaskParams['image_path_origin'] || '')" />
 							</view>
 							<view class="text-content">
 								<scroll-view scroll-y="true" class="text-scroll">
@@ -421,13 +495,13 @@ const formatTime = (timestamp: string | number) => {
 							<text class="params-title">生成参数</text>
 						</view>
 						<scroll-view scroll-y="true" class="params-scroll">
-							<view class="param-item" v-for="(value, key) in currentTaskParams" :key="key">
+							<view class="param-item" v-for="([key, value]) in currentTaskParamEntries" :key="key">
 								<view class="param-label">{{ key }}</view>
 								<view class="param-value">
-									<text v-if="typeof value === 'string' && value.length > 50" class="param-text-long">
-										{{ value.substring(0, 50) }}...
+									<text v-if="isLongString(value)" class="param-text-long">
+										{{ getTruncatedValue(value) }}
 									</text>
-									<text v-else class="param-text">{{ value }}</text>
+									<text v-else class="param-text">{{ formatParamValue(value) }}</text>
 								</view>
 							</view>
 							<!-- 任务信息 -->
