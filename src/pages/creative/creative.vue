@@ -130,7 +130,7 @@ const graphicDatas = computed(()=>{
      </template> -->
    <!-- </TnWaterFall> -->
   </BaseLayout>
-  <view style="height: 200rpx;">  <fui-footer text="Copyright © 2021 Fuzi-AI"></fui-footer></view>
+  <view style="height: 200rpx;">  <fui-footer text="Copyright © 2021 aikan.cn"></fui-footer></view>
 </template>
 
 <style scoped lang="scss">

@@ -16,11 +16,12 @@
     &__content {
       flex-grow: 1;
       display: flex;
+      margin-left: -10rpx;
     }
     &__avatar {
       flex-shrink: 0;
-      width: 90rpx;
-      height: 90rpx;
+      width: 40rpx;
+      height: 40rpx;
       border-radius: 50%;
       background-color: var(--tn-color-gray--disabled);
       .image {

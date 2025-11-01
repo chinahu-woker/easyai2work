@@ -1,6 +1,6 @@
 <template>
   <!-- 背景图片容器 -->
-  <view class="background-container" :style="containerStyle"></view>
+  <view class="background-container" :style="containerStyle as any"></view>
   
   <!-- 内容容器 -->
   <view class="new-index-container">
@@ -11,9 +11,14 @@
       :enable-back-to-top="true"
       :scroll-with-animation="false"
       :enable-passive="true"
+      @scroll="onContentScroll"
     >
-      <!-- 使用v-show替代组件的重新创建，保持组件状态 -->
-      <view  v-for="(pageType, index) in pageTypes" :key="pageType" v-show="currentPageIndex === index">
+      <view
+        v-for="pageType in cachedPageTypes"
+        :key="pageType"
+        v-show="currentPageType === pageType"
+        class="page-cache-item"
+      >
         <dynamic-page-renderer :page-type="pageType" />
       </view>
     </scroll-view>
@@ -39,13 +44,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watchEffect, watch, getCurrentInstance, nextTick } from 'vue'
-import { onLoad, onShow } from '@dcloudio/uni-app'
+import { ref, computed, watch, getCurrentInstance, nextTick, provide, onBeforeUnmount } from 'vue'
+import { onLoad, onShow, onShareAppMessage, onShareTimeline } from '@dcloudio/uni-app'
 import { useAppStore } from '@/stores/appStore'
 import { storeToRefs } from 'pinia'
 import DynamicPageRenderer from '@/components/DynamicPageRenderer.vue'
 import { globalTabbarData, pageComponents, dynamicComponentRules } from '@/cofigs/data/globalAppData'
 import pagesGlobalData from '@/cofigs/data/pagesGlobalData.json'
+import { getShareData, clearShareData } from '@/utils/shareManager'
+import type { ShareData } from '@/utils/shareManager'
 
 // 定义类型
 interface TabbarItem {
@@ -54,6 +61,86 @@ interface TabbarItem {
   iconPath: string
   selectedIconPath: string
   organizations?: string[]
+}
+
+type ScrollDirection = 'up' | 'down'
+
+interface ScrollTickPayload {
+  scrollTop: number
+  scrollHeight: number
+  direction: ScrollDirection
+  deltaY: number
+  timestamp: number
+}
+
+interface VideoPerformanceBus {
+  subscribeScrollTick: (handler: (payload: ScrollTickPayload) => void) => () => void
+  emitPauseAll: (options?: Record<string, unknown>) => void
+  emitPlayRequest: (options?: Record<string, unknown>) => void
+  maxConcurrent: number
+}
+
+const VIDEO_PERFORMANCE_KEY = 'videoPerformance'
+const MAX_CACHED_PAGES = 3
+const DEFAULT_SHARE_APP = pagesGlobalData?.HeadProps?.appName || 'JuleiAI'
+const DEFAULT_SHARE_TITLE = pagesGlobalData?.HeadProps?.title || DEFAULT_SHARE_APP
+const DEFAULT_SHARE_IMAGE = pagesGlobalData?.HeadProps?.image || ''
+
+function ensureLeadingSlash(path: string) {
+  if (!path) {
+    return '/pages/index/index'
+  }
+  return path.startsWith('/') ? path : `/${path}`
+}
+
+function addOrUpdateQuery(path: string, key: string, value?: string | number) {
+  if (value === undefined || value === null || value === '') {
+    return path
+  }
+  const valueStr = encodeURIComponent(String(value))
+  const pattern = new RegExp(`([?&])${key}=[^&]*`)
+  if (pattern.test(path)) {
+    return path.replace(pattern, `$1${key}=${valueStr}`)
+  }
+  return `${path}${path.includes('?') ? '&' : '?'}${key}=${valueStr}`
+}
+
+function buildSharePath(basePath: string, params: Record<string, string | number | undefined>) {
+  let resolvedPath = ensureLeadingSlash(basePath || '/pages/index/index')
+  Object.entries(params).forEach(([paramKey, paramValue]) => {
+    resolvedPath = addOrUpdateQuery(resolvedPath, paramKey, paramValue)
+  })
+  return resolvedPath
+}
+
+function hasCustomShareData(data: ShareData | undefined | null): data is ShareData {
+  if (!data) {
+    return false
+  }
+  return Object.keys(data).some((key) => {
+    const value = data[key as keyof ShareData]
+    return value !== undefined && value !== null && value !== ''
+  })
+}
+
+type FrameCallback = (time: number) => void
+
+function useFrameThrottle<T>(handler: (payload: T) => void) {
+  const requestFrame = typeof requestAnimationFrame === 'function'
+    ? requestAnimationFrame
+    : ((cb: FrameCallback) => setTimeout(() => cb(Date.now()), 16) as unknown as number)
+  let frameId: number | null = null
+  let latestPayload: T
+  return (payload: T) => {
+    latestPayload = payload
+    if (frameId !== null) {
+      return
+    }
+    frameId = requestFrame(() => {
+      frameId = null
+      handler(latestPayload)
+    })
+  }
 }
 
 // 状态管理
@@ -71,6 +158,25 @@ const isLogin = computed(() => {
 // 当前页面索引
 const currentPageIndex = ref(0)
 
+const cachedPageTypes = ref<string[]>([])
+
+const registerCachedPage = (pageType?: string) => {
+  if (!pageType) {
+    return
+  }
+  const pages = cachedPageTypes.value
+  const existingIndex = pages.indexOf(pageType)
+  if (existingIndex !== -1) {
+    pages.splice(existingIndex, 1)
+    pages.push(pageType)
+    return
+  }
+  if (pages.length >= MAX_CACHED_PAGES) {
+    pages.shift()
+  }
+  pages.push(pageType)
+}
+
 // 安全访问过滤后的导航栏数据
 const safeFilteredTabbarData = computed(() => {
   try {
@@ -80,6 +186,15 @@ const safeFilteredTabbarData = computed(() => {
     return []
   }
 })
+
+const getActiveTabLabel = () => {
+  const tabs = safeFilteredTabbarData.value
+  if (!Array.isArray(tabs) || tabs.length === 0) {
+    return DEFAULT_SHARE_TITLE
+  }
+  const safeIndex = Math.min(Math.max(0, currentPageIndex.value), tabs.length - 1)
+  return tabs[safeIndex]?.text || DEFAULT_SHARE_TITLE
+}
 
 // 处理标签点击事件，增加一层防御性包装
 const handleTabClick = (index: number) => {
@@ -232,6 +347,54 @@ const currentPageType = computed(() => {
   }
 })
 
+let lastScrollTop = 0
+
+const emitScrollTick = useFrameThrottle<ScrollTickPayload>((payload) => {
+  uni.$emit('global:scroll-tick', payload)
+})
+
+const onContentScroll = (event: any) => {
+  const { detail } = event
+  const scrollTop = detail?.scrollTop ?? 0
+  const scrollHeight = detail?.scrollHeight ?? 0
+  const rawDeltaY = typeof detail?.deltaY === 'number' ? detail.deltaY : scrollTop - lastScrollTop
+  const direction: ScrollDirection = rawDeltaY >= 0 ? 'down' : 'up'
+  lastScrollTop = scrollTop
+  emitScrollTick({
+    scrollTop,
+    scrollHeight,
+    direction,
+    deltaY: rawDeltaY,
+    timestamp: Date.now()
+  })
+}
+
+const subscribeScrollTick = (handler: (payload: ScrollTickPayload) => void) => {
+  const listener = (payload: ScrollTickPayload) => handler(payload)
+  uni.$on('global:scroll-tick', listener)
+  return () => {
+    uni.$off('global:scroll-tick', listener)
+  }
+}
+
+const broadcastPageActivated = (pageType: string) => {
+  uni.$emit('global:page:activated', { pageType })
+}
+
+const broadcastPageDeactivated = (pageType: string, reason: string) => {
+  uni.$emit('global:page:deactivated', { pageType, reason })
+}
+
+const videoPerformanceBus: VideoPerformanceBus = {
+  subscribeScrollTick,
+  emitPauseAll: (options) => uni.$emit('global:video-pause', options ?? {}),
+  emitPlayRequest: (options) => uni.$emit('global:video-play', options ?? {}),
+  maxConcurrent: 3
+}
+
+provide(VIDEO_PERFORMANCE_KEY, videoPerformanceBus)
+provide('activePageType', currentPageType)
+
 // 切换页面
 const switchPage = (index: number) => {
   try {
@@ -267,11 +430,12 @@ const switchPage = (index: number) => {
     }
     
     // 确保 currentPageType 存在
-    const pageType = currentPageType && currentPageType.value ? currentPageType.value : 'unknown'
-    
+    const targetPageType = tabbarData[index]?.tabText || 'unknown'
+    videoPerformanceBus.emitPauseAll({ keepPageType: targetPageType })
+
     console.log('切换到页面:', {
       index,
-      type: pageType,
+      type: targetPageType,
       text: tabbarData[index]?.text
     })
   } catch (error) {
@@ -279,8 +443,29 @@ const switchPage = (index: number) => {
   }
 }
 
+watch(currentPageType, (newType, oldType) => {
+  if (newType) {
+    registerCachedPage(newType)
+    broadcastPageActivated(newType)
+  }
+  if (oldType && oldType !== newType) {
+    broadcastPageDeactivated(oldType, 'hidden')
+  }
+}, { immediate: true })
+
 // 页面加载时的处理
 onLoad((options: any = {}) => {
+  if (typeof uni.showShareMenu === 'function') {
+    try {
+      uni.showShareMenu({
+        withShareTicket: true,
+        menus: ['shareAppMessage', 'shareTimeline']
+      })
+    } catch (error) {
+      console.warn('showShareMenu 调用失败:', error)
+    }
+  }
+  
   // 处理页面索引参数
   if (options && options.pageindex) {
     const targetIndex = parseInt(options.pageindex)
@@ -318,6 +503,12 @@ onShow(() => {
   console.log('页面显示，当前页面索引:', currentPageIndex.value)
 })
 
+onBeforeUnmount(() => {
+  if (currentPageType.value) {
+    broadcastPageDeactivated(currentPageType.value, 'unmount')
+  }
+})
+
 // 监听登录状态变化
 watch(() => isLogin.value, (newLoginStatus) => {
   console.log('登录状态变化:', newLoginStatus)
@@ -335,6 +526,9 @@ watch(() => isLogin.value, (newLoginStatus) => {
 watch(() => filteredTabbarData.value, (newData, oldData) => {
   // 确保 newData 是数组
   const tabbarData = Array.isArray(newData) ? newData : []
+  const validTypes = new Set(tabbarData.map(item => item?.tabText || ''))
+  cachedPageTypes.value = cachedPageTypes.value.filter(page => validTypes.has(page))
+  registerCachedPage(currentPageType.value)
   
   // 如果导航栏配置改变了（通常是权限变化导致），需要检查当前页面索引是否仍然有效
   if (oldData && Array.isArray(oldData) && tabbarData.length !== oldData.length) {
@@ -343,6 +537,109 @@ watch(() => filteredTabbarData.value, (newData, oldData) => {
       console.log('页面索引超出范围，重置到首页')
       currentPageIndex.value = 0
     }
+  }
+})
+
+onShareAppMessage(() => {
+  const inviteCode = (user.value as any)?.my_invite_code || ''
+  const shareData = getShareData()
+  // 使用 pagesGlobalData 中配置的固定分享文案
+  const configuredAppInfo = pagesGlobalData?.globalAppData?.share?.appInfo
+  const fixedTitle = typeof configuredAppInfo === 'string' && configuredAppInfo.trim().length > 0
+    ? configuredAppInfo
+    : DEFAULT_SHARE_APP
+
+  // 首先尝试从全局 shareData 获取图片
+  let imageCandidate: string | undefined = shareData?.imageUrl || undefined
+
+  // 如果没有，尝试从社区缓存中取一张用户当前可见的图片
+  if (!imageCandidate) {
+    try {
+      const communityImages = uni.getStorageSync && uni.getStorageSync('communityImages')
+      if (Array.isArray(communityImages) && communityImages.length) {
+        imageCandidate = communityImages[0]
+      }
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  // 最终回退为默认图
+  if (!imageCandidate) {
+    imageCandidate = DEFAULT_SHARE_IMAGE || undefined
+  }
+
+  if (hasCustomShareData(shareData)) {
+    clearShareData()
+    const basePath = shareData.path || '/pages/index/index'
+    const shouldAttachPageIndex = basePath.includes('/pages/index/index') && !/pageindex=/i.test(basePath)
+    const finalPath = buildSharePath(basePath, {
+      inviteCode: inviteCode || undefined,
+      pageindex: shouldAttachPageIndex ? currentPageIndex.value : undefined
+    })
+
+    return {
+      title: fixedTitle,
+      path: finalPath,
+      imageUrl: shareData.imageUrl || imageCandidate
+    }
+  }
+
+  return {
+    title: fixedTitle,
+    path: buildSharePath('/pages/index/index', {
+      pageindex: currentPageIndex.value,
+      inviteCode: inviteCode || undefined
+    }),
+    imageUrl: imageCandidate
+  }
+})
+
+onShareTimeline(() => {
+  const inviteCode = (user.value as any)?.my_invite_code || ''
+  const shareData = getShareData()
+  // 使用 pagesGlobalData 中配置的固定分享文案
+  const configuredAppInfo = pagesGlobalData?.globalAppData?.share?.appInfo
+  const fixedTitle = typeof configuredAppInfo === 'string' && configuredAppInfo.trim().length > 0
+    ? configuredAppInfo
+    : DEFAULT_SHARE_APP
+
+  // timeline 也尽量使用动态图片或全局 shareData
+  let imageCandidate2: string | undefined = shareData?.imageUrl || undefined
+  if (!imageCandidate2) {
+    try {
+      const communityImages = uni.getStorageSync && uni.getStorageSync('communityImages')
+      if (Array.isArray(communityImages) && communityImages.length) {
+        imageCandidate2 = communityImages[0]
+      }
+    } catch (e) {}
+  }
+  if (!imageCandidate2) imageCandidate2 = DEFAULT_SHARE_IMAGE || undefined
+
+  if (hasCustomShareData(shareData)) {
+    clearShareData()
+    const basePath = shareData.path || '/pages/index/index'
+    const shouldAttachPageIndex = basePath.includes('/pages/index/index') && !/pageindex=/i.test(basePath)
+    const finalPath = buildSharePath(basePath, {
+      inviteCode: inviteCode || undefined,
+      pageindex: shouldAttachPageIndex ? currentPageIndex.value : undefined
+    })
+
+    return {
+      title: fixedTitle,
+      path: finalPath,
+      imageUrl: shareData.imageUrl || imageCandidate2
+    }
+  }
+
+  return {
+    title: fixedTitle,
+    path: buildSharePath('/pages/index/index', {
+      pageindex: currentPageIndex.value,
+      inviteCode: inviteCode || undefined
+    }),
+    // 微信朋友圈分享接口通常只使用 path/title，image 由微信抓取页面内 meta 或小程序图片，但我们仍传回备用
+    imageUrl: imageCandidate2
   }
 })
 </script>
@@ -388,6 +685,10 @@ watch(() => filteredTabbarData.value, (newData, oldData) => {
   background-color: transparent;
   -webkit-overflow-scrolling: touch;
   /* 移除硬件加速相关属性，减少安卓端重绘 */
+}
+
+.page-cache-item {
+  width: 100%;
 }
 
 .tabbar-container {

@@ -7,6 +7,8 @@
 	import TnLazyLoad from '@tuniao/tnui-vue3-uniapp/components/lazy-load/src/lazy-load.vue'
 	import { graphicCardEmits, graphicCardProps } from './types'
 	import { useGraphicCard, useGraphicCardCustomStyle } from './composables'
+	import { setShareData } from '@/utils/shareManager'
+	import type { ShareData } from '@/utils/shareManager'
 
 	const props = defineProps(graphicCardProps)
 	const emits = defineEmits(graphicCardEmits)
@@ -99,6 +101,53 @@
 		return ''
 	}
 
+	const buildCurrentPagePath = () => {
+		try {
+			const pages = typeof getCurrentPages === 'function' ? getCurrentPages() : []
+			const currentPage = Array.isArray(pages) && pages.length ? pages[pages.length - 1] : null
+			if (!currentPage) {
+				return '/pages/index/index'
+			}
+			const route = (currentPage as any).route ? `/${(currentPage as any).route}` : '/pages/index/index'
+			const options = (currentPage as any).options || {}
+			const queryKeys = Object.keys(options)
+			if (!queryKeys.length) {
+				return route
+			}
+			const query = queryKeys
+				.map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(options[key])}`)
+				.join('&')
+			return `${route}?${query}`
+		} catch (error) {
+			console.warn('构建分享路径时出错:', error)
+			return '/pages/index/index'
+		}
+	}
+
+	const prepareShareDataForCurrentPage = () => {
+		const payload: ShareData = {
+			title: props.title || props.description || '聚类AI',
+			path: buildCurrentPagePath(),
+		}
+		const fallbackImage = Array.isArray(props.images) && props.images.length
+			? props.images[0]
+			: props.avatar
+		if (fallbackImage) {
+			payload.imageUrl = fallbackImage
+		}
+		setShareData(payload)
+		uni.showToast({
+			title: '分享内容已更新',
+			icon: 'none',
+			duration: 1200
+		})
+	}
+
+	const handleShareAction = () => {
+		prepareShareDataForCurrentPage()
+		handleMoreClick()
+	}
+
 	function linkType(url: string | undefined): number {
 		// 如果输入不是字符串，返回 2（未知类型）
 		if (typeof url !== 'string') return 2;
@@ -134,8 +183,8 @@
 			<view :class="[ns.e('brief-info__content')]">
 				<view :class="[ns.e('brief-info__avatar')]" @tap.stop="handleAvatarClick">
 					<!--          <image class="image" :src="avatar" mode="aspectFill" />-->
-					<TnAvatar v-if="avatar" :url="avatar" />
-					<TnAvatar v-else :size="80">{{username?.slice(0,1)}}</TnAvatar>
+					<TnAvatar v-if="avatar" :url="avatar" :size="40" />
+					<TnAvatar v-else :size="40">{{username?.slice(0,1)}}</TnAvatar>
 				</view>
 				<view :class="[ns.e('brief-info__data')]">
 					<view class="title tn-text-ellipsis-1">{{ title }}</view>
@@ -146,8 +195,8 @@
 			</view>
 			<view v-if="showMore" :class="[ns.e('brief-info__operation')]">
 				<slot name="briefOperation">
-					<view :class="[ns.em('brief-info__operation', 'more')]" @tap.stop="handleMoreClick">
-						<TnIcon name="more-vertical" />
+					<view :class="[ns.em('brief-info__operation', 'more')]" @tap.stop="handleShareAction">
+						<TnIcon name="share" />
 					</view>
 				</slot>
 			</view>

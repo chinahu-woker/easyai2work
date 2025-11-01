@@ -20,8 +20,8 @@
     }
   },
   "organizations_store": [
-    "68d23a545ae1fbd83108633a",
-    "68c4d63fd9d81c765dd8c3cd"
+    "None",
+    "None"
   ],
   "tabbarData": [
     {
@@ -29,21 +29,21 @@
       "tabText": "home",
       "iconPath": "https://static.nailoffice.cn/2025-09-21/6841119cb9df852ec0a2c684/upload/20250921152153882-画板1.svg",
       "selectedIconPath": "https://static.nailoffice.cn/2025-09-17/6841119cb9df852ec0a2c684/upload/20250917223323627-画板2(2).png",
-      "organizations": []
+      "organizations": ["None"]
     },
     {
       "text": "应用",
       "tabText": "store",
       "iconPath": "https://static.nailoffice.cn/2025-09-21/6841119cb9df852ec0a2c684/upload/20250921152304246-默认变量(1).svg",
       "selectedIconPath": "https://static.nailoffice.cn/2025-09-21/6841119cb9df852ec0a2c684/upload/20250921152249772-默认变量.svg",
-      "organizations": []
+      "organizations":["None"]
     },
     {
       "text": "我的",
       "tabText": "profile",
       "iconPath": "https://static.nailoffice.cn/2025-09-21/6841119cb9df852ec0a2c684/upload/20250921152428670-画板5.svg",
       "selectedIconPath": "https://static.nailoffice.cn/2025-09-21/6841119cb9df852ec0a2c684/upload/20250921152442877-画板5(1).svg",
-      "organizations": []
+      "organizations":["None"]
     }
   ],
   "backGroundImage": "https://chinahu-ai-server.oss-cn-chengdu.aliyuncs.com/aidraw/image/temps/67873d6c232a3c5d52240dd6/Home2.jpg",
