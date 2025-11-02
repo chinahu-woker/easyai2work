@@ -1,5 +1,5 @@
 <template>
-  <fui-background-image :src="backGroundImage" />
+  <!-- 移除背景图片组件，让背景图透过 -->
   <view class="dynamic-page-renderer" :style="pageLayoutStyle">
     <view 
       v-for="(componentConfig, index) in filteredComponents" 
@@ -119,7 +119,7 @@ const pageLayoutStyle = computed(() => {
   
   return {
     padding: pageConfig.layout.padding,
-    backgroundColor: pageConfig.layout.backgroundColor,
+    backgroundColor: 'transparent', // 设置为透明，让背景图透过
     width: '100%',
     boxSizing: 'border-box' as const
   }

@@ -16,7 +16,8 @@
   "globalAppData": {
     "name": "globalAppData",
     "share": {
-      "appInfo": "这款全民使用的AI程序，简直好用到爆炸"
+      "appInfo": "这款全民使用的AI程序，简直好用到爆炸",
+      "backGroundImage":"https://aikna.cn/api/upload/files/output%2F2025-10-28%2F68fde4230d9708fed01e3d7d%2Fe236b0ec1b07485264ab254599d18d3d5a65a9470ea506a4e0a829f647d2289d-20251027163427701.png"
     }
   },
   "organizations_store": [

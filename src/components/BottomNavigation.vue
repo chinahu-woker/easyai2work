@@ -1,104 +1,86 @@
 <script setup lang="ts">
+import { storeToRefs } from "pinia";
+import { useAppStore } from "@/stores/appStore.ts";
+import { onMounted, ref } from 'vue';
 
-import TnTabbarItem from "@tuniao/tnui-vue3-uniapp/components/tabbar/src/tabbar-item.vue";
-import TnTabbar from "@tuniao/tnui-vue3-uniapp/components/tabbar/src/tabbar.vue";
-import {storeToRefs} from "pinia";
-import {useAppStore} from "@/stores/appStore.ts";
-import { onMounted } from 'vue';
+const TAB_STORAGE_KEY = 'currentTab'
+const PAGE_ROUTES = [
+  '/pages/index/index',
+  '/pages/creative/creative',
+  '/pages/setting/setting'
+]
 
-const {tabbarIndex}=storeToRefs(useAppStore())
-
-onMounted(() => {
-    // 获取当前选中的 Tab 索引
-    const currentTab = uni.getStorageSync('currentTab');
-    if (currentTab !== undefined) {
-		console.log('-++++++++++++++++++++++++++++++++++++++-',currentTab.value)
-        currentTab2.value = currentTab;
-    }
-});	
-
-const currentTab2 = 0  
-
-//处理导航栏点击事件
-const changeHomePage = (index: number) => {
-    tabbarIndex.value = index.index;
-    console.log('index', tabbarIndex.value);
-
-    let url = '';
-    if (tabbarIndex.value === 0) {
-        url = `/pages/index/index?currentTab=${tabbarIndex.value}`;
-    } else if (tabbarIndex.value === 1) {
-        url = `/pages/creative/creative?currentTab=${tabbarIndex.value}`;
-    } else if (tabbarIndex.value === 2) {
-        url = `/pages/setting/setting?currentTab=${tabbarIndex.value}`;
-    }
-	console.log(url)
-    uni.redirectTo({
-        url
-    });
-};
-
-const handleTabbarClick = (index: number) => {
-  console.log('index',index)
-  tabbarIndex.value=index
-  if(tabbarIndex.value===0){
-	uni.navigateTo({
-		url:'/pages/index/index'
-	})
-  //   uni.redirectTo ({
-  //     url:'/pages/index/index'
-  //   })
-  }
-  else if(tabbarIndex.value===1){
-	  uni.navigateTo({
-	  	url:'/pages/creative/creative'
-	  })
-    // uni.redirectTo ({
-    //   url:'/pages/creative/creative'
-    // })
-  }else if(tabbarIndex.value===2){
-	  uni.navigateTo({
-	  	url:'/pages/setting/setting'
-	  })
-    // uni.redirectTo ({
-    //   url:'/pages/setting/setting'
-    // })
-  }
-}
-
-// 导航栏数据
+const { tabbarIndex } = storeToRefs(useAppStore())
+const currentTab = ref(0)
 const tabbarData = [
   {
     name: '首页',
     icon: 'home',
-    activeIcon: 'write-fill',
-    to: '/pages/index/index',
-    onClick: handleTabbarClick
+    activeIcon: 'write-fill'
   },
   {
     name: '创意',
     icon: 'edit-pen',
-    activeIcon: 'shop-fill',
-    to:'/pages/creative/creative',
-    onClick:handleTabbarClick
+    activeIcon: 'shop-fill'
   },
   {
     name: '我的',
     icon: 'account',
-    activeIcon: 'my-circle-fill',
-    onClick:handleTabbarClick,
+    activeIcon: 'my-circle-fill'
   }
 ]
 
-
-
-const handleChange = (index: number) => {
-  console.log(index);
+const resolveIndex = (payload: number | { index?: number }) => {
+  if (typeof payload === 'number') {
+    return payload
+  }
+  if (payload && typeof payload.index === 'number') {
+    return payload.index
+  }
+  return Number.NaN
 }
-const handleClick = (index: number) => {
-  console.log('click');
+
+const navigateByIndex = (index: number) => {
+  const target = PAGE_ROUTES[index]
+  if (!target) {
+    return
+  }
+  const url = `${target}?currentTab=${index}`
+  if (index === 0) {
+    uni.reLaunch({ url })
+  } else {
+    uni.redirectTo({ url })
+  }
 }
 
+const updateState = (index: number) => {
+  if (index < 0 || index >= PAGE_ROUTES.length) {
+    return
+  }
+  currentTab.value = index
+  tabbarIndex.value = index
+  uni.setStorageSync(TAB_STORAGE_KEY, index)
+}
+
+const changeHomePage = (payload: number | { index?: number }) => {
+  const nextIndex = resolveIndex(payload)
+  if (!Number.isInteger(nextIndex) || nextIndex < 0 || nextIndex >= PAGE_ROUTES.length) {
+    return
+  }
+  if (nextIndex === currentTab.value) {
+    return
+  }
+  updateState(nextIndex)
+  navigateByIndex(nextIndex)
+}
+
+onMounted(() => {
+  const storedValue = uni.getStorageSync(TAB_STORAGE_KEY)
+  const parsed = typeof storedValue === 'number' ? storedValue : parseInt(storedValue, 10)
+  if (!Number.isNaN(parsed) && parsed >= 0 && parsed < PAGE_ROUTES.length) {
+    updateState(parsed)
+  }
+})
 </script>
 
 <template>
@@ -119,7 +101,7 @@ const handleClick = (index: number) => {
 							<view class="fui-search__box ">
 								<fui-tabs class="tabs_class" direction='column' color='#ACB0D0' :isSlider='false'
 									selectedColor='#17135F' :tabs="tabbarData" scale='1.5' @change="changeHomePage"
-									:center="false" :short="true" :scroll='false' itemPadding="25" :height='400' :current="currentTab2"
+                :center="false" :short="true" :scroll='false' itemPadding="25" :height='400' :current="currentTab"
 									size='28' fontWeight='900' background></fui-tabs>
 
 							</view>

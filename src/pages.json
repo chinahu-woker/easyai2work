@@ -15,11 +15,14 @@
       "path": "pages/index/index",
       "style": {
         "navigationBarTitleText": " ",
+        "navigationStyle": "custom",
         "enablePullDownRefresh": false,
-        "bounce": "none",
         "disableScroll": true,
         "maxWidth": "100%"
-      }
+      },
+      "onReachBottomDistance": 50,
+      "enableShareAppMessage": true,
+      "enableShareTimeline": true
     },
     { "path": "pages/creative/creative", "style": { "navigationBarTitleText": " " } },
     { "path": "pages/home/home", "style": { "navigationBarTitleText": " " } },
@@ -48,9 +51,10 @@
     { "path": "pages/draw/image-editor", "style": { "navigationBarTitleText": "图片编辑" } }
   ],
   "globalStyle": {
-    "navigationBarTextStyle": "black",
+    "navigationBarTextStyle": "white",
     "navigationBarTitleText": " ",
-    "navigationStyle": "custom"
+    "navigationStyle": "custom",
+    "navigationBarBackgroundColor": "#ffffff"  
   },
   "condition": {
     "current": 0,

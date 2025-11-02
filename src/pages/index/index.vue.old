@@ -1,1363 +1,756 @@
 <template>
-  <!-- 自定义滚动容器，替代系统页面滚动，避免 iOS 橡皮筋与原生滚动条 -->
-  <scroll-view class="page-scroll" scroll-y :show-scrollbar="false" enable-back-to-top>
-	<fui-background-image :src="backGroundImage" />
-	<view v-show="currentPageType === 'home'" class="page-section home-section">
-
-		<Newhead />
-
-		<NewIcon style="margin-bottom: 5%;margin-top: 0%;" />
-
-		<AppSwiper style="margin-top: 5%;" />
-
-		<up-gap height="10"></up-gap>
-		<!--  搜索-->
-		<!-- <Search /> -->
-
-		<up-gap height="10"></up-gap>
-		<!-- <AppTags /> -->
-
-		<!-- <AppWaterFall /> -->
-		<NewCommunity />
-		<view style="height: 80rpx;"> </view>
-
-
-	</view>
-	<view v-show="currentPageType === 'store'" class="page-section store-section">
-		<!-- <AppSwiper   /> -->
-		<NewSwiper />
-		<NewStore style="margin-top: 50rpx;" />
-		<NewClassWaterFall />
-		<!-- <NewPayWork /> -->
-		<!-- <NewWaterFall /> -->
-	</view>
-
-	<view v-show="currentPageType === 'profile'" class="page-section profile-section">
-		<NewLoginInfo />
-	</view>
-		<view style="height:140rpx" />
-	</scroll-view>
-	<fui-tabbar class="fui-wrap" :tabBar="tabbarData" :current="pageindex" selectedColor="#7041ed" @click="changeHomePage" />
+  <!-- 背景图片容器 -->
+  <view class="background-container" :style="containerStyle as any"></view>
+  
+  <!-- 内容容器 -->
+  <view class="new-index-container">
+    <!-- 动态页面渲染器 -->
+    <scroll-view 
+      scroll-y 
+      class="content-scroll-view"
+      :enable-back-to-top="true"
+      :scroll-with-animation="false"
+      :enable-passive="true"
+      @scroll="onContentScroll"
+    >
+      <view
+        v-for="pageType in cachedPageTypes"
+        :key="pageType"
+        v-show="currentPageType === pageType"
+        class="page-cache-item"
+      >
+        <dynamic-page-renderer :page-type="pageType" />
+      </view>
+    </scroll-view>
+    
+    <!-- 底部导航栏 -->
+    <view class="tabbar-container">
+      <view 
+        v-for="(item, index) in safeFilteredTabbarData" 
+        :key="index"
+        class="tabbar-item"
+        :class="{ active: currentPageIndex === index }"
+        @click="handleTabClick(index)"
+      >
+        <image 
+          :src="currentPageIndex === index ? item.selectedIconPath : item.iconPath" 
+          class="tabbar-icon"
+          mode="aspectFit"
+        />
+        <text class="tabbar-text">{{ item.text }}</text>
+      </view>
+    </view>
+  </view>
 </template>
 
 <script setup lang="ts">
-import NewLoginInfo from "@/components/home/NewLoginInfo.vue";
-import MyNavbar from "@/components/common/MyNavbar.vue";
-
-// 在非微信环境（如 H5）中避免直接引用 wx 导致的编译/运行时错误
-declare const wx: any;
-
-import GetUserInfoPopup from "@/components/GetUserInfoPopup.vue";
-import {
-	creatOrder,
-	getLoginInfo,
-	getOrderInfoById,
-	getPrePay,
-	getProductList,
-	isLogin,
-	loginByUsername,
-	loginByWechatCode,
-	loginOut,
-	refreshUserInfo,
-	saveLoginInfo
-} from "@/composables/useCommon.ts";
-import BaseLayout from '@/layouts/BaseLayout.vue'
-import Newhead from "@/components/home/Newhead.vue";
-import NewIcon from "@/components/home/NewIcon.vue";
-import NewWaterFall from "@/components/home/NewWaterFall.vue";
-import NewSwiper from "@/components/home/NewSwiper.vue";
-import NewStore from "@/components/home/NewStore.vue";
-import NewPayWork from "@/components/home/NewPayWork.vue";
-import NewClassWaterFall from "@/components/home/NewClassWaterFall.vue";
-import NewCommunity from "@/components/home/NewCommunity.vue";
-import { onShareAppMessage, onShareTimeline } from '@dcloudio/uni-app'
-import { globalAppData, organizations, tabbarData as globalTabbarData, backGroundImage as globalBackGroundImage } from '@/cofigs/data/globalAppData.ts'
+import { ref, computed, watch, getCurrentInstance, nextTick, provide, onBeforeUnmount } from 'vue'
+import { onLoad, onShow, onShareAppMessage, onShareTimeline } from '@dcloudio/uni-app'
+import { useAppStore } from '@/stores/appStore'
+import { storeToRefs } from 'pinia'
+import DynamicPageRenderer from '@/components/DynamicPageRenderer.vue'
+import { globalTabbarData, pageComponents, dynamicComponentRules } from '@/cofigs/data/globalAppData'
+import pagesGlobalData from '@/cofigs/data/pagesGlobalData.json'
 import { getShareData, clearShareData } from '@/utils/shareManager'
+import type { ShareData } from '@/utils/shareManager'
 
-import TnIcon from '@tuniao/tnui-vue3-uniapp/components/icon/src/icon.vue'
-import { onLoad, onReady, onShow } from "@dcloudio/uni-app";
+// 定义类型
+interface TabbarItem {
+  text: string
+  tabText: string
+  iconPath: string
+  selectedIconPath: string
+  organizations?: string[]
+}
 
-// import useWorkFlow from "@/composables/useWorkFlow.ts";
-import useWorkFlow from "@/composables/useWorkFlow";
+type ScrollDirection = 'up' | 'down'
 
-import UserMemberInfo from "@/components/home/UserMemberInfo.vue";
-import { ref, onMounted, onUnmounted, computed, watch, nextTick, onActivated } from 'vue'
-import { request } from "@/utils/request.ts";
-import type { IDrawHistoryItem } from "@/types";
-import { formatDateTime } from "@/utils/common.ts";
-import AppSwiper from "@/components/home/AppSwiper.vue";
-import Search from "@/components/home/Search.vue";
-import AppTags from "@/components/home/AppTags.vue";
-import AppWaterFall from "@/components/home/AppWaterFall.vue";
-import Home from "@/pages/home/home.vue";
-import Creative from "@/pages/creative/creative.vue";
-import TaskExcuting from "@/components/common/TaskExcuting.vue";
-import BottomNavigation from "@/components/BottomNavigation.vue";
-import History from "@/pages/history/history.vue";
-import { storeToRefs } from "pinia";
-import { useAppStore } from "@/stores/appStore.ts";
-import { EventType } from "@/types/event.types.ts";
-import { on } from "@/utils/emitter.ts";
-import fuiBackgroundImage from "@/components/firstui/fui-background-image/fui-background-image.vue";
-import { getModelList, getUserKey, getUserToken, getUserInfo, ChatAPiUrl } from "@/composables/aiChat.ts";
+interface ScrollTickPayload {
+  scrollTop: number
+  scrollHeight: number
+  direction: ScrollDirection
+  deltaY: number
+  timestamp: number
+}
 
-// import { TextEncoder, TextDecoder } from 'text-decoding'
-// global.TextEncoder = TextEncoder
-// global.TextDecoder = TextDecoder
-// 在模块顶层创建唯一的 appStore 实例，供文件内各处使用
+interface VideoPerformanceBus {
+  subscribeScrollTick: (handler: (payload: ScrollTickPayload) => void) => () => void
+  emitPauseAll: (options?: Record<string, unknown>) => void
+  emitPlayRequest: (options?: Record<string, unknown>) => void
+  maxConcurrent: number
+}
+
+const VIDEO_PERFORMANCE_KEY = 'videoPerformance'
+const MAX_CACHED_PAGES = 3
+const DEFAULT_SHARE_APP = pagesGlobalData?.HeadProps?.appName || 'JuleiAI'
+const DEFAULT_SHARE_TITLE = pagesGlobalData?.HeadProps?.title || DEFAULT_SHARE_APP
+const DEFAULT_SHARE_IMAGE = pagesGlobalData?.HeadProps?.image || ''
+
+function ensureLeadingSlash(path: string) {
+  if (!path) {
+    return '/pages/index/index'
+  }
+  return path.startsWith('/') ? path : `/${path}`
+}
+
+function addOrUpdateQuery(path: string, key: string, value?: string | number) {
+  if (value === undefined || value === null || value === '') {
+    return path
+  }
+  const valueStr = encodeURIComponent(String(value))
+  const pattern = new RegExp(`([?&])${key}=[^&]*`)
+  if (pattern.test(path)) {
+    return path.replace(pattern, `$1${key}=${valueStr}`)
+  }
+  return `${path}${path.includes('?') ? '&' : '?'}${key}=${valueStr}`
+}
+
+function buildSharePath(basePath: string, params: Record<string, string | number | undefined>) {
+  let resolvedPath = ensureLeadingSlash(basePath || '/pages/index/index')
+  Object.entries(params).forEach(([paramKey, paramValue]) => {
+    resolvedPath = addOrUpdateQuery(resolvedPath, paramKey, paramValue)
+  })
+  return resolvedPath
+}
+
+function hasCustomShareData(data: ShareData | undefined | null): data is ShareData {
+  if (!data) {
+    return false
+  }
+  return Object.keys(data).some((key) => {
+    const value = data[key as keyof ShareData]
+    return value !== undefined && value !== null && value !== ''
+  })
+}
+
+type FrameCallback = (time: number) => void
+
+function useFrameThrottle<T>(handler: (payload: T) => void) {
+  const requestFrame = typeof requestAnimationFrame === 'function'
+    ? requestAnimationFrame
+    : ((cb: FrameCallback) => setTimeout(() => cb(Date.now()), 16) as unknown as number)
+  let frameId: number | null = null
+  let latestPayload: T
+  return (payload: T) => {
+    latestPayload = payload
+    if (frameId !== null) {
+      return
+    }
+    frameId = requestFrame(() => {
+      frameId = null
+      handler(latestPayload)
+    })
+  }
+}
+
+// 状态管理
 const appStore = useAppStore()
-
-onLoad((options: any = {}) => {
-	// 初始化应用状态，确保用户信息正确加载
-	appStore.init() // 从 storage 加载用户信息
-
-	// 处理页面索引参数，确保权限检查
-	if (options && options.pageindex) {
-		const targetIndex = parseInt(options.pageindex)
-		// 延迟设置页面索引，等待 tabbarData 计算完成
-		nextTick(() => {
-			// 把原始（未过滤）索引映射到过滤后的索引
-			const mapped = getFilteredIndex(targetIndex)
-			if (mapped >= 0 && mapped < tabbarData.value.length) {
-				pageindex.value = mapped
-			} else {/* Lines 246-248 omitted */}
-		})
-	} else {
-		// 默认显示首页
-		pageindex.value = 0
-	}
-
-	console.log('页面加载时的用户信息:', appStore.user)
-});
-
-// 页面显示时的轻量级更新，避免重复的重载操作
-onShow(() => {
-	// 只在必要时更新权限相关状态
-	Kongzhitai()
-	
-	// 检查是否有需要刷新的数据（比如从其他页面返回时）
-	// 但不重新初始化所有数据，保持页面状态
-	console.log('页面显示，当前页面索引:', pageindex.value)
-})
-// 分享
-onShareAppMessage((res: any) => {
-	const inviteCode = useAppStore().user.my_invite_code
-
-	// 检查是否有特定的分享数据
-	const shareData = getShareData()
-	if (shareData) {
-		// 清除已使用的分享数据
-		clearShareData()
-
-		return {
-			title: shareData.title,
-			path: `${shareData.path}&inviteCode=${inviteCode}`,
-			imageUrl: shareData.imageUrl || ''
-		}
-	}
-
-	// 如果是从社区页面分享，使用自定义分享内容
-	if (pageindex.value === 2 && res.from === 'button') {
-		return {
-			title: '发现一个很棒的AI工具！快来看看吧~',
-			path: `/pages/index/index?pageindex=2&inviteCode=${inviteCode}`,
-			imageUrl: '' // 这里可以设置分享图片
-		}
-	}
-
-	// 默认分享内容
-	return {
-		title: globalAppData.share.appInfo,
-		path: `/pages/index/index?inviteCode=${inviteCode}`,
-	}
+const { user } = storeToRefs(appStore)
+// 本地计算登录状态（store 中未直接提供 isLogin）
+const isLogin = computed(() => {
+  try {
+    return user && user.value && Object.keys(user.value).length > 0
+  } catch (e) {
+    return false
+  }
 })
 
-// 朋友圈
-onShareTimeline(() => {
-	const inviteCode = useAppStore().user.my_invite_code
+// 当前页面索引
+const currentPageIndex = ref(0)
 
-	// 检查是否有特定的分享数据
-	const shareData = getShareData()
-	if (shareData) {
-		// 清除已使用的分享数据
-		clearShareData()
+const cachedPageTypes = ref<string[]>([])
 
-		return {
-			title: shareData.title,
-			path: `${shareData.path}&inviteCode=${inviteCode}`
-		}
-	}
-
-	// 如果是社区页面，使用特定的朋友圈分享内容
-	if (pageindex.value === 2) {
-		return {
-			title: '我分享了一个作品，真的太棒了！',
-			path: `/pages/index/index?pageindex=2&inviteCode=${inviteCode}`,
-		}
-	}
-
-	return {
-		title: globalAppData.share.appInfo,
-		path: `/pages/index/index?inviteCode=${inviteCode}`,
-	}
-})
-function ToConsole() {
-	uni.navigateTo({
-		url: '/pages/console/console'
-	})
-
+const registerCachedPage = (pageType?: string) => {
+  if (!pageType) {
+    return
+  }
+  const pages = cachedPageTypes.value
+  const existingIndex = pages.indexOf(pageType)
+  if (existingIndex !== -1) {
+    pages.splice(existingIndex, 1)
+    pages.push(pageType)
+    return
+  }
+  if (pages.length >= MAX_CACHED_PAGES) {
+    pages.shift()
+  }
+  pages.push(pageType)
 }
 
-
-const role = ref(false)
-const roltList = ['manager', 'admin']
-function Kongzhitai() {
-	if (!isLogin.value) {
-		role.value = false
-		return 0
-	}
-	else {
-		const UserInfor: any = uni.getStorageSync('userInfo') || {};
-		// 兼容性检查：确保 role 存在且为数组或可索引的字符串
-		let hasRole = false;
-		if (UserInfor && UserInfor.role) {
-			if (Array.isArray(UserInfor.role) && UserInfor.role.length > 0) {
-				hasRole = roltList.includes(UserInfor.role[0]);
-			} else if (typeof UserInfor.role === 'string' && UserInfor.role.length > 0) {
-				// 某些实现可能将 role 存为字符串
-				hasRole = roltList.includes(UserInfor.role);
-			}
-		}
-		console.log("361---userInfo---------------", UserInfor, 'hasRole=', hasRole)
-		role.value = !!hasRole;
-	}
-
-
-}
-Kongzhitai()
-
-// 当页面被激活或显示时的处理已移至上面的 onShow 中
-// onShow(() => {
-// 	Kongzhitai()
-// })
-
-// 当组件被 keep-alive 激活（例如从其他页面返回）时也触发
-onActivated(() => {
-	Kongzhitai()
+// 安全访问过滤后的导航栏数据
+const safeFilteredTabbarData = computed(() => {
+  try {
+    return Array.isArray(filteredTabbarData?.value) ? filteredTabbarData.value : []
+  } catch (error) {
+    console.warn('Error accessing filteredTabbarData:', error)
+    return []
+  }
 })
 
-// 监听登录状态或用户信息变化（来自 store）以重新计算 role
-// 使用页面顶部创建的 appStore 实例，避免重复声明
-watch(() => appStore?.user, () => {
-	Kongzhitai()
-}, { deep: true })
-
-// 监听权限变化，自动调整当前页面索引
-watch(() => tabbarData?.value, (newTabbarData, oldTabbarData) => {
-	// 如果 tabbar 配置改变了（通常是权限变化导致），需要检查当前页面索引是否仍然有效
-	if (newTabbarData && oldTabbarData && newTabbarData.length !== oldTabbarData.length) {
-		// 如果当前页面索引超出了新的 tabbar 范围，重置到首页
-		if (pageindex.value >= newTabbarData.length) {
-			console.log('页面索引超出范围，重置到首页')
-			pageindex.value = 0
-		}
-	}
-}, { deep: true })
-
-// 监听登录状态变化，确保页面正确显示
-watch(() => isLogin?.value, (newLoginStatus) => {
-	console.log('登录状态变化:', newLoginStatus)
-	try {
-		// 如果用户登出，可能导致 tabbar 过滤变化（例如门店项被移除），需要修正当前 pageindex
-		if (newLoginStatus === false) {
-			const currentTab = tabbarData.value && tabbarData.value[pageindex.value] ? tabbarData.value[pageindex.value] : null
-			// 如果当前 tab 已不存在或当前用户无权访问，重置到首页
-			if (!currentTab || !checkPagePermission(currentTab)) {
-				console.log('当前页面对未登录用户不可见，重置到首页')
-				pageindex.value = 0
-				// 二次校验：如果首页也不可见（极端情况），把最后一项设置为登录页索引（如果存在）
-				const homeTab = tabbarData.value && tabbarData.value[0] ? tabbarData.value[0] : null
-				if (!homeTab || !checkPagePermission(homeTab)) {
-					const length = tabbarData.value ? tabbarData.value.length : 0
-					const lastIndex = Math.max(0, length - 1)
-					pageindex.value = lastIndex
-				}
-			}
-		}
-	} catch (e) {
-		console.error('处理登录状态变化出错:', e)
-	}
-})
-
-// ---------------------------AIChat  Page------------------------------
-
-let items = ref('')
-
-
-
-function copyText(text: any) {
-
-	uni.setClipboardData({
-		data: text,
-		success: () => {
-			console.log('复制成功');
-			// 可以在这里给用户提示
-			uni.showToast({
-				title: '复制成功',
-				icon: 'none'
-			});
-		},
-		fail: (err) => {
-			console.error('复制失败', err);
-			// 处理错误情况
-			uni.showToast({
-				title: '复制失败，请稍后再试',
-				icon: 'none'
-			});
-		}
-	});
-}
-// --------------------------------------------------------------------------------------
-
-let isNavigating = false
-function goToEntire(id: any) {
-	if (isNavigating) return
-	isNavigating = true
-
-	uni.navigateTo({
-		url: `/pages/drawLike/alike?id=${id}`,
-		complete: () => {
-			isNavigating = false
-		}
-	})
-}
-// --------------------------------------------------------------------------------------
-async function chatAiGetToken() {
-	const requestTask = ref()
-	const userInfo = ref()
-	// 获取 用户信息
-
-	await getUserToken().then((res: any) => {
-		// console.log('获取到的getUserToken信息:', res.data);
-		requestTask.value = res.data
-	}).catch((err: any) => {
-		console.error('获取getUserToken失败:', err);
-	});
-	console.log('getUserToken执行完毕');
-	// console.log('获取到的requestTask信息:', requestTask.value);
-	await getUserInfo(requestTask.value).then((res: any) => {
-		// console.log('获取到的getUserInfo信息:', res.data);
-		userInfo.value = res.data
-	}).catch((err: any) => {
-		console.error('获取getUserInfo失败:', err);
-	});
-	console.log('getUserInfo执行完毕');
-	await getModelList(requestTask.value.token).then((res: any) => {
-		// console.log('获取到的getUserInfo信息:', res.data);
-		modelList.value = res.data
-		chooseModel.value = res.data[0]
-	}).catch((err: any) => {
-		console.error('获取getModelList失败:', err);
-	});
-	console.log('getModelList执行完毕');
-	await getUserKey(userInfo.value, requestTask.value.refresh_token).then((res: any) => {
-		console.log('获取到的getUserKey信息:', res.data);
-		userkey.value = res.data.key
-	}).catch((err: any) => {
-		console.error('获取getUserKey失败:', err);
-	});
-	console.log('getUserKey执行完毕');
+const getActiveTabLabel = () => {
+  const tabs = safeFilteredTabbarData.value
+  if (!Array.isArray(tabs) || tabs.length === 0) {
+    return DEFAULT_SHARE_TITLE
+  }
+  const safeIndex = Math.min(Math.max(0, currentPageIndex.value), tabs.length - 1)
+  return tabs[safeIndex]?.text || DEFAULT_SHARE_TITLE
 }
 
-
-function chooseImage() {
-	uni.showToast({
-		icon: "error",
-		title: '您没有输入',
-		duration: 2000
-	});
+// 处理标签点击事件，增加一层防御性包装
+const handleTabClick = (index: number) => {
+  try {
+    // 确保索引在安全的导航栏数据范围内
+    const safeData = safeFilteredTabbarData.value
+    if (index >= 0 && index < safeData.length) {
+      switchPage(index)
+    } else {
+      console.warn('Tab index out of bounds:', index)
+    }
+  } catch (error) {
+    console.error('Error in handleTabClick:', error)
+  }
 }
-
-// 初始化 modelList 为一个空数组
-const popup = ref(false)
-const modelList = ref([]);
-const chooseModel = ref('')
-
-function change(e: any) {
-	// 选择模型
-	popup.value = false
-	chooseModel.value = e.value
-}
-function cancel() { popup.value = false }
-function popupMth() {
-	if (!isLogin.value) {
-		uni.showToast({
-			icon: "error",
-			title: '您还没有登录',
-			duration: 2000
-		});
-		return 0
-	}
-
-
-	popup.value = true
-}
-// 定义 fetchData 函数
-
-
-const content = ref('')
-const msgList = ref([{
-	"content": "你好我是Ai聊天助手，有什么问题问我吧！(温馨提示：点击消息可以复制哦)",
-	"role": "system"
-},
-
-])
-
-// ------------------------------------------------------------------------------------------------
-
-
-
-
-// 将下面的改成将你的oneapi的代理域名，注意因为这个域名是单独的，所以记得在小程序业务域名中添加
-//'https://{你的oneapi的域名}/v1/chat/completions', // 请求地址
-
-
-
-
-
-// ------------------------------------------------------------------------------------------------
-
-const userkey = ref('')
-const StreamRequest = (content: any) => {
-
-	return new Promise((resolve, reject) => {
-		const requestTask = uni.request({
-
-			url: ChatAPiUrl(), // 请求地址
-			method: "POST",
-
-			data: {
-				"messages": content,
-				"model": chooseModel.value,
-				"stream": true,
-				"features": {
-					"thinking_enabled": false
-				}
-			},
-			dataType: "json",
-			header: {
-				'Authorization': 'Bearer sk-' + userkey.value
-			},
-			responseType: 'text',
-			enableChunked: true, // 开启流传输
-			success: (res) => {
-				resolve(res);
-				// console.log('请求成功', res);
-				// uni.parseStreamData(res.data)
-			}, // 请求成功回调
-			fail: (err) => {
-				reject(err);
-				uni.showToast({
-					icon: "error",
-					title: '请求失败',
-					duration: 2000
-				});
-				console.log('请求失败', err);
-			} // 请求失败回调
-		});
-
-		// 监听进度更新事件（兼容不同平台）
-		if (requestTask && typeof (requestTask as any).onChunkReceived === 'function') {
-			(requestTask as any).onChunkReceived((chunk: any) => {
-				try {
-					let arrayBuffer: any = chunk.data;
-					// 微信小程序环境：使用 wx 提供的转换方法
-					if (typeof wx !== 'undefined' && wx.arrayBufferToBase64 && wx.base64ToArrayBuffer) {
-						const base64 = wx.arrayBufferToBase64(chunk.data);
-						arrayBuffer = wx.base64ToArrayBuffer(base64);
-					} else {
-						// 浏览器/H5 环境：chunk.data 通常就是 ArrayBuffer 或带 buffer 的视图
-						if (chunk.data && chunk.data.buffer) {
-							arrayBuffer = chunk.data.buffer;
-						}
-					}
-
-					// TextDecoder 在部分环境可用
-					const decoder: any = (typeof TextDecoder !== 'undefined') ? new TextDecoder() : { decode: (b: any) => String.fromCharCode(...Array.from(new Uint8Array(b))) };
-					const text = (typeof TextDecoder !== 'undefined') ? decoder.decode(arrayBuffer, { stream: true }) : decoder.decode(arrayBuffer);
-					// 交给统一的处理函数
-					handleStreamData(text);
-				} catch (error) {
-					console.error('处理数据块失败', error);
-				}
-			});
-		} else {
-			// 某些平台可能不支持流式回调，记录警告并回退到 success 的处理方式
-			console.warn('当前平台不支持 onChunkReceived，流式响应可能不可用。');
-		}
-		if (requestTask && typeof (requestTask as any).onHeadersReceived === 'function') {
-			(requestTask as any).onHeadersReceived(() => {
-				console.log('请求完成');
-			});
-		}
-	});
-}
-const msg = ref('')
-function handleStreamData(responseText: any) {
-	const messages = ('' + responseText).split('\n').filter((line: any) => line.startsWith('data:'));
-	for (const message of messages) {
-		// console.log('-----message---------',message)
-		if (message.trim() === 'data: [DONE]') {
-			msgStatu.value = true
-			return;
-		}
-		try {
-			const data = JSON.parse(message.substring(5).trim()); // 去掉 'data:' 前缀并解析 JSON
-			if (data.choices && data.choices[0] && data.choices[0].delta && data.choices[0].delta.content) {
-				msg.value += data.choices[0].delta.content;
-			}
-		} catch (error) {
-			console.log('解析错误:', error);
-		}
-	}
-	const index = msgList.value.length - 1
-	msgList.value[index].content = msg.value
-	items.value = "items-" + (msgList.value.length - 1)
-	msgStatu.value = false
-
-}
-const msgStatu = ref(true)
-function msgSend() {
-	if (!isLogin.value) {
-		uni.showToast({
-			icon: "error",
-			title: '您还没有登录',
-			duration: 2000
-		});
-		return 0
-	}
-
-	// console.log(chooseModel.value)
-	if (chooseModel.value == undefined) {
-		uni.showToast({
-			icon: "error",
-			title: '您没有选择模型',
-			duration: 2000
-		});
-		return 0
-	}
-	if (msgStatu.value != true) {
-		uni.showToast({
-			icon: "error",
-			title: '请等待消息结束',
-			duration: 2000
-		});
-		return 0
-	}
-
-	msgList.value.push(
-		{
-			"content": content.value,
-			"role": "user"
-		}
-	)
-	content.value = ''
-	StreamRequest(msgList.value)
-	msgList.value.push({
-		"content": '',
-		"role": "system"
-	})
-	msg.value = ''
-	console.log(msgList.value)
-}
-
-
-
-// -----------------------------------------
-onReady(() => {
-
-	socketInit()
-	on(EventType.PAY_SUCCESS, ({ order_id }) => handlePayMessage(order_id))
-	// 移除 wode_loging() 调用，使用新的权限控制逻辑
-	// chatAiGetToken()
-
-
-
-
-
-})
-onMounted(() => {
-	// 社区数据已移至 NewCommunity 组件中处理
-})
-
-onUnmounted(() => {
-	// 清理当前组件资源
-})
-const fuiNavBar_class = ref('fuiNavBar')
-
-function changeStyle(e: any) {
-	// console.log("changeStyle-----------------", e)
-	if (e.isFixed == false) {
-		fuiNavBar_class.value = "fuiNavBar"
-	}
-	else {
-		fuiNavBar_class.value = "fuiNavBar_isTrue"
-	}
-
-}
-// ------------------------------------------------------
-// 使用模块级 appStore，避免重复创建 store 实例
-const { tabbarIndex } = storeToRefs(appStore)
-const pageindex = ref(0)
 
 // 检查用户是否有访问指定页面的权限
-const checkPagePermission = (pageConfig: any) => {
-	try {
-		// 如果页面没有配置 organizations 或为空数组，表示所有人都可以访问
-		if (!pageConfig.organizations || !Array.isArray(pageConfig.organizations) || pageConfig.organizations.length === 0) {
-			return true
-		}
+const checkPagePermission = (pageConfig: TabbarItem) => {
+  try {
+    // 如果页面没有配置 organizations 或为空数组，表示所有人都可以访问
+    if (!pageConfig.organizations || !Array.isArray(pageConfig.organizations) || pageConfig.organizations.length === 0) {
+      return true
+    }
 
-		const requiredOrgs = pageConfig.organizations
+    const requiredOrgs = pageConfig.organizations
 
-		// 如果 organizations 包含 "None"，表示未登录用户也可以访问
-		if (requiredOrgs.includes("None")) {
-			return true
-		}
+    // 如果 organizations 包含 "None"，表示未登录用户也可以访问
+    if (requiredOrgs.includes("None")) {
+      return true
+    }
 
-		// 如果用户未登录，且没有 "None" 权限，无法访问有权限要求的页面
-		if (!isLogin.value || !user.value || !Array.isArray(user.value?.organizations)) {
-			return false
-		}
+    // 如果用户未登录，且没有 "None" 权限，无法访问有权限要求的页面
+    // 添加更多的防御性检查
+    if (!isLogin || !isLogin.value) {
+      return false
+    }
+    
+    if (!user || !user.value) {
+      return false
+    }
+    
+    if (!Array.isArray(user.value.organizations)) {
+      return false
+    }
 
-		const userOrgs = user.value.organizations
+    const userOrgs = user.value.organizations
 
-		// 检查用户的组织ID列表是否与页面要求的组织ID有交集
-		return userOrgs.some((userOrgId: string) => requiredOrgs.includes(userOrgId))
-	} catch (e) {
-		console.error('检查页面权限时出错:', e)
-		return false
-	}
+    // 检查用户的组织ID列表是否与页面要求的组织ID有交集
+    return userOrgs.some((userOrgId: string) => requiredOrgs.includes(userOrgId))
+  } catch (e) {
+    console.error('检查页面权限时出错:', e)
+    return false
+  }
 }
 
-// 为兼容现有逻辑，保留 isOrgAllowed 计算属性（专门用于检查门店权限）
-const isOrgAllowed = computed(() => {
-	const storeTab = globalTabbarData.find((it: any) => {
-		const text = (typeof it.text === 'string') ? it.text : (it.text && it.text.value) || ''
-		return text === '门店'
-	})
-	return storeTab ? checkPagePermission(storeTab) : false
+// 过滤后的导航栏数据（根据权限）
+const filteredTabbarData = computed(() => {
+  // 添加防止无限循环的条件判断
+  if (!globalTabbarData) {
+    console.warn('globalTabbarData is not defined, returning empty array')
+    return []
+  }
+  const tabbarData = Array.isArray(globalTabbarData) ? globalTabbarData : []
+  
+  // 深拷贝避免直接修改全局配置对象
+  const arr = tabbarData.map((item: TabbarItem) => ({ ...item }))
+
+  // 过滤掉用户没有权限访问的页面
+  const filtered = arr.filter((item: TabbarItem) => {
+    return checkPagePermission(item)
+  })
+
+  // 未登录时，确保有登录入口：将最后一项改为登录页
+  if (isLogin && !isLogin.value && filtered.length > 0) {
+    const lastIndex = filtered.length - 1
+    filtered[lastIndex] = {
+      ...filtered[lastIndex],
+      text: '登录',
+      tabText: 'login'
+    }
+  } else if (isLogin && isLogin.value && filtered.length > 0) {
+    // 已登录时，最后一项显示为"我的"
+    const lastIndex = filtered.length - 1
+    filtered[lastIndex] = {
+      ...filtered[lastIndex],
+      text: '我的',
+      tabText: 'profile'
+    }
+  }
+
+  return filtered
 })
 
-const changeHomePage = (payload: any) => {
-	// payload 可能是数字或带 index 字段的对象，兼容两者
-	const idx = typeof payload === 'number' ? payload : (payload && payload.index !== undefined ? payload.index : payload)
-	const target = Number(idx) || 0
-
-	// 获取当前过滤后的 tabbar 配置
-	const currentTabbarData = tabbarData.value
-
-	// 检查目标索引是否有效
-	if (!currentTabbarData || target >= currentTabbarData.length) {
-		console.warn('目标页面索引超出范围:', target)
-		return
-	}
-
-	// 获取目标页面配置
-	const targetPageConfig = currentTabbarData[target]
-	if (!targetPageConfig) {
-		console.warn('目标页面配置不存在:', target)
-		return
-	}
-
-	// 处理未登录状态下点击登录页
-	const targetText = (typeof targetPageConfig.text === 'string') ? targetPageConfig.text : (typeof targetPageConfig.text === 'object' && targetPageConfig.text !== null ? String(targetPageConfig.text) : '') || ''
-	if (!isLogin.value && targetText === '登录') {
-		handleLogin()
-		return
-	}
-
-	// 设置页面索引
-	pageindex.value = target
-	
-	console.log('切换到页面:', {
-		index: pageindex.value, 
-		text: targetText,
-		contentType: getPageContentType(target)
-	});
-};
-
-
-const name_value = ref('我的')
-// 移除旧的 wode_loging 函数，使用新的权限控制逻辑
-// 使用全局配置的 tabbarData，基于权限动态过滤（无权限则隐藏“门店”项），并把最后一项的 text 替换为响应式 name_value
-const tabbarData = computed(() => {
-	// 深拷贝避免直接修改全局配置对象
-	const arr = globalTabbarData.map((item: any) => ({ ...item }))
-
-	// 如果没有组织访问权限，过滤掉文本为“门店”的项
-	const filtered = arr.filter((item: any) => {
-		return checkPagePermission(item)
-	})
-
-	// 未登录时，确保有登录入口：将最后一项改为登录页
-	if (!isLogin.value && filtered.length > 0) {
-		const lastIndex = filtered.length - 1
-		filtered[lastIndex] = {
-			...filtered[lastIndex],
-			text: '登录',
-			onClick: tabbarIndex
-		}
-	} else if (isLogin.value && filtered.length > 0) {
-		// 已登录时，最后一项显示为"我的"
-		const lastIndex = filtered.length - 1
-		filtered[lastIndex] = {
-			...filtered[lastIndex],
-			text: '我的',
-			onClick: tabbarIndex
-		}
-	}
-
-	console.log('过滤后的 tabbar 配置:', filtered, '登录状态:', isLogin.value)
-
-	return filtered
+// 获取所有页面类型
+const pageTypes = computed(() => {
+  try {
+    // 确保 filteredTabbarData 存在
+    if (!filteredTabbarData) {
+      console.warn('filteredTabbarData is not defined')
+      return ['home']
+    }
+    
+    // 确保 filteredTabbarData.value 是数组
+    const tabbarData = Array.isArray(filteredTabbarData.value) ? filteredTabbarData.value : []
+    
+    // 提取所有页面的tabText
+    return tabbarData.map(tab => tab.tabText || 'home')
+  } catch (error) {
+    console.error('Error in pageTypes:', error)
+    return ['home']
+  }
 })
 
-// 创建页面内容的动态映射逻辑
-// 优先使用配置字段 `tabText`（稳定键），如果不存在再回退到 `text`（中文展示名）
-const getPageContentType = (currentIndex: number) => {
-	const currentTabbar = tabbarData.value
-	if (!currentTabbar || currentIndex >= currentTabbar.length) return 'home'
+// 容器样式，使用 pagesGlobalData 中的背景图片
+const containerStyle = computed(() => {
+  const backgroundImage = pagesGlobalData?.backGroundImage || 'https://chinahu-ai-server.oss-cn-chengdu.aliyuncs.com/aidraw/image/temps/67873d6c232a3c5d52240dd6/Home2.jpg'
+  return {
+    backgroundImage: `url(${backgroundImage})`,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center top',
+    backgroundRepeat: 'no-repeat',
+    width: '100%',
+    height: '100vh',
+    position: 'fixed',
+    top: '0',
+    left: '0',
+    zIndex: '-1'
+  }
+})
 
-	const currentTab = currentTabbar[currentIndex]
-	if (!currentTab) return 'home'
-
-	// 优先读取稳定的键名 tabText（例如 'home'|'store'|'profile'），否则回退到中文 text
-	const tabKey = (typeof currentTab.tabText === 'string' && currentTab.tabText.trim() !== '')
-		? currentTab.tabText.trim()
-		: ((typeof currentTab.text === 'string') ? currentTab.text.trim() : (currentTab.text && typeof currentTab.text !== 'object' ? String(currentTab.text) : ''))
-
-	// 根据 tabKey 决定页面内容类型（支持两种风格的配置）
-	// 支持：tabText: 'home'|'store'|'profile' 或 text: '主页'|'门店'|'我的'|'登录'
-	if (tabKey === 'home' || tabKey === '主页') return 'home'
-	if (tabKey === 'store' || tabKey === '门店') return 'store'
-	if (tabKey === 'profile' || tabKey === '我的' || tabKey === '登录') return 'profile'
-
-	// 默认返回主页
-	return 'home'
-}
-
-// 计算当前页面内容类型
+// 获取当前页面类型
 const currentPageType = computed(() => {
-	const contentType = getPageContentType(pageindex.value)
-	console.log('当前页面类型:', {
-		pageindex: pageindex.value,
-		contentType,
-		tabbarData: tabbarData.value,
-		isLogin: isLogin.value
-	})
-	return contentType
-})
-const getFilteredIndex = (originalIndex: number) => {
-	// originalIndex 是基于 globalTabbarData 的索引（未过滤前）
-	const originalConfig = globalTabbarData[originalIndex]
-	if (!originalConfig) return -1
-
-	const filteredConfigs = tabbarData.value
-
-	// 规范化函数，返回优先 tabText，否则 text 的小写形式
-	const normalize = (cfg: any) => {
-		if (!cfg) return ''
-		if (typeof cfg.tabText === 'string' && cfg.tabText.trim() !== '') return cfg.tabText.trim().toLowerCase()
-		if (typeof cfg.text === 'string' && cfg.text.trim() !== '') return cfg.text.trim().toLowerCase()
-		return ''
-	}
-
-	const originalKey = normalize(originalConfig)
-	if (!filteredConfigs) return -1
-	
-	for (let i = 0; i < filteredConfigs.length; i++) {
-		const filteredKey = normalize(filteredConfigs[i])
-
-		// 直接匹配稳定键或中文展示名
-		if (originalKey && filteredKey && originalKey === filteredKey) return i
-
-		// 容错：原始为 '我的'，过滤后可能是 '登录'（未登录场景），也视为匹配
-		if (originalKey === '我的' && filteredKey === '登录') return i
-		if (originalKey === '我的' && filteredKey === '我的') return i
-
-		// 也支持原始使用 'profile' 等键的情况
-		if (originalKey === 'profile' && (filteredKey === '我的' || filteredKey === '登录' || filteredKey === 'profile')) return i
-	}
-
-	// 未找到匹配项，返回 -1
-	return -1
-}
-
-const backGroundImage = computed(() => {
-	return globalBackGroundImage || 'https://chinahu-ai-server.oss-cn-chengdu.aliyuncs.com/aidraw/image/temps/67873d6c232a3c5d52240dd6/Home2.jpg'
+  try {
+    // 确保 pageTypes 存在且是数组
+    const types = Array.isArray(pageTypes.value) ? pageTypes.value : ['home']
+    
+    // 确保 currentPageIndex 存在
+    if (!currentPageIndex) {
+      console.warn('currentPageIndex is not defined')
+      return 'home'
+    }
+    
+    // 确保 currentPageIndex.value 在有效范围内
+    const index = Math.min(Math.max(0, currentPageIndex.value), types.length - 1)
+    
+    return types[index] || 'home'
+  } catch (error) {
+    console.error('Error in currentPageType:', error)
+    return 'home'
+  }
 })
 
+let lastScrollTop = 0
 
-// ---------------------------------------------------------
+const emitScrollTick = useFrameThrottle<ScrollTickPayload>((payload) => {
+  uni.$emit('global:scroll-tick', payload)
+})
 
-
-
-// -------------------------------------------------------
-
-// 扫码登录功能
-
-function scanQrLogin() {
-	if (!isLogin.value){
-		// 提示并跳转到登录页，改善用户体验
-		uni.showToast({ title: '请先登录', icon: 'none' })
-		uni.navigateTo({ url: '/pages/login/login' })
-		return
-	}
-	// 直接调用扫码功能
-	if (typeof uni.scanCode !== 'function') {
-		uni.showToast({ title: '当前环境不支持扫码', icon: 'none' })
-		return
-	}
-	
-	uni.scanCode({
-		success: async (res) => {
-			const raw = res.result || ''
-			let token = ''
-			
-			// 解析扫码结果
-			if (/^https?:\/\//i.test(raw)) {
-				try {
-					const url = new URL(raw)
-					token = url.searchParams.get('token') || url.searchParams.get('qr_token') || ''
-					if (!token) {
-						const hash = url.hash.replace(/^#/, '')
-						if (hash.startsWith('token=')) token = hash.split('=')[1]
-					}
-				} catch (e) {
-					// URL解析失败，当作纯token处理
-				}
-			}
-			
-			if (!token) token = raw.trim()
-			if (!token) {
-				uni.showToast({ title: '未识别到有效的登录码', icon: 'none' })
-				return
-			}
-			
-			// 跳转到扫码登录页面并传递token
-			uni.navigateTo({
-				url: `/pages/login/Qr_login?qr_token=${encodeURIComponent(token)}`
-			})
-		},
-		fail: () => {
-			uni.showToast({ title: '扫码失败', icon: 'none' })
-		}
-	})
+const onContentScroll = (event: any) => {
+  const { detail } = event
+  const scrollTop = detail?.scrollTop ?? 0
+  const scrollHeight = detail?.scrollHeight ?? 0
+  const rawDeltaY = typeof detail?.deltaY === 'number' ? detail.deltaY : scrollTop - lastScrollTop
+  const direction: ScrollDirection = rawDeltaY >= 0 ? 'down' : 'up'
+  lastScrollTop = scrollTop
+  emitScrollTick({
+    scrollTop,
+    scrollHeight,
+    direction,
+    deltaY: rawDeltaY,
+    timestamp: Date.now()
+  })
 }
 
-function toEmpty() {
-	// 需要登录后才能访问扫码登录页面（管理端扫码）
-	if (!isLogin.value) {
-		uni.showToast({ title: '请先登录', icon: 'none' })
-		uni.navigateTo({ url: '/pages/login/login' })
-		return
-	}
-
-	// 跳转到扫码登录页面（二维码登录）
-	uni.navigateTo({ url: '/pages/login/Qr_login' })
-}
-// 使用已存在的 appStore 以避免重复声明
-const { user } = storeToRefs(appStore)
-const show = ref(true)
-const pic = ref('')
-function handleGotoHistory() {
-	uni.navigateTo({
-		url: '/pages/history/history_fui/history_fui'
-	})
-}
-const handleLogin = async () => {
-	// 如果已经登录，不跳转到登录页面，让用户查看个人信息
-	if (isLogin.value) {
-		return
-	}
-
-	// 未登录时跳转到登录页面
-	uni.navigateTo({
-		url: "/pages/login/login"
-	})
-	// 	if (isLogin.value) {
-	// 		return
-	// 	}
-	// 	uni.showLoading({
-	// 		title: '正在登录...',
-	// 		mask: true
-	// 	})
-	// 	//获取平台信息
-	// 	const { uniPlatform } = uni.getSystemInfoSync()
-
-	// 	if (uniPlatform !== 'web') {
-	// 		// 非开发者工具环境，执行登录操作
-	// 		handleLoginByWechat()
-
-	// 	} else {
-	// 		// console.log('dev')
-	// 		// 开发者工具环境，模拟登录 todo
-	// 		const user = await loginByUsername({
-	// 			username: 'test456',
-	// 			password: '123456'
-	// 		})
-	// 		saveLoginInfo(user)
-	// 		uni.hideLoading()
-	// 	}
-	// 	// chatAiGetToken()
-	// 	name_value.value = '我的'
-	// 	Kongzhitai()
-	// 	 uni.reLaunch({ url: '/pages/index/index' });
-	// 	 uni.showLoading({
-	// 	 title: '加载中'
-	// 	 });
-
-
-}
-/** 通过微信登录 */
-const handleLoginByWechat = () => {
-	uni.login({
-		success: async function ({ code }) {
-			try {
-				// 添加邀请码处理
-				const inviteCode = uni.getStorageSync('inviteCode') || 'none'
-				const result = await loginByWechatCode(code, inviteCode)
-
-				// 处理缺失的用户信息字段，设置默认值
-				const userInfo = {
-					...result,
-					// 如果没有头像，设置默认头像
-					avatar_url: result.avatar_url || 'https://ai-1357282892.cos.ap-shanghai.myqcloud.com/6811db59c58c28287e07e45c/upload/20250521115936505-3434-06.png',
-					// 如果没有昵称，使用用户名或设置默认昵称
-					nickname: result.nickname || result.username || '微信用户'
-				}
-
-				saveLoginInfo(userInfo)
-				uni.hideLoading()
-				console.log("------------result--------", userInfo)
-				uni.setStorageSync('refreshToken', userInfo.refresh_token)
-
-				uni.showToast({
-					title: '登录成功',
-					icon: 'success'
-				})
-			} catch (error) {
-				uni.hideLoading()
-				console.error('微信登录失败:', error)
-				uni.showToast({
-					title: '登录失败，请重试',
-					icon: 'none'
-				})
-			}
-		},
-		fail: function (err) {
-			uni.hideLoading()
-			uni.showToast({
-				title: '登录错误',
-				icon: 'none'
-			})
-		}
-	})
-}
-const { socketInit } = useWorkFlow()
-
-const handlePayMessage = async (order_id: string) => {
-	// 监听到支付成功事件
-	console.log('收到支付成功消息', order_id)
-	//查询订单支付状态进行复核
-	const order = await getOrderInfoById(order_id)
-	if (order[0] && order[0].order_status === 1) {
-		uni.showToast({
-			title: '支付成功',
-			icon: 'none'
-		})
-		refreshUserInfo()
-	}
-}
-const handleLoginOut = () => {
-	uni.showLoading({
-		title: '正在退出登录...',
-		mask: true
-	})
-
-	loginOut()
-
-	uni.hideLoading()
-	role.value = false
-	uni.showToast({
-		title: '退出成功',
-		icon: 'none'
-	})
-	name_value.value = '登录'
+const subscribeScrollTick = (handler: (payload: ScrollTickPayload) => void) => {
+  const listener = (payload: ScrollTickPayload) => handler(payload)
+  uni.$on('global:scroll-tick', listener)
+  return () => {
+    uni.$off('global:scroll-tick', listener)
+  }
 }
 
+const broadcastPageActivated = (pageType: string) => {
+  uni.$emit('global:page:activated', { pageType })
+}
 
-/** 支付 **/
-const { showPay } = storeToRefs(useAppStore())
+const broadcastPageDeactivated = (pageType: string, reason: string) => {
+  uni.$emit('global:page:deactivated', { pageType, reason })
+}
+
+const videoPerformanceBus: VideoPerformanceBus = {
+  subscribeScrollTick,
+  emitPauseAll: (options) => uni.$emit('global:video-pause', options ?? {}),
+  emitPlayRequest: (options) => uni.$emit('global:video-play', options ?? {}),
+  maxConcurrent: 3
+}
+
+provide(VIDEO_PERFORMANCE_KEY, videoPerformanceBus)
+provide('activePageType', currentPageType)
+
+// 切换页面
+const switchPage = (index: number) => {
+  try {
+    // 确保 filteredTabbarData 存在
+    if (!filteredTabbarData) {
+      console.warn('filteredTabbarData is not defined')
+      return
+    }
+    
+    // 确保 filteredTabbarData.value 是数组
+    const tabbarData = Array.isArray(filteredTabbarData.value) ? filteredTabbarData.value : []
+    
+    // 确保 index 在有效范围内
+    if (index < 0 || index >= tabbarData.length) {
+      console.warn('无效的页面索引:', index)
+      return
+    }
+    
+    // 如果点击的是登录页且用户未登录
+    if (isLogin && !isLogin.value && index === tabbarData.length - 1) {
+      uni.navigateTo({
+        url: "/pages/login/login"
+      })
+      return
+    }
+    
+    // 确保 currentPageIndex 存在
+    if (currentPageIndex) {
+      // 使用 nextTick 确保DOM更新完成后再切换页面
+      nextTick(() => {
+        currentPageIndex.value = index
+      })
+    }
+    
+    // 确保 currentPageType 存在
+    const targetPageType = tabbarData[index]?.tabText || 'unknown'
+    videoPerformanceBus.emitPauseAll({ keepPageType: targetPageType })
+
+    console.log('切换到页面:', {
+      index,
+      type: targetPageType,
+      text: tabbarData[index]?.text
+    })
+  } catch (error) {
+    console.error('切换页面时发生错误:', error)
+  }
+}
+
+watch(currentPageType, (newType, oldType) => {
+  if (newType) {
+    registerCachedPage(newType)
+    broadcastPageActivated(newType)
+  }
+  if (oldType && oldType !== newType) {
+    broadcastPageDeactivated(oldType, 'hidden')
+  }
+}, { immediate: true })
+
+// 页面加载时的处理
+onLoad((options: any = {}) => {
+  if (typeof uni.showShareMenu === 'function') {
+    try {
+      uni.showShareMenu({
+        withShareTicket: true,
+        menus: ['shareAppMessage', 'shareTimeline']
+      })
+    } catch (error) {
+      console.warn('showShareMenu 调用失败:', error)
+    }
+  }
+  
+  // 处理页面索引参数
+  if (options && options.pageindex) {
+    const targetIndex = parseInt(options.pageindex)
+    // 延迟设置页面索引，等待 filteredTabbarData 计算完成
+    setTimeout(() => {
+      // 添加防御性检查
+      if (filteredTabbarData && filteredTabbarData.value && Array.isArray(filteredTabbarData.value)) {
+        if (targetIndex >= 0 && targetIndex < filteredTabbarData.value.length) {
+          currentPageIndex.value = targetIndex
+        }
+      }
+    }, 100)
+  }
+  
+  // 设置页面类型，供子组件获取
+  const instance = getCurrentInstance()
+  if (instance && instance.proxy) {
+    ;(instance.proxy as any).type = 'home'
+  }
+})
+
+// 监听页面索引变化，更新页面类型
+watch(() => currentPageIndex.value, (newIndex) => {
+  const instance = getCurrentInstance()
+  if (instance && instance.proxy) {
+    // 根据当前索引设置页面类型
+    const pageType = pageTypes.value[newIndex] || 'home'
+    ;(instance.proxy as any).type = pageType
+    console.log(`页面类型已更新为: ${pageType}`)
+  }
+})
+
+// 页面显示时的处理
+onShow(() => {
+  console.log('页面显示，当前页面索引:', currentPageIndex.value)
+})
+
+onBeforeUnmount(() => {
+  if (currentPageType.value) {
+    broadcastPageDeactivated(currentPageType.value, 'unmount')
+  }
+})
+
+// 监听登录状态变化
+watch(() => isLogin.value, (newLoginStatus) => {
+  console.log('登录状态变化:', newLoginStatus)
+  // 确保 filteredTabbarData.value 是数组
+  const tabbarData = Array.isArray(filteredTabbarData.value) ? filteredTabbarData.value : []
+  
+  // 如果当前页面索引超出了新的导航栏范围，重置到首页
+  if (currentPageIndex.value >= tabbarData.length) {
+    currentPageIndex.value = 0
+  }
+})
+
+// 监听导航栏数据变化
+// 移除 deep: true 配置以防止响应式依赖循环
+watch(() => filteredTabbarData.value, (newData, oldData) => {
+  // 确保 newData 是数组
+  const tabbarData = Array.isArray(newData) ? newData : []
+  const validTypes = new Set(tabbarData.map(item => item?.tabText || ''))
+  cachedPageTypes.value = cachedPageTypes.value.filter(page => validTypes.has(page))
+  registerCachedPage(currentPageType.value)
+  
+  // 如果导航栏配置改变了（通常是权限变化导致），需要检查当前页面索引是否仍然有效
+  if (oldData && Array.isArray(oldData) && tabbarData.length !== oldData.length) {
+    // 如果当前页面索引超出了新的导航栏范围，重置到首页
+    if (currentPageIndex.value >= tabbarData.length) {
+      console.log('页面索引超出范围，重置到首页')
+      currentPageIndex.value = 0
+    }
+  }
+})
+
+onShareAppMessage(() => {
+  const inviteCode = (user.value as any)?.my_invite_code || ''
+  const shareData = getShareData()
+  // 使用 pagesGlobalData 中配置的固定分享文案
+  const configuredAppInfo = pagesGlobalData?.globalAppData?.share?.appInfo
+  const fixedTitle = typeof configuredAppInfo === 'string' && configuredAppInfo.trim().length > 0
+    ? configuredAppInfo
+    : DEFAULT_SHARE_APP
+
+  // 首先尝试从全局 shareData 获取图片
+  let imageCandidate: string | undefined = shareData?.imageUrl || undefined
+
+  // 如果没有，尝试从社区缓存中取一张用户当前可见的图片
+  if (!imageCandidate) {
+    try {
+      const communityImages = uni.getStorageSync && uni.getStorageSync('communityImages')
+      if (Array.isArray(communityImages) && communityImages.length) {
+        imageCandidate = communityImages[0]
+      }
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  // 最终回退为默认图
+  if (!imageCandidate) {
+    imageCandidate = DEFAULT_SHARE_IMAGE || undefined
+  }
+
+  if (hasCustomShareData(shareData)) {
+    clearShareData()
+    const basePath = shareData.path || '/pages/index/index'
+    const shouldAttachPageIndex = basePath.includes('/pages/index/index') && !/pageindex=/i.test(basePath)
+    const finalPath = buildSharePath(basePath, {
+      inviteCode: inviteCode || undefined,
+      pageindex: shouldAttachPageIndex ? currentPageIndex.value : undefined
+    })
+
+    return {
+      title: fixedTitle,
+      path: finalPath,
+      imageUrl: shareData.imageUrl || imageCandidate
+    }
+  }
+
+  return {
+    title: fixedTitle,
+    path: buildSharePath('/pages/index/index', {
+      pageindex: currentPageIndex.value,
+      inviteCode: inviteCode || undefined
+    }),
+    imageUrl: imageCandidate
+  }
+})
+
+onShareTimeline(() => {
+  const inviteCode = (user.value as any)?.my_invite_code || ''
+  const shareData = getShareData()
+  // 使用 pagesGlobalData 中配置的固定分享文案
+  const configuredAppInfo = pagesGlobalData?.globalAppData?.share?.appInfo
+  const fixedTitle = typeof configuredAppInfo === 'string' && configuredAppInfo.trim().length > 0
+    ? configuredAppInfo
+    : DEFAULT_SHARE_APP
+
+  // timeline 也尽量使用动态图片或全局 shareData
+  let imageCandidate2: string | undefined = shareData?.imageUrl || undefined
+  if (!imageCandidate2) {
+    try {
+      const communityImages = uni.getStorageSync && uni.getStorageSync('communityImages')
+      if (Array.isArray(communityImages) && communityImages.length) {
+        imageCandidate2 = communityImages[0]
+      }
+    } catch (e) {}
+  }
+  if (!imageCandidate2) imageCandidate2 = DEFAULT_SHARE_IMAGE || undefined
+
+  if (hasCustomShareData(shareData)) {
+    clearShareData()
+    const basePath = shareData.path || '/pages/index/index'
+    const shouldAttachPageIndex = basePath.includes('/pages/index/index') && !/pageindex=/i.test(basePath)
+    const finalPath = buildSharePath(basePath, {
+      inviteCode: inviteCode || undefined,
+      pageindex: shouldAttachPageIndex ? currentPageIndex.value : undefined
+    })
+
+    return {
+      title: fixedTitle,
+      path: finalPath,
+      imageUrl: shareData.imageUrl || imageCandidate2
+    }
+  }
+
+  return {
+    title: fixedTitle,
+    path: buildSharePath('/pages/index/index', {
+      pageindex: currentPageIndex.value,
+      inviteCode: inviteCode || undefined
+    }),
+    // 微信朋友圈分享接口通常只使用 path/title，image 由微信抓取页面内 meta 或小程序图片，但我们仍传回备用
+    imageUrl: imageCandidate2
+  }
+})
 </script>
-<style scoped lang="scss">
-body, page, .uni-page-body {
-	overflow: hidden !important;
+
+<style scoped>
+.background-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  z-index: -1;
+  /* 移除可能导致重绘的属性 */
 }
 
-.page-scroll {
-	position: relative;
-	width: 100%;
-	height: 100vh;
-	overflow-y: scroll;
-	-webkit-overflow-scrolling: touch;
-	overscroll-behavior: contain; // 阻止向外层继续滚动（防止 iOS 回弹露出白边）
-	scrollbar-width: none; // Firefox
-}
-.page-scroll::-webkit-scrollbar { display: none; }
-
-.page-section { width:100%; box-sizing:border-box; }
-.home-section { margin-top:15%; }
-.store-section { margin-top:150rpx; }
-.scroll-Y {
-	margin-top: -11%;
-	height: 1200rpx;
+.new-index-container {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding-top: 100rpx;
+  overflow: hidden;
+  /* 安卓优化：使用纯色背景替代毛玻璃效果 */
+  background-color: rgba(255, 255, 255, 0.85);
+  /* iOS保留毛玻璃效果 */
 }
 
-.fui-custom__wrap {
-	width: 100%;
-	height: 520rpx;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	background-color: #EDEDED;
+/* iOS设备使用毛玻璃 */
+@supports (backdrop-filter: blur(8px)) or (-webkit-backdrop-filter: blur(8px)) {
+  .new-index-container {
+    background-color: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
 }
 
-.AITool {
-	margin-right: 24rpx;
-	height: 72rpx;
-	/* #ifndef APP-NVUE */
-	display: flex;
-	flex-shrink: 0;
-	/* #endif */
-	align-items: center;
-	justify-content: center;
-	/* #ifdef H5 */
-	cursor: pointer;
-	/* #endif */
-
-
+.content-scroll-view {
+  flex: 1;
+  width: 100%;
+  height: calc(100vh - 100rpx);
+  overflow-y: auto;
+  box-sizing: border-box;
+  background-color: transparent;
+  -webkit-overflow-scrolling: touch;
+  /* 移除硬件加速相关属性，减少安卓端重绘 */
 }
 
-.image-data {
-	width: calc(100% - 20rpx);
-	margin: 10rpx;
-
-	.image {
-		width: 100%;
-		height: auto;
-	}
+.page-cache-item {
+  width: 100%;
 }
 
-// ---------------------------------
-page {
-	background-color: #ededed;
+.tabbar-container {
+  width: 100%;
+  height: 100rpx;
+  /* 安卓优化：使用纯色背景 */
+  background-color: rgba(255, 255, 255, 0.95);
+  border-top: 1rpx solid rgba(240, 240, 240, 0.5);
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  z-index: 999;
+  box-shadow: 0 -2rpx 8rpx rgba(0, 0, 0, 0.05);
 }
 
-.camera {
-	width: 54px;
-	height: 44px;
-
-	&:active {
-		background-color: #ededed;
-	}
+/* iOS设备使用毛玻璃 */
+@supports (backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px)) {
+  .tabbar-container {
+    background-color: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
 }
 
-.user-box {
-	background-color: #fff;
+.tabbar-item {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 10rpx 0;
+  /* 优化点击响应 */
+  transition: opacity 0.2s ease;
 }
 
-.u-cell-group {
-	background-color: #fff;
+.tabbar-item:active {
+  opacity: 0.7;
 }
 
-.fui-search__box {
-
-	background: transparent;
-	width: 450rpx;
-	height: 48px;
-	margin-left: -0%;
-	margin-top: -5%;
-	box-sizing: border-box;
-
-	border-radius: 0px;
-	display: flex;
-	align-items: center;
-	justify-content: left;
-
+.tabbar-item.active {
+  color: #7041ed;
 }
 
-.fuiNavBar_isTrue {
-	width: 100%;
-	padding: 24rpx;
-	box-sizing: border-box;
-	display: flex;
-
-	background: #F8F8F8;
-	color: #465CFF;
-	font-weight: bold;
-
+.tabbar-icon {
+  width: 48rpx;
+  height: 48rpx;
+  margin-bottom: 4rpx;
+  /* 优化图片渲染 */
+  image-rendering: -webkit-optimize-contrast;
 }
 
-.fuiNavBar {
-
-
-
-	// text-align: center;
-	margin-top: 5%;
-	margin-bottom: 2%;
+.tabbar-text {
+  font-size: 24rpx;
+  color: #666666;
 }
 
-.trans_back {
-	background-color: transparent;
-	border: transparent;
-
-}
-
-.tabs_class {
-	width: 537rpx;
-	display: flex;
-	display: border-box;
-}
-
-.fui-wrap {
-	background-color: transparent;
-	padding-bottom: env(safe-area-inset-bottom, 0);
-	box-sizing: border-box;
-	position: fixed;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	z-index: 999;
-}
-
-.main-content {
-	width: 100%;
-	min-height: 100vh;
-	box-sizing: border-box;
-	padding-bottom: 120rpx;
-	/* 预留底部tabbar高度，防止内容被遮挡 */
-}
-
-.fui-chat__box {
-	margin-top: 2%;
-	width: 100%;
-	padding: 48rpx 24rpx 0;
-	box-sizing: border-box;
-	white-space: pre-wrap;
-	word-break: break-word;
-}
-
-.fui-chat__item {
-	width: 100%;
-	display: flex;
-	padding-right: 96rpx;
-	margin-bottom: 148rpx;
-	box-sizing: border-box;
-	overflow: hidden;
-	white-space: pre-wrap;
-	word-break: break-word;
-}
-
-.fui-chat__content {
-	margin-left: 24rpx;
-	background-color: #fff;
-	padding: 20rpx 24rpx;
-	box-sizing: border-box;
-	border-radius: 0 32rpx 32rpx 32rpx;
-	font-size: 32rpx;
-	text-align: justify;
-	display: flex;
-	align-items: center;
-	white-space: pre-wrap;
-	word-break: break-word;
-	/* overflow: hidden; */
-	position: relative;
-}
-
-.fui-chat__left .fui-chat__content::after {
-	content: '';
-	position: absolute;
-	left: -43rpx;
-	top: 0;
-	width: 44rpx;
-	height: 44rpx;
-	background-color: #fff;
-	clip-path: polygon(45% 0, 100% 0, 100% 45%);
-}
-
-.fui-chat__left .fui-chat__content::before {
-	content: '';
-	position: absolute;
-	left: -42rpx;
-	top: 3rpx;
-	width: 42rpx;
-	height: 42rpx;
-	background-color: #EDEDED;
-	z-index: 2;
-	border-radius: 50%;
-}
-
-.fui-chat__content text {
-	max-width: 100%;
-	white-space: pre-wrap;
-	word-break: break-word;
-}
-
-.fui-chat__right {
-	padding-left: 96rpx;
-	padding-right: 0;
-	flex-direction: row-reverse;
-}
-
-
-.fui-chat__right .fui-chat__content {
-	margin-left: 0;
-	margin-right: 24rpx;
-	border-radius: 32rpx 0 32rpx 32rpx;
-	background-color: #465CFF;
-	color: #fff;
-
-}
-
-.fui-chat__right .fui-chat__content::after {
-	content: '';
-	position: absolute;
-	right: -43rpx;
-	top: 0;
-	width: 44rpx;
-	height: 44rpx;
-	background-color: #465CFF;
-	clip-path: polygon(0 0, 45% 0, 0 45%);
-}
-
-.fui-chat__right .fui-chat__content::before {
-	content: '';
-	position: absolute;
-	right: -42rpx;
-	top: 3rpx;
-	width: 42rpx;
-	height: 42rpx;
-	background-color: #EDEDED;
-	z-index: 2;
-	border-radius: 50%;
-}
-
-.fui-chatbar__wrap {
-	/* #ifndef APP-NVUE */
-	width: 100%;
-	display: flex;
-	/* #endif */
-	padding: 6px 24rpx;
-	flex-direction: row;
-	align-items: flex-end;
-	justify-content: space-between;
-	background: #f8f8f8;
-	box-sizing: border-box;
-}
-
-.fui-chatbar__input-box {
-	/* #ifndef APP-NVUE */
-	width: 100%;
-	display: flex;
-	/* #endif */
-	flex-direction: row;
-	flex: 1;
-	position: relative;
-	border-radius: 40rpx;
-	box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 8rpx;
-}
-
-.fui-chatbar__input {
-	/* #ifndef APP-NVUE || MP-ALIPAY || MP-QQ */
-	width: 100%;
-	min-height: 32rpx;
-	box-sizing: content-box;
-	padding: 20rpx 40rpx;
-	/* #endif */
-	/* #ifdef MP-ALIPAY || MP-QQ */
-	line-height: 1;
-	min-height: 72rpx;
-	/* #endif */
-	flex: 1;
-	/* #ifdef APP-NVUE */
-	height: 72rpx;
-	padding: 16rpx 20rpx;
-	/* #endif */
-	border-radius: 40rpx;
-	font-size: 32rpx;
-	background: #fff;
-}
-
-.fui-chatbar__icon-box {
-	height: 72rpx;
-	/* #ifndef APP-NVUE */
-	display: flex;
-	flex-shrink: 0;
-	/* #endif */
-	align-items: center;
-	justify-content: center;
-	/* #ifdef H5 */
-	cursor: pointer;
-	/* #endif */
-
-}
-
-.fui-chatbar__icon-box_left {
-	height: 72rpx;
-	/* #ifndef APP-NVUE */
-	display: flex;
-	flex-shrink: 0;
-	/* #endif */
-	align-items: center;
-	justify-content: center;
-	/* #ifdef H5 */
-	cursor: pointer;
-	/* #endif */
-
-}
-
-.fui-chatbar__icon-box image {
-	width: 68rpx;
-	height: 68rpx;
-	flex-shrink: 0;
-}
-
-.fui-chatbar__icon-box:active {
-	opacity: .5;
-}
-
-.fui-chatbar__send-box {
-	padding-left: 24rpx;
-}
-
-
-
-.fui-chatbar__fixed {
-	/* margin-top: 20%; */
-	margin-bottom: 0%;
-	position: fixed;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	z-index: 10;
-}
-
-.fui-wrap {
-	/* #ifndef APP-NVUE */
-	padding-bottom: constant(safe-area-inset-bottom);
-	padding-bottom: env(safe-area-inset-bottom);
-	/* #endif */
+.tabbar-item.active .tabbar-text {
+  color: #7041ed;
 }
 </style>

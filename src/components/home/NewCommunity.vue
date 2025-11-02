@@ -519,7 +519,7 @@ function shareToTimeline(imageUrl: string, itemData?: any) {
 
     // #ifdef MP-WEIXIN
     // 在微信小程序中，通过右上角分享菜单分享到朋友圈
-    const shareTitle = itemData ? `${itemData.title} | NAILOFFICE-AI` : 'NAILOFFICE-AI | 精美美甲设计分享'
+    const shareTitle = itemData ? `${itemData.title} | Julei` : 'Julei | 精美美甲设计分享'
 
     uni.showModal({
         title: '分享提示',

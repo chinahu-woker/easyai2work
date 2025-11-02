@@ -1,5 +1,5 @@
 // 分享状态管理
-import { ref } from 'vue'
+import { ref, toRaw } from 'vue'
 
 // 分享数据接口
 export interface ShareData {
@@ -11,10 +11,18 @@ export interface ShareData {
 
 // 当前分享数据
 const currentShareData = ref<ShareData>({})
-
+console.log('初始化全局分享数据:', currentShareData.value)
 // 设置分享数据
 export function setShareData(data: ShareData) {
-  currentShareData.value = { ...data }
+  try {
+    // 如果 data 是响应式 Proxy，使用 toRaw 将其转为普通对象
+    const raw = typeof toRaw === 'function' ? toRaw(data as any) : data
+    // 深拷贝一份以防止引用问题
+    currentShareData.value = JSON.parse(JSON.stringify(raw || {}))
+  } catch (e) {
+    // 回退：直接浅拷贝
+    currentShareData.value = { ...(data as any) }
+  }
   console.log('设置全局分享数据:', currentShareData.value)
 }
 
@@ -31,7 +39,7 @@ export function clearShareData() {
 // 生成详情页分享数据
 export function generateDetailShareData(itemId: string, title: string, imageUrl?: string): ShareData {
   return {
-    title: `${title} - 精美美甲设计 | NAILOFFICE-AI`,
+    title: `${title} - 这款全民使用的AI程序，简直好用到爆炸`,
     path: `/pages/drawLike/alike?id=${itemId}`,
     imageUrl: imageUrl || '',
     itemId
@@ -41,7 +49,7 @@ export function generateDetailShareData(itemId: string, title: string, imageUrl?
 // 生成社区页分享数据
 export function generateCommunityShareData(): ShareData {
   return {
-    title: '发现精美美甲设计，快来看看吧~ | NAILOFFICE-AI',
+    title: '这款全民使用的AI程序，简直好用到爆炸',
     path: '/pages/index/index?pageindex=2',
     imageUrl: ''
   }

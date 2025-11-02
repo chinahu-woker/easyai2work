@@ -4,21 +4,19 @@
   
   <!-- 内容容器 -->
   <view class="new-index-container">
+    <!-- 分享按钮 -->
+   
+    
     <!-- 动态页面渲染器 -->
-    <scroll-view 
-      scroll-y 
+    <scroll-view
+      scroll-y
       class="content-scroll-view"
       :enable-back-to-top="true"
       :scroll-with-animation="false"
       :enable-passive="true"
-      @scroll="onContentScroll"
     >
-      <view
-        v-for="pageType in cachedPageTypes"
-        :key="pageType"
-        v-show="currentPageType === pageType"
-        class="page-cache-item"
-      >
+      <!-- 使用v-show替代组件的重新创建，保持组件状态 -->
+      <view  v-for="(pageType, index) in pageTypes" :key="pageType" v-show="currentPageIndex === index">
         <dynamic-page-renderer :page-type="pageType" />
       </view>
     </scroll-view>
@@ -40,19 +38,49 @@
         <text class="tabbar-text">{{ item.text }}</text>
       </view>
     </view>
+    
+    <!-- 隐藏的画布用于生成分享图片 -->
+    <canvas canvas-id="pageCaptureCanvas" type="2d" style="position: fixed; top: -9999px; left: -9999px; width: 750px; height: 1334px;"></canvas>
   </view>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, getCurrentInstance, nextTick, provide, onBeforeUnmount } from 'vue'
+import { ref, computed, onMounted, watchEffect, watch, getCurrentInstance, nextTick, toRaw } from 'vue'
 import { onLoad, onShow, onShareAppMessage, onShareTimeline } from '@dcloudio/uni-app'
 import { useAppStore } from '@/stores/appStore'
 import { storeToRefs } from 'pinia'
 import DynamicPageRenderer from '@/components/DynamicPageRenderer.vue'
 import { globalTabbarData, pageComponents, dynamicComponentRules } from '@/cofigs/data/globalAppData'
 import pagesGlobalData from '@/cofigs/data/pagesGlobalData.json'
-import { getShareData, clearShareData } from '@/utils/shareManager'
-import type { ShareData } from '@/utils/shareManager'
+import { setShareData, generateCommunityShareData } from '@/utils/shareManager'
+import { PageCapture } from '@/utils/pageCapture'
+import { getShareData } from '@/utils/shareManager'
+
+// 获取当前分享数据
+const currentGlobalShareData = computed(() => getShareData())
+
+// 页面背景图片URL - 使用pagesGlobalData中的backGroundImage
+const pageBackgroundImageUrl = computed(() => {
+  const defaultImageUrl = pagesGlobalData?.backGroundImage
+  console.log('使用页面背景图:', defaultImageUrl)
+  return defaultImageUrl || ''
+})
+
+// 分享背景图片URL - 优先使用全局分享参数中的imageUrl，其次使用globalAppData中的分享背景图
+const shareBackgroundImageUrl = computed(() => {
+  const globalImageUrl = currentGlobalShareData.value?.imageUrl
+  const shareBackgroundImage = pagesGlobalData?.globalAppData?.share?.backGroundImage
+  
+  // 如果全局分享数据中有imageUrl，优先使用
+  if (globalImageUrl && globalImageUrl.trim() !== '') {
+    console.log('使用全局分享参数的背景图:', globalImageUrl)
+    return globalImageUrl
+  }
+  
+  // 否则使用分享专用背景图
+  console.log('使用分享专用背景图:', shareBackgroundImage)
+  return shareBackgroundImage || ''
+})
 
 // 定义类型
 interface TabbarItem {
@@ -61,86 +89,6 @@ interface TabbarItem {
   iconPath: string
   selectedIconPath: string
   organizations?: string[]
-}
-
-type ScrollDirection = 'up' | 'down'
-
-interface ScrollTickPayload {
-  scrollTop: number
-  scrollHeight: number
-  direction: ScrollDirection
-  deltaY: number
-  timestamp: number
-}
-
-interface VideoPerformanceBus {
-  subscribeScrollTick: (handler: (payload: ScrollTickPayload) => void) => () => void
-  emitPauseAll: (options?: Record<string, unknown>) => void
-  emitPlayRequest: (options?: Record<string, unknown>) => void
-  maxConcurrent: number
-}
-
-const VIDEO_PERFORMANCE_KEY = 'videoPerformance'
-const MAX_CACHED_PAGES = 3
-const DEFAULT_SHARE_APP = pagesGlobalData?.HeadProps?.appName || 'JuleiAI'
-const DEFAULT_SHARE_TITLE = pagesGlobalData?.HeadProps?.title || DEFAULT_SHARE_APP
-const DEFAULT_SHARE_IMAGE = pagesGlobalData?.HeadProps?.image || ''
-
-function ensureLeadingSlash(path: string) {
-  if (!path) {
-    return '/pages/index/index'
-  }
-  return path.startsWith('/') ? path : `/${path}`
-}
-
-function addOrUpdateQuery(path: string, key: string, value?: string | number) {
-  if (value === undefined || value === null || value === '') {
-    return path
-  }
-  const valueStr = encodeURIComponent(String(value))
-  const pattern = new RegExp(`([?&])${key}=[^&]*`)
-  if (pattern.test(path)) {
-    return path.replace(pattern, `$1${key}=${valueStr}`)
-  }
-  return `${path}${path.includes('?') ? '&' : '?'}${key}=${valueStr}`
-}
-
-function buildSharePath(basePath: string, params: Record<string, string | number | undefined>) {
-  let resolvedPath = ensureLeadingSlash(basePath || '/pages/index/index')
-  Object.entries(params).forEach(([paramKey, paramValue]) => {
-    resolvedPath = addOrUpdateQuery(resolvedPath, paramKey, paramValue)
-  })
-  return resolvedPath
-}
-
-function hasCustomShareData(data: ShareData | undefined | null): data is ShareData {
-  if (!data) {
-    return false
-  }
-  return Object.keys(data).some((key) => {
-    const value = data[key as keyof ShareData]
-    return value !== undefined && value !== null && value !== ''
-  })
-}
-
-type FrameCallback = (time: number) => void
-
-function useFrameThrottle<T>(handler: (payload: T) => void) {
-  const requestFrame = typeof requestAnimationFrame === 'function'
-    ? requestAnimationFrame
-    : ((cb: FrameCallback) => setTimeout(() => cb(Date.now()), 16) as unknown as number)
-  let frameId: number | null = null
-  let latestPayload: T
-  return (payload: T) => {
-    latestPayload = payload
-    if (frameId !== null) {
-      return
-    }
-    frameId = requestFrame(() => {
-      frameId = null
-      handler(latestPayload)
-    })
-  }
 }
 
 // 状态管理
@@ -158,24 +106,8 @@ const isLogin = computed(() => {
 // 当前页面索引
 const currentPageIndex = ref(0)
 
-const cachedPageTypes = ref<string[]>([])
-
-const registerCachedPage = (pageType?: string) => {
-  if (!pageType) {
-    return
-  }
-  const pages = cachedPageTypes.value
-  const existingIndex = pages.indexOf(pageType)
-  if (existingIndex !== -1) {
-    pages.splice(existingIndex, 1)
-    pages.push(pageType)
-    return
-  }
-  if (pages.length >= MAX_CACHED_PAGES) {
-    pages.shift()
-  }
-  pages.push(pageType)
-}
+// 存储当前生成的分享图片
+const currentShareImage = ref('')
 
 // 安全访问过滤后的导航栏数据
 const safeFilteredTabbarData = computed(() => {
@@ -186,15 +118,6 @@ const safeFilteredTabbarData = computed(() => {
     return []
   }
 })
-
-const getActiveTabLabel = () => {
-  const tabs = safeFilteredTabbarData.value
-  if (!Array.isArray(tabs) || tabs.length === 0) {
-    return DEFAULT_SHARE_TITLE
-  }
-  const safeIndex = Math.min(Math.max(0, currentPageIndex.value), tabs.length - 1)
-  return tabs[safeIndex]?.text || DEFAULT_SHARE_TITLE
-}
 
 // 处理标签点击事件，增加一层防御性包装
 const handleTabClick = (index: number) => {
@@ -307,12 +230,10 @@ const pageTypes = computed(() => {
     return ['home']
   }
 })
-
 // 容器样式，使用 pagesGlobalData 中的背景图片
 const containerStyle = computed(() => {
-  const backgroundImage = pagesGlobalData?.backGroundImage || 'https://chinahu-ai-server.oss-cn-chengdu.aliyuncs.com/aidraw/image/temps/67873d6c232a3c5d52240dd6/Home2.jpg'
   return {
-    backgroundImage: `url(${backgroundImage})`,
+    backgroundImage: `url(${pageBackgroundImageUrl.value})`,
     backgroundSize: 'cover',
     backgroundPosition: 'center top',
     backgroundRepeat: 'no-repeat',
@@ -346,54 +267,6 @@ const currentPageType = computed(() => {
     return 'home'
   }
 })
-
-let lastScrollTop = 0
-
-const emitScrollTick = useFrameThrottle<ScrollTickPayload>((payload) => {
-  uni.$emit('global:scroll-tick', payload)
-})
-
-const onContentScroll = (event: any) => {
-  const { detail } = event
-  const scrollTop = detail?.scrollTop ?? 0
-  const scrollHeight = detail?.scrollHeight ?? 0
-  const rawDeltaY = typeof detail?.deltaY === 'number' ? detail.deltaY : scrollTop - lastScrollTop
-  const direction: ScrollDirection = rawDeltaY >= 0 ? 'down' : 'up'
-  lastScrollTop = scrollTop
-  emitScrollTick({
-    scrollTop,
-    scrollHeight,
-    direction,
-    deltaY: rawDeltaY,
-    timestamp: Date.now()
-  })
-}
-
-const subscribeScrollTick = (handler: (payload: ScrollTickPayload) => void) => {
-  const listener = (payload: ScrollTickPayload) => handler(payload)
-  uni.$on('global:scroll-tick', listener)
-  return () => {
-    uni.$off('global:scroll-tick', listener)
-  }
-}
-
-const broadcastPageActivated = (pageType: string) => {
-  uni.$emit('global:page:activated', { pageType })
-}
-
-const broadcastPageDeactivated = (pageType: string, reason: string) => {
-  uni.$emit('global:page:deactivated', { pageType, reason })
-}
-
-const videoPerformanceBus: VideoPerformanceBus = {
-  subscribeScrollTick,
-  emitPauseAll: (options) => uni.$emit('global:video-pause', options ?? {}),
-  emitPlayRequest: (options) => uni.$emit('global:video-play', options ?? {}),
-  maxConcurrent: 3
-}
-
-provide(VIDEO_PERFORMANCE_KEY, videoPerformanceBus)
-provide('activePageType', currentPageType)
 
 // 切换页面
 const switchPage = (index: number) => {
@@ -430,12 +303,11 @@ const switchPage = (index: number) => {
     }
     
     // 确保 currentPageType 存在
-    const targetPageType = tabbarData[index]?.tabText || 'unknown'
-    videoPerformanceBus.emitPauseAll({ keepPageType: targetPageType })
-
+    const pageType = currentPageType && currentPageType.value ? currentPageType.value : 'unknown'
+    
     console.log('切换到页面:', {
       index,
-      type: targetPageType,
+      type: pageType,
       text: tabbarData[index]?.text
     })
   } catch (error) {
@@ -443,29 +315,8 @@ const switchPage = (index: number) => {
   }
 }
 
-watch(currentPageType, (newType, oldType) => {
-  if (newType) {
-    registerCachedPage(newType)
-    broadcastPageActivated(newType)
-  }
-  if (oldType && oldType !== newType) {
-    broadcastPageDeactivated(oldType, 'hidden')
-  }
-}, { immediate: true })
-
 // 页面加载时的处理
 onLoad((options: any = {}) => {
-  if (typeof uni.showShareMenu === 'function') {
-    try {
-      uni.showShareMenu({
-        withShareTicket: true,
-        menus: ['shareAppMessage', 'shareTimeline']
-      })
-    } catch (error) {
-      console.warn('showShareMenu 调用失败:', error)
-    }
-  }
-  
   // 处理页面索引参数
   if (options && options.pageindex) {
     const targetIndex = parseInt(options.pageindex)
@@ -496,17 +347,27 @@ watch(() => currentPageIndex.value, (newIndex) => {
     ;(instance.proxy as any).type = pageType
     console.log(`页面类型已更新为: ${pageType}`)
   }
+  
+  // 页面切换时，重新生成分享图片
+  generateShareImage().then((image) => {
+    currentShareImage.value = image
+    console.log('页面切换，重新生成分享图片成功')
+  }).catch((error) => {
+    console.error('页面切换，重新生成分享图片失败:', error)
+  })
 })
 
 // 页面显示时的处理
 onShow(() => {
   console.log('页面显示，当前页面索引:', currentPageIndex.value)
-})
-
-onBeforeUnmount(() => {
-  if (currentPageType.value) {
-    broadcastPageDeactivated(currentPageType.value, 'unmount')
-  }
+  
+  // 预生成分享图片（异步，不阻塞页面显示）
+  generateShareImage().then((image) => {
+    currentShareImage.value = image
+    console.log('预生成分享图片成功')
+  }).catch((error) => {
+    console.error('预生成分享图片失败:', error)
+  })
 })
 
 // 监听登录状态变化
@@ -526,9 +387,6 @@ watch(() => isLogin.value, (newLoginStatus) => {
 watch(() => filteredTabbarData.value, (newData, oldData) => {
   // 确保 newData 是数组
   const tabbarData = Array.isArray(newData) ? newData : []
-  const validTypes = new Set(tabbarData.map(item => item?.tabText || ''))
-  cachedPageTypes.value = cachedPageTypes.value.filter(page => validTypes.has(page))
-  registerCachedPage(currentPageType.value)
   
   // 如果导航栏配置改变了（通常是权限变化导致），需要检查当前页面索引是否仍然有效
   if (oldData && Array.isArray(oldData) && tabbarData.length !== oldData.length) {
@@ -540,106 +398,200 @@ watch(() => filteredTabbarData.value, (newData, oldData) => {
   }
 })
 
-onShareAppMessage(() => {
-  const inviteCode = (user.value as any)?.my_invite_code || ''
-  const shareData = getShareData()
-  // 使用 pagesGlobalData 中配置的固定分享文案
-  const configuredAppInfo = pagesGlobalData?.globalAppData?.share?.appInfo
-  const fixedTitle = typeof configuredAppInfo === 'string' && configuredAppInfo.trim().length > 0
-    ? configuredAppInfo
-    : DEFAULT_SHARE_APP
-
-  // 首先尝试从全局 shareData 获取图片
-  let imageCandidate: string | undefined = shareData?.imageUrl || undefined
-
-  // 如果没有，尝试从社区缓存中取一张用户当前可见的图片
-  if (!imageCandidate) {
-    try {
-      const communityImages = uni.getStorageSync && uni.getStorageSync('communityImages')
-      if (Array.isArray(communityImages) && communityImages.length) {
-        imageCandidate = communityImages[0]
-      }
-    } catch (e) {
-      // ignore
+// 生成当前页面的分享图片
+const generateShareImage = async () => {
+  try {
+    // 确保 filteredTabbarData 存在
+    if (!filteredTabbarData || !filteredTabbarData.value) {
+      throw new Error('导航栏数据未加载')
     }
-  }
-
-  // 最终回退为默认图
-  if (!imageCandidate) {
-    imageCandidate = DEFAULT_SHARE_IMAGE || undefined
-  }
-
-  if (hasCustomShareData(shareData)) {
-    clearShareData()
-    const basePath = shareData.path || '/pages/index/index'
-    const shouldAttachPageIndex = basePath.includes('/pages/index/index') && !/pageindex=/i.test(basePath)
-    const finalPath = buildSharePath(basePath, {
-      inviteCode: inviteCode || undefined,
-      pageindex: shouldAttachPageIndex ? currentPageIndex.value : undefined
+    
+    // 确保 filteredTabbarData.value 是数组
+    const tabbarData = Array.isArray(filteredTabbarData.value) ? filteredTabbarData.value : []
+    
+    // 获取当前页面信息
+    const currentPage = tabbarData[currentPageIndex.value]
+    if (!currentPage) {
+      throw new Error('当前页面信息不存在')
+    }
+    
+    // 获取邀请码
+    const inviteCodeArray = appStore.user?.my_invite_code
+    const inviteCode = Array.isArray(inviteCodeArray) ? inviteCodeArray[0] : (inviteCodeArray || '')
+    
+    // 使用分享专用背景图
+    const bgImage = shareBackgroundImageUrl.value
+    
+    console.log('生成分享图片，使用背景图:', bgImage)
+    
+    // 生成分享海报，传入当前页面信息
+    const shareImage = await PageCapture.capturePage({
+      title: `Julei - ${currentPage.text}`,
+      subtitle: '专业AI助手',
+      backgroundImage: bgImage,
+      inviteCode: inviteCode
     })
-
-    return {
-      title: fixedTitle,
-      path: finalPath,
-      imageUrl: shareData.imageUrl || imageCandidate
-    }
+    
+    return shareImage
+  } catch (error) {
+    console.error('生成分享图片失败:', error)
+    throw error
   }
+}
 
+// 分享功能
+const handleShare = async () => {
+  try {
+    // 显示加载提示
+    uni.showLoading({
+      title: '正在生成分享图片...',
+      mask: true
+    })
+    
+    // 生成当前页面的分享图片
+    const shareImage = await generateShareImage()
+    
+    // 保存当前分享图片
+    currentShareImage.value = shareImage
+    
+    // 隐藏加载提示
+    uni.hideLoading()
+    
+    // 显示分享选项
+    uni.showActionSheet({
+      itemList: ['分享给朋友', '分享到朋友圈', '保存图片'],
+      success: (res) => {
+        if (res.tapIndex === 0) {
+          // 分享给朋友
+          // 设置分享数据，包含生成的图片
+          const shareData = {
+            title: 'Julei - 专业美甲设计助手',
+            path: '/pages/index/index',
+            imageUrl: shareImage
+          }
+          setShareData(toRaw(shareData))
+          
+          uni.showShareMenu({
+            withShareTicket: true,
+            menus: ['shareAppMessage']
+          })
+        } else if (res.tapIndex === 1) {
+          // 分享到朋友圈
+          // 设置分享数据，包含生成的图片
+          const shareData = {
+            title: 'Julei - 专业美甲设计助手',
+            path: '/pages/index/index',
+            imageUrl: shareImage
+          }
+          setShareData(toRaw(shareData))
+          
+          uni.showShareMenu({
+            withShareTicket: true,
+            menus: ['shareTimeline']
+          })
+        } else if (res.tapIndex === 2) {
+          // 保存图片
+          uni.saveImageToPhotosAlbum({
+            filePath: shareImage,
+            success: () => {
+              uni.showToast({
+                title: '图片已保存到相册',
+                icon: 'success'
+              })
+            },
+            fail: () => {
+              uni.showToast({
+                title: '保存失败，请检查权限设置',
+                icon: 'none'
+              })
+            }
+          })
+        }
+      }
+    })
+  } catch (error) {
+    uni.hideLoading()
+    console.error('生成分享图片失败:', error)
+    uni.showToast({
+      title: '生成分享图片失败',
+      icon: 'none'
+    })
+  }
+}
+
+// 分享给朋友
+onShareAppMessage(() => {
+  // 获取当前页面信息
+  const tabbarData = Array.isArray(filteredTabbarData.value) ? filteredTabbarData.value : []
+  const currentPage = tabbarData[currentPageIndex.value]
+  const pageTitle = currentPage ? `Julei - ${currentPage.text}` : 'Julei - 专业AI助手'
+  
+  // 获取邀请码
+  const inviteCodeArray = appStore.user?.my_invite_code
+  const inviteCode = Array.isArray(inviteCodeArray) && inviteCodeArray.length > 0 ? inviteCodeArray[0] : ''
+  
+  // 使用当前已生成的分享图片，如果没有则使用分享专用背景图
+  const shareImage = currentShareImage.value || shareBackgroundImageUrl.value || ''
+  
+  // 设置分享数据
+  const shareData = {
+    title: pageTitle,
+    path: '/pages/index/index',
+    imageUrl: shareImage
+  }
+  setShareData(toRaw(shareData))
+  
+  // 构建分享路径
+  let sharePath = shareData.path
+  if (inviteCode && !sharePath.includes('inviteCode=')) {
+    sharePath = sharePath.includes('?') ? `${sharePath}&inviteCode=${inviteCode}` : `${sharePath}?inviteCode=${inviteCode}`
+  }
+  
+  console.log('首页分享路径:', sharePath)
+  console.log('分享图片:', shareData.imageUrl)
+  
   return {
-    title: fixedTitle,
-    path: buildSharePath('/pages/index/index', {
-      pageindex: currentPageIndex.value,
-      inviteCode: inviteCode || undefined
-    }),
-    imageUrl: imageCandidate
+    title: shareData.title,
+    path: sharePath,
+    imageUrl: shareData.imageUrl
   }
 })
 
+// 分享到朋友圈
 onShareTimeline(() => {
-  const inviteCode = (user.value as any)?.my_invite_code || ''
-  const shareData = getShareData()
-  // 使用 pagesGlobalData 中配置的固定分享文案
-  const configuredAppInfo = pagesGlobalData?.globalAppData?.share?.appInfo
-  const fixedTitle = typeof configuredAppInfo === 'string' && configuredAppInfo.trim().length > 0
-    ? configuredAppInfo
-    : DEFAULT_SHARE_APP
-
-  // timeline 也尽量使用动态图片或全局 shareData
-  let imageCandidate2: string | undefined = shareData?.imageUrl || undefined
-  if (!imageCandidate2) {
-    try {
-      const communityImages = uni.getStorageSync && uni.getStorageSync('communityImages')
-      if (Array.isArray(communityImages) && communityImages.length) {
-        imageCandidate2 = communityImages[0]
-      }
-    } catch (e) {}
+  // 获取当前页面信息
+  const tabbarData = Array.isArray(filteredTabbarData.value) ? filteredTabbarData.value : []
+  const currentPage = tabbarData[currentPageIndex.value]
+  const pageTitle = currentPage ? `Julei - ${currentPage.text}` : 'Julei - 专业AI助手'
+  
+  // 获取邀请码
+  const inviteCodeArray = appStore.user?.my_invite_code
+  const inviteCode = Array.isArray(inviteCodeArray) && inviteCodeArray.length > 0 ? inviteCodeArray[0] : ''
+  
+  // 使用当前已生成的分享图片，如果没有则使用分享专用背景图
+  const shareImage = currentShareImage.value || shareBackgroundImageUrl.value || ''
+  
+  // 设置分享数据
+  const shareData = {
+    title: pageTitle,
+    path: '/pages/index/index',
+    imageUrl: shareImage
   }
-  if (!imageCandidate2) imageCandidate2 = DEFAULT_SHARE_IMAGE || undefined
-
-  if (hasCustomShareData(shareData)) {
-    clearShareData()
-    const basePath = shareData.path || '/pages/index/index'
-    const shouldAttachPageIndex = basePath.includes('/pages/index/index') && !/pageindex=/i.test(basePath)
-    const finalPath = buildSharePath(basePath, {
-      inviteCode: inviteCode || undefined,
-      pageindex: shouldAttachPageIndex ? currentPageIndex.value : undefined
-    })
-
-    return {
-      title: fixedTitle,
-      path: finalPath,
-      imageUrl: shareData.imageUrl || imageCandidate2
-    }
+  setShareData(shareData)
+  
+  // 构建分享路径
+  let sharePath = shareData.path
+  if (inviteCode && !sharePath.includes('inviteCode=')) {
+    sharePath = sharePath.includes('?') ? `${sharePath}&inviteCode=${inviteCode}` : `${sharePath}?inviteCode=${inviteCode}`
   }
-
+  
+  console.log('首页朋友圈分享路径:', sharePath)
+  console.log('分享图片:', shareData.imageUrl)
+  
   return {
-    title: fixedTitle,
-    path: buildSharePath('/pages/index/index', {
-      pageindex: currentPageIndex.value,
-      inviteCode: inviteCode || undefined
-    }),
-    // 微信朋友圈分享接口通常只使用 path/title，image 由微信抓取页面内 meta 或小程序图片，但我们仍传回备用
-    imageUrl: imageCandidate2
+    title: shareData.title,
+    path: sharePath,
+    imageUrl: shareData.imageUrl
   }
 })
 </script>
@@ -663,18 +615,11 @@ onShareTimeline(() => {
   padding-top: 100rpx;
   overflow: hidden;
   /* 安卓优化：使用纯色背景替代毛玻璃效果 */
-  background-color: rgba(255, 255, 255, 0.85);
+  background-color: rgba(255, 255, 255, 0);
   /* iOS保留毛玻璃效果 */
 }
 
-/* iOS设备使用毛玻璃 */
-@supports (backdrop-filter: blur(8px)) or (-webkit-backdrop-filter: blur(8px)) {
-  .new-index-container {
-    background-color: rgba(255, 255, 255, 0.5);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-  }
-}
+/* iOS设备也保持透明，不使用毛玻璃效果 */
 
 .content-scroll-view {
   flex: 1;
@@ -687,16 +632,12 @@ onShareTimeline(() => {
   /* 移除硬件加速相关属性，减少安卓端重绘 */
 }
 
-.page-cache-item {
-  width: 100%;
-}
-
 .tabbar-container {
   width: 100%;
   height: 100rpx;
-  /* 安卓优化：使用纯色背景 */
-  background-color: rgba(255, 255, 255, 0.95);
-  border-top: 1rpx solid rgba(240, 240, 240, 0.5);
+  /* 使用更透明的背景，让背景图透过 */
+  background-color: rgba(255, 255, 255, 0.8);
+  border-top: 1rpx solid rgba(240, 240, 240, 0.3);
   display: flex;
   flex-direction: row;
   justify-content: space-around;
@@ -708,12 +649,12 @@ onShareTimeline(() => {
   box-shadow: 0 -2rpx 8rpx rgba(0, 0, 0, 0.05);
 }
 
-/* iOS设备使用毛玻璃 */
+/* iOS设备使用轻微毛玻璃效果，保持透明 */
 @supports (backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px)) {
   .tabbar-container {
-    background-color: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background-color: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
   }
 }
 
@@ -752,5 +693,27 @@ onShareTimeline(() => {
 
 .tabbar-item.active .tabbar-text {
   color: #7041ed;
+}
+
+/* 分享按钮样式 */
+.share-button {
+  position: fixed;
+  top: 120rpx;
+  right: 30rpx;
+  width: 80rpx;
+  height: 80rpx;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  transition: all 0.3s ease;
+}
+
+.share-button:active {
+  transform: scale(0.95);
+  background-color: rgba(255, 255, 255, 0.8);
 }
 </style>

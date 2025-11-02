@@ -261,7 +261,7 @@ export class PosterGenerator {
     ctx.fillStyle = '#333333'
     ctx.font = 'bold 32px sans-serif'
     ctx.textAlign = 'left'
-    ctx.fillText('NAILOFFICE-AI', 30, footerY + 30)
+    ctx.fillText('Julei', 30, footerY + 30)
     
     ctx.fillStyle = '#999999'
     ctx.font = '28px sans-serif'
