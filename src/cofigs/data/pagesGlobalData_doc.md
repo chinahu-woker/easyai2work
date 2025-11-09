@@ -1,139 +1,426 @@
+# pagesGlobalData.json 配置文档
 
-# pagesGlobalData 使用说明文档
+## 概述
 
-本文档基于 `pagesGlobalData.json`（位于 `src/cofigs/data/pagesGlobalData.json`）生成，目的是为前端开发者和产品人员说明全局页面配置的字段含义、常用示例以及在模板中如何引用这些配置。
+`pagesGlobalData.json` 是 uniapp 项目的全局页面配置数据文件，用于动态配置应用的页面布局、组件属性、样式等。通过修改此文件，可以实现页面内容的动态调整，无需修改代码。
 
-> 说明：项目中很多页面或动态组件会通过占位符语法 `{{...}}` 在运行时注入配置项（例如 `"logo": "{{HeadProps.logo}}"`）。请确保占位符路径在 `pagesGlobalData.json` 中存在对应字段。
+## 文件结构
 
-## 顶层字段概览
-
-- `iconTagName`: 图标标签/缩略名数组，常用于 icon 列表或检索。
-- `globalAppData`: 全局应用信息（如分享文案等）。
-- `organizations_store`: 默认的组织 ID 列表（用于权限/展示过滤）。
-- `tabbarData`: APP 底部 tab 配置数组（每项包含文本、图标路径等）。
-- `backGroundImage`: 全局背景图 URL。
-- `HeadProps`: 顶部/首页头部相关属性集合（logo、appName、title、subtitle、按钮文案等）。
-- `iconData`: 首页图标数据和布局（包括每个 icon 的 action、label、匹配关键词等）。
-- `storeProps`: 应用商店页面的一些展示配置。
-- `payWorkProps`: 付费应用页面的展示配置。
-- `loginInfoIcons`: 登录相关页面/组件的图标配置。
-- `pageComponents`: 每个页面的组件布局与组件配置（用于动态页面构建）。
-- `dynamicComponentRules`: 动态组件显示规则（按页面和条件控制组件是否显示）。
-
-## 主要字段详解与示例
-
-### iconTagName
-用途：提供图标分类或检索标签。
-示例：
-```
-"iconTagName": [ { "name": "Style-depth-...", "index": 0 }, ... ]
-```
-
-### globalAppData
-用途：全局可复用的信息（例如分享文本）。
-示例：
-```
-"globalAppData": { "name": "globalAppData", "share": { "appInfo": "这款全民使用的AI程序..." } }
-```
-
-### tabbarData
-用途：APP 底部 TabBar 的文本和图标路径配置。
-示例：
-```
-{ "text": "首页", "tabText": "home", "iconPath": "...", "selectedIconPath": "..." }
-```
-在页面中使用：通常由 TabBar 组件读取并渲染。
-
-### HeadProps
-用途：首页/头部组件的数据映射，包含 logo、标题、描述、按钮文本等。
-常见占位用法：`"logo": "{{HeadProps.logo}}"` 在组件 props 中会被替换为实际 URL。
-示例字段：
-- `logo`: 顶部 logo URL
-- `appName`: 应用名
-- `title`: 页面主标题
-- `subtitle`: 副标题（可含换行）
-- `image`, `image2`: 装饰图片
-- `primaryText`, `rightButtonText`, `rightTitle`, `rightDesc`, `badgeText`
-
-### iconData
-用途：配置首页主图标集合、每个按钮的 action（用于触发不同功能）。
-示例：
-```
-"iconData": { "icons": [ { "id": "icon-remen", "label": "热门应用", "action": "ai_expand" } ], "columns": 4 }
-```
-action 字段通常在点击处理函数中做路由或逻辑分发（例如 action = "ai_expand" 对应某个功能入口）。
-
-### pageComponents
-用途：按页面（如 `home`、`store`、`profile`）定义要渲染的组件序列与每个组件的 props 与样式。
-示例结构：
-```
-"pageComponents": {
-	"home": {
-		"title": "首页",
-		"components": [ { "id": "home-header", "component": "Newhead", "props": { "logo": "{{HeadProps.logo}}" } } ]
-	}
+```json
+{
+  "iconTagName": [...],           // 图标标签配置
+  "globalAppData": {...},         // 全局应用数据
+  "organizations_store": [...],   // 组织机构配置
+  "tabbarData": [...],            // 底部导航栏配置
+  "backGroundImage": "...",       // 全局背景图片
+  "HeadProps": {...},             // 头部组件属性
+  "iconData": {...},              // 图标网格数据
+  "storeProps": {...},            // 应用商店属性
+  "aiTeamProps": {...},           // AI团队属性
+  "payWorkProps": {...},          // 付费作品属性
+  "loginInfoIcons": {...},        // 登录信息图标
+  "pageComponents": {...},        // 页面组件配置
+  "dynamicComponentRules": {...}  // 动态组件规则
 }
 ```
-使用方式：项目会读取该结构并按顺序渲染 `component`，并对 `props` 中的占位符进行替换。
 
-### dynamicComponentRules
-用途：控制哪些动态组件在特定页面显示或隐藏（按条件过滤，例如用户登录状态或组织）。
-示例：
-```
-"dynamicComponentRules": { "home": [ { "componentId": "home-header", "conditions": { "userStatus": "all" } } ] }
-```
+## 详细参数说明
 
-## 占位符语法与替换规则
-- 占位符使用 `{{path.to.field}}` 的格式。渲染引擎在构建组件 props 时会用 `pagesGlobalData.json` 中对应的值替换占位符。
-- 支持嵌套：例如 `{{HeadProps.logo}}` 会解析为 `pagesGlobalData.HeadProps.logo`。
-- 若占位符路径不存在，渲染时应该有兜底逻辑（避免报错），建议在渲染层使用短路或默认值。
+### 1. iconTagName (图标标签配置)
 
-## 示例：如何在页面中引用
-- 在 `pageComponents.home.components` 中看到：
-```
-{ "component": "Newhead", "props": { "logo": "{{HeadProps.logo}}", "appName": "{{HeadProps.appName}}" } }
-```
-渲染引擎会把 `logo` 与 `appName` 注入到 `Newhead` 组件的 props 中。
+**类型**: `Array<Object>`  
+**作用**: 定义图标标签的名称和索引，用于标识不同的图标样式或分类。
 
-## 推荐实践
-1. 规范字段命名：尽量使用驼峰或下划线的统一风格，便于占位符查找与替换。
-2. 为关键字段提供默认值：在渲染时对缺失字段做容错（例如 `logo || '/static/default-logo.png'`）。
-3. 对动态组件的 props 做类型约束：尤其是 `props.options` 之类的动态数据，建议在组件内有默认值与校验。
-4. 如果某些页面需要按组织显示内容，优先在 `dynamicComponentRules` 中配置，而不是在组件内写复杂的逻辑判断。
+**字段说明**:
+- `name` (string): 图标标签的唯一标识符，通常对应后端API的样式名称
+- `index` (number): 标签的索引位置，从0开始
 
-## 常见问题与排查
-- 问：占位符替换后仍显示 `{{HeadProps.logo}}`？
-	- 检查渲染引擎是否在渲染前执行了占位符替换（确保数据加载顺序正确）。
-	- 检查路径是否拼写正确。
-
-- 问：图片 URL 加载失败导致样式错乱？
-	- 为图片资源设置 fallback（例如在组件中设置 `onError` 替换为默认图）。
-
-## 附录：pagesGlobalData.json 中的示例片段
-（以下为摘录示例，详见 `pagesGlobalData.json`）
-
-```
-"HeadProps": {
-	"logo": "https://.../logo.svg",
-	"appName": "聚类AI",
-	"title": "AIGC",
-	"subtitle": "上传图片\n生成专属内容"
-}
-
-"tabbarData": [
-	{ "text": "首页", "tabText": "home", "iconPath": "...", "selectedIconPath": "..." },
-	{ "text": "应用", "tabText": "store", ... }
+**示例**:
+```json
+[
+  {
+    "name": "Style-depth-510nail_8style",
+    "index": 0
+  },
+  {
+    "name": "fakenail2manicure1",
+    "index": 1
+  }
 ]
+```
 
-"pageComponents": {
-	"home": {
-		"title": "首页",
-		"components": [ { "id": "home-header", "component": "Newhead", "props": { "logo": "{{HeadProps.logo}}" } } ]
-	}
+**修改注意**: 确保 `name` 与后端API返回的样式名称一致，`index` 唯一且连续。
+
+---
+
+### 2. globalAppData (全局应用数据)
+
+**类型**: `Object`  
+**作用**: 存储应用级别的全局配置信息，如分享信息等。
+
+**字段说明**:
+- `name` (string): 配置名称标识
+- `share` (Object): 分享相关配置
+  - `appInfo` (string): 应用分享描述
+  - `backGroundImage` (string): 分享背景图片URL
+
+**示例**:
+```json
+{
+  "name": "globalAppData",
+  "share": {
+    "appInfo": "这款全民使用的AI程序，简直好用到爆炸",
+    "backGroundImage": "https://aikna.cn/api/upload/files/..."
+  }
 }
 ```
 
 ---
 
-如需我将此文档进一步转换为团队内部可编辑模板（例如包含每个字段的类型注释、示例值与可选/必选标记），我可以继续扩展。现在我将该任务标记为已完成。
+### 3. organizations_store (组织机构配置)
 
+**类型**: `Array<string>`  
+**作用**: 定义可用的组织机构标识，用于权限控制和内容过滤。
+
+**示例**:
+```json
+["None", "68d23a545ae1fbd83108633a", "68c4d63fd9d81c765dd8c3cd"]
+```
+
+**允许值**: 字符串数组，每个元素为组织ID或"None"
+
+---
+
+### 4. tabbarData (底部导航栏配置)
+
+**类型**: `Array<Object>`  
+**作用**: 配置底部导航栏的各个tab项，包括文本、图标、权限等。
+
+**字段说明**:
+- `text` (string): tab显示的文字
+- `tabText` (string): tab的唯一标识符，用于页面路由
+- `iconPath` (string): 未选中状态的图标URL
+- `selectedIconPath` (string): 选中状态的图标URL
+- `organizations` (Array<string>): 允许访问此tab的组织ID列表
+
+**示例**:
+```json
+[
+  {
+    "text": "首页",
+    "tabText": "home",
+    "iconPath": "https://static.nailoffice.cn/...",
+    "selectedIconPath": "https://static.nailoffice.cn/...",
+    "organizations": ["None"]
+  }
+]
+```
+
+**修改注意**:
+- 图标URL必须是可访问的图片链接
+- `organizations` 中的ID必须在 `organizations_store` 中定义
+- 最多支持5个tab
+
+---
+
+### 5. backGroundImage (全局背景图片)
+
+**类型**: `string`  
+**作用**: 设置应用的全局背景图片。
+
+**示例**:
+```json
+"https://chinahu-ai-server.oss-cn-chengdu.aliyuncs.com/aidraw/image/temps/67873d6c232a3c5d52240dd6/Home2.jpg"
+```
+
+---
+
+### 6. HeadProps (头部组件属性)
+
+**类型**: `Object`  
+**作用**: 配置首页头部组件的显示内容和样式。
+
+**字段说明**:
+- `logo` (string): 应用logo图片URL
+- `appName` (string): 应用名称
+- `title` (string): 主标题
+- `subtitle` (string): 副标题，支持\n换行
+- `image` (string): 主展示图片URL
+- `image2` (string): 辅助图片URL
+- `primaryText` (string): 主要按钮文本
+- `rightButtonText` (string): 右侧按钮文本
+- `rightTitle` (string): 右侧区域标题
+- `rightDesc` (string): 右侧区域描述
+- `badgeText` (string): 徽章文本
+
+**示例**:
+```json
+{
+  "logo": "https://static.nailoffice.cn/...",
+  "appName": "聚类AI",
+  "title": "AIGC",
+  "subtitle": "上传图片\n生成专属内容",
+  "primaryText": "免费体验",
+  "badgeText": "VIP"
+}
+```
+
+---
+
+### 7. iconData (图标网格数据)
+
+**类型**: `Object`  
+**作用**: 配置首页图标网格的布局和功能图标。
+
+**字段说明**:
+- `icons` (Array<Object>): 图标列表
+  - `id` (string): 图标唯一标识
+  - `symbol` (string): 图标样式类名
+  - `label` (string): 图标显示文字
+  - `action` (string): 点击后执行的动作标识
+  - `matchKeywords` (Array<string>): 搜索匹配关键词
+  - `actionButton` (string): 是否为操作按钮 ("true"/"false")
+- `columns` (number): 每行显示的图标数量
+- `iconSize` (number): 图标大小（单位：rpx）
+- `gap` (number): 图标间距（单位：rpx）
+
+**示例**:
+```json
+{
+  "icons": [
+    {
+      "id": "icon-remen",
+      "symbol": "iconfontIndex",
+      "label": "热门应用",
+      "action": "ai_expand",
+      "matchKeywords": ["热门", "热门应用"],
+      "actionButton": "false"
+    }
+  ],
+  "columns": 4,
+  "iconSize": 100,
+  "gap": 42
+}
+```
+
+---
+
+### 8. storeProps (应用商店属性)
+
+**类型**: `Object`  
+**作用**: 配置应用商店页面的筛选和显示属性。
+
+**字段说明**:
+- `showTag` (string): 默认显示的标签
+- `showTags` (Array<string>): 可用的标签列表
+- `filterMode` (string): 筛选模式 ("any"/"single")
+
+**示例**:
+```json
+{
+  "showTag": "AI工具",
+  "showTags": ["图生视频", "AI产品生成", "AI重绘"],
+  "filterMode": "any"
+}
+```
+
+---
+
+### 9. aiTeamProps (AI团队属性)
+
+**类型**: `Object`  
+**作用**: 配置AI团队页面的显示属性。
+
+**字段说明**:
+- `title` (string): 页面标题
+- `filterMode` (string): 筛选模式
+
+---
+
+### 10. payWorkProps (付费作品属性)
+
+**类型**: `Object`  
+**作用**: 配置付费作品页面的显示属性。
+
+**字段说明**:
+- `title` (string): 页面标题
+- `showTag` (string): 显示标签
+
+---
+
+### 11. loginInfoIcons (登录信息图标)
+
+**类型**: `Object`  
+**作用**: 配置登录页面的图标资源。
+
+**字段说明**:
+- `scanIcon` (string): 扫码图标
+- `arrowIcon` (string): 箭头图标
+- `historyIcon` (string): 历史记录图标URL
+- `chatIcon` (string): 聊天图标URL
+- `logoutIcon` (string): 退出登录图标URL
+- `consoleIcon` (string): 控制台图标URL
+- `bannerImage` (string): 横幅图片URL
+
+---
+
+### 12. pageComponents (页面组件配置)
+
+**类型**: `Object`  
+**作用**: 定义各个页面的组件布局和属性配置。
+
+**结构说明**:
+- 键名: 页面标识符 ("home", "store", "profile", "login")
+- 值: 页面配置对象
+  - `title` (string): 页面标题
+  - `components` (Array<Object>): 组件列表
+    - `id` (string): 组件唯一标识
+    - `component` (string): 组件名称
+    - `props` (Object): 组件属性，支持占位符语法 `{{变量名}}`
+    - `style` (Object): 组件样式
+  - `layout` (Object): 页面布局配置
+
+**占位符语法说明**:
+- 使用 `{{变量名}}` 引用其他配置项的值
+- 例如: `"logo": "{{HeadProps.logo}}"` 会引用 `HeadProps.logo` 的值
+
+**示例**:
+```json
+{
+  "home": {
+    "title": "首页",
+    "components": [
+      {
+        "id": "home-header",
+        "component": "Newhead",
+        "props": {
+          "logo": "{{HeadProps.logo}}",
+          "appName": "{{HeadProps.appName}}"
+        },
+        "style": {
+          "marginBottom": "20rpx"
+        }
+      }
+    ],
+    "layout": {
+      "padding": "20rpx",
+      "backgroundColor": "#f5f5f5"
+    }
+  }
+}
+```
+
+---
+
+### 13. dynamicComponentRules (动态组件规则)
+
+**类型**: `Object`  
+**作用**: 定义组件的显示条件和权限控制规则。
+
+**结构说明**:
+- 键名: 页面标识符
+- 值: 规则数组
+  - `componentId` (string): 组件ID，对应 `pageComponents` 中的组件
+  - `conditions` (Object): 显示条件
+    - `userStatus` (string): 用户状态 ("all"/"loggedIn"/"notLoggedIn")
+    - `organizations` (Array<string>): 允许的组织ID列表（可选）
+
+**示例**:
+```json
+{
+  "home": [
+    {
+      "componentId": "home-header",
+      "conditions": {
+        "userStatus": "all"
+      }
+    }
+  ],
+  "store": [
+    {
+      "componentId": "store-paywork",
+      "conditions": {
+        "userStatus": "loggedIn",
+        "organizations": ["68d23a545ae1fbd83108633a", "68c4d63fd9d81c765dd8c3cd"]
+      }
+    }
+  ]
+}
+```
+
+## 使用指南
+
+### 1. 添加新页面
+
+1. 在 `pageComponents` 中添加新页面配置
+2. 在 `dynamicComponentRules` 中添加对应的显示规则
+3. 如需要，在 `tabbarData` 中添加底部导航
+
+### 2. 添加新组件
+
+1. 在目标页面的 `components` 数组中添加组件配置
+2. 设置 `id`、`component`、`props`、`style`
+3. 在 `dynamicComponentRules` 中添加显示条件
+
+### 3. 使用占位符引用
+
+```json
+// 在组件props中使用占位符
+"props": {
+  "logo": "{{HeadProps.logo}}",
+  "title": "{{HeadProps.title}}"
+}
+```
+
+### 4. 添加新标签页
+
+```json
+// 在tabbarData中添加
+{
+  "text": "新页面",
+  "tabText": "newpage",
+  "iconPath": "https://...",
+  "selectedIconPath": "https://...",
+  "organizations": ["None"]
+}
+```
+
+### 5. 权限控制
+
+```json
+// 只对特定组织显示组件
+{
+  "componentId": "vip-feature",
+  "conditions": {
+    "userStatus": "loggedIn",
+    "organizations": ["vip-org-id"]
+  }
+}
+```
+
+## 修改注意事项
+
+1. **URL链接**: 确保所有图片URL都是可访问的HTTPS链接
+2. **占位符语法**: 使用 `{{变量名}}` 引用其他配置项的值
+3. **组件ID**: 确保 `componentId` 在 `pageComponents` 中存在
+4. **组织权限**: `organizations` 中的ID必须在 `organizations_store` 中定义
+5. **JSON格式**: 保持正确的JSON格式，避免语法错误
+6. **热更新**: 修改后需要重新启动应用才能生效
+
+## 常见问题
+
+### Q: 修改配置后不生效？
+A: 需要重新启动应用，配置是应用启动时加载的。
+
+### Q: 图片不显示？
+A: 检查URL是否正确，是否支持HTTPS，是否跨域。
+
+### Q: 组件不显示？
+A: 检查 `dynamicComponentRules` 中的条件是否满足。
+
+### Q: 如何添加新的组件类型？
+A: 在 `pageComponents` 中使用已存在的组件名，或开发新组件后添加。
+
+---
+
+*最后更新时间: 2025年11月9日*

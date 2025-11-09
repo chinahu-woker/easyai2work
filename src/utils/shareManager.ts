@@ -40,7 +40,7 @@ export function clearShareData() {
 export function generateDetailShareData(itemId: string, title: string, imageUrl?: string): ShareData {
   return {
     title: `${title} - 这款全民使用的AI程序，简直好用到爆炸`,
-    path: `/pages/drawLike/alike?id=${itemId}`,
+    path: `/pagesDrawLike/alike?id=${itemId}`,
     imageUrl: imageUrl || '',
     itemId
   }

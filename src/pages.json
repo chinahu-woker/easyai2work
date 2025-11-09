@@ -30,31 +30,78 @@
     { "path": "pages/history/history", "style": { "navigationBarTitleText": " " } },
     { "path": "pages/draw/apps/apps", "style": { "navigationBarTitleText": " ", "navigationStyle": "custom" } },
     { "path": "pages/Empty/Empty", "style": { "navigationBarTitleText": "" } },
-    { "path": "pages/history/history_fui/history_fui", "style": { "navigationBarTitleText": "" } },
-    { "path": "pages/draw/draw_info/draw_info", "style": { "navigationBarTitleText": "" } },
     { "path": "pages/console/console", "style": { "navigationBarTitleText": "" } },
-    { 
-      "path": "pages/drawLike/alike", 
-      "style": { 
-        "navigationBarTitleText": "作品详情",
-        "enablePullDownRefresh": false,
-        "backgroundTextStyle": "dark",
-        "app-plus": {
-          "animationType": "slide-in-right",
-          "animationDuration": 200
-        }
-      } 
-    },
     { "path": "pages/login/login", "style": { "navigationBarTitleText": "" } },
-  { "path": "pages/login/Qr_login", "style": { "navigationBarTitleText": "扫码登录" } },
-    { "path": "pages/login/register", "style": { "navigationBarTitleText": "" } },
-    { "path": "pages/draw/image-editor", "style": { "navigationBarTitleText": "图片编辑" } }
+    { "path": "pages/login/Qr_login", "style": { "navigationBarTitleText": "扫码登录" } },
+    { "path": "pages/login/register", "style": { "navigationBarTitleText": "" } }
   ],
+  "subPackages": [
+    {
+      "root": "pagesDrawSub",
+      "name": "drawSub",
+      "pages": [
+        { "path": "draw_info/draw_info", "style": { "navigationBarTitleText": "" } },
+        { "path": "image-editor", "style": { "navigationBarTitleText": "图片编辑" } }
+      ]
+    },
+    {
+      "root": "pagesHistorySub",
+      "name": "historySub",
+      "pages": [
+        { "path": "history_fui/history_fui", "style": { "navigationBarTitleText": "" } }
+      ]
+    },
+    {
+      "root": "pagesDrawLike",
+      "name": "drawLike",
+      "pages": [
+        { 
+          "path": "alike", 
+          "style": { 
+            "navigationBarTitleText": "作品详情",
+            "enablePullDownRefresh": false,
+            "backgroundTextStyle": "dark",
+            "app-plus": {
+              "animationType": "slide-in-right",
+              "animationDuration": 200
+            }
+          } 
+        }
+      ]
+    }
+  ],
+  "preloadRule": {
+    "pages/index/index": {
+      "network": "all",
+      "packages": ["drawSub"]
+    },
+    "pages/creative/creative": {
+      "network": "all",
+      "packages": ["drawSub"]
+    },
+    "pages/home/home": {
+      "network": "all",
+      "packages": ["historySub"]
+    }
+  },
   "globalStyle": {
     "navigationBarTextStyle": "white",
     "navigationBarTitleText": " ",
     "navigationStyle": "custom",
-    "navigationBarBackgroundColor": "#ffffff"  
+    "navigationBarBackgroundColor": "#ffffff",
+    "backgroundColor": "#f6f7fa",
+    "backgroundTextStyle": "light",
+    "enablePullDownRefresh": false,
+    "onReachBottomDistance": 50,
+    "pageOrientation": "portrait",
+    "animationType": "pop-in",
+    "animationDuration": 200,
+    "app-plus": {
+      "bounce": "none",
+      "scrollIndicator": "none",
+      "softinputMode": "adjustResize",
+      "popGesture": "close"
+    }
   },
   "condition": {
     "current": 0,

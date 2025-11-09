@@ -668,14 +668,14 @@ onShareAppMessage((res: any) => {
     clearShareData()
 
     // 确保分享数据中的路径有效
-    let sharePath = shareData.path || '/pages/drawLike/alike'
+    let sharePath = shareData.path || '/pagesDrawLike/alike'
     // 确保路径以 / 开头
     if (!sharePath.startsWith('/')) {
       sharePath = '/' + sharePath
     }
     
     // 如果路径是alike页面但没有id参数，尝试从当前页面获取
-    if (sharePath.includes('/pages/drawLike/alike') && !sharePath.includes('id=')) {
+    if (sharePath.includes('/pagesDrawLike/alike') && !sharePath.includes('id=')) {
       const id = detailId.value || draw_data.value?.data?._id
       if (id) {
         sharePath = inviteCode ? `${sharePath}?id=${id}&inviteCode=${inviteCode}` : `${sharePath}?id=${id}`
@@ -704,7 +704,7 @@ onShareAppMessage((res: any) => {
   if (!id) {
     console.error('分享失败：缺少作品ID')
     // 即使没有作品ID，也尝试分享当前页面，而不是跳转到首页
-    const currentPath = inviteCode ? `/pages/drawLike/alike?inviteCode=${inviteCode}` : '/pages/drawLike/alike'
+    const currentPath = inviteCode ? `/pagesDrawLike/alike?inviteCode=${inviteCode}` : '/pagesDrawLike/alike'
     console.log('当前页面分享路径:', currentPath)
     return {
       title: `${workTitle} - 精美设计 | AI创作`,
@@ -714,7 +714,7 @@ onShareAppMessage((res: any) => {
   }
   
   // 构建作品详情页路径
-  const detailPath = inviteCode ? `/pages/drawLike/alike?id=${id}&inviteCode=${inviteCode}` : `/pages/drawLike/alike?id=${id}`
+  const detailPath = inviteCode ? `/pagesDrawLike/alike?id=${id}&inviteCode=${inviteCode}` : `/pagesDrawLike/alike?id=${id}`
   console.log('作品详情页路径:', detailPath)
   return {
     title: `${workTitle} - 精美设计 | AI创作`,
@@ -765,7 +765,7 @@ onShareTimeline(() => {
   }
   
   // 构建作品详情页路径
-  const detailPath = inviteCode ? `/pages/drawLike/alike?id=${id}&inviteCode=${inviteCode}` : `/pages/drawLike/alike?id=${id}`
+  const detailPath = inviteCode ? `/pagesDrawLike/alike?id=${id}&inviteCode=${inviteCode}` : `/pagesDrawLike/alike?id=${id}`
   console.log('朋友圈作品详情页路径:', detailPath)
   return {
     title: `我分享了一个${workTitle}，真的太棒了！`,

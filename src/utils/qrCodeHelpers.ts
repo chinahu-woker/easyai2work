@@ -15,7 +15,7 @@ async function generateMiniProgramCodeWithAPI(itemId: string): Promise<string> {
         const response = await request('wechat/generateQRCode', {
             method: 'POST',
             data: {
-                page: 'pages/drawLike/alike',     // 跳转页面
+                page: 'pagesDrawLike/alike',     // 跳转页面
                 scene: `id=${itemId}`,            // 传递参数
                 width: 280,                       // 二维码尺寸
                 env_version: 'release'            // 版本：develop, trial, release
@@ -37,7 +37,7 @@ async function generateMiniProgramCodeDirect(itemId: string): Promise<string> {
     
     const params = {
         scene: `id=${itemId}`,
-        page: 'pages/drawLike/alike',
+        page: 'pagesDrawLike/alike',
         width: 280,
         auto_color: false,
         line_color: { "r": 0, "g": 0, "b": 0 },

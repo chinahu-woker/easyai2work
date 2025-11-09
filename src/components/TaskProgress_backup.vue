@@ -205,7 +205,7 @@ const handleSave = () => {
 }
 
 const handleGotoHistory = () => {
-	uni.navigateTo({ url: '/pages/history/history_fui/history_fui' })
+	uni.navigateTo({ url: '/pagesHistorySub/history_fui/history_fui' })
 }
 
 // 下载网络图片并保存到相册

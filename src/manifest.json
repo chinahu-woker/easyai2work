@@ -16,6 +16,13 @@
             "autoclose" : true,
             "delay" : 0
         },
+        "optimization" : {
+            "subPackages" : true
+        },
+        "runmode" : "liberate",
+        "compatible" : {
+            "ignoreVersion" : true
+        },
         /* 模块配置 */
         "modules" : {
             "OAuth" : {},

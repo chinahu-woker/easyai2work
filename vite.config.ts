@@ -13,10 +13,7 @@ export default defineConfig(async () => {
   const { default: tailwindcss } = await import('@tailwindcss/vite')
   return {
     plugins: [
-      // 改成 mts，则爆 uni is not a function
       uni(),
-      // 以默认的 cjs 方式加载，报错
-      // Failed to resolve "@tailwindcss/vite". This package is ESM only but it was tried to load by `require`
       tailwindcss(),
       UnifiedViteWeappTailwindcssPlugin(
         {
@@ -25,16 +22,38 @@ export default defineConfig(async () => {
         }
       )
     ],
+    build: {
+      minify: 'terser' as const,
+      terserOptions: {
+        compress: {
+          drop_console: true,
+          drop_debugger: true,
+          pure_funcs: ['console.log']
+        }
+      },
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            'vendor': ['vue', '@dcloudio/uni-app'],
+            'ui': ['uview-plus'],
+            'utils': ['pinia']
+          }
+        }
+      },
+      chunkSizeWarningLimit: 1000
+    },
+    optimizeDeps: {
+      include: ['vue', 'pinia', '@dcloudio/uni-app'],
+      exclude: ['@dcloudio/uni-app-plus']
+    },
     css:{
       preprocessorOptions: {
         scss: {
-          // additionalData: `$u-primary: #8d1520;`
-          // additionalData: '@import "@/styles/theme.scss";'
         }
       },
 	  define: {
-	  	      'global': {} // 模拟 global 变量
-	  	    }
+	  	'global': {}
+	  }
     }
   }
 });
