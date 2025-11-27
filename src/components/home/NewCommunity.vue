@@ -392,6 +392,7 @@ const emitCommunityImages = (items: CommunityCard[]) => {
         const uniqueImages = Array.from(new Set(
             items.flatMap(item => item.images.filter(url => MEDIA_URL_PATTERN.test(url)))
         )).slice(0, 60)
+        console.log('NewCommunity - emitting community-images, count:', uniqueImages.length, 'first:', uniqueImages[0])
         uni.$emit && uni.$emit('community-images', uniqueImages)
         try { uni.setStorageSync && uni.setStorageSync('communityImages', uniqueImages) } catch (error) {}
     } catch (error) {

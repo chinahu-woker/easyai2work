@@ -218,7 +218,7 @@ const fetchCommunityImages = async (force = false) => {
 		}
 
     console.log('背景缓存失效或强制刷新，开始请求社区图片...');
-    const response = await request<any[]>('draw/history/findMany', {
+    const response = await request<any>('draw/history/findMany', {
       method: 'POST',
       data: {
         history: { is_deleted: false, is_public: true },
@@ -227,16 +227,29 @@ const fetchCommunityImages = async (force = false) => {
       }
     });
 
-    if (response && Array.isArray(response)) {
+    // Handle new API format: {total, items: [...]} or legacy array format
+    let items: any[] = [];
+    if (response) {
+      if (Array.isArray(response)) {
+        items = response;
+      } else if (response.items && Array.isArray(response.items)) {
+        items = response.items;
+      } else if (response.data && Array.isArray(response.data.items)) {
+        items = response.data.items;
+      }
+    }
+
+    if (items.length > 0) {
       const images: string[] = [];
-      response.forEach(item => {
+      items.forEach(item => {
         if (Array.isArray(item.output)) {
           images.push(...item.output.filter((u: string) => /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(u)));
         }
-        if (item.params) {
-          Object.keys(item.params).forEach(k => {
-            const v = item.params[k];
-            if (typeof v === 'string' && /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(v)) images.push(v);
+        if (item.output_content && Array.isArray(item.output_content)) {
+          item.output_content.forEach((c: any) => {
+            if (c && typeof c.url === 'string' && /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(c.url)) {
+              images.push(c.url);
+            }
           });
         }
       });
@@ -662,7 +675,7 @@ async function refreshLocalTasksFromServer(ids?: string[]) {
 	try {
 		// 请求最近的任务（后端若不支持按 id 查询，此接口通常仍能返回最近记录）
 		const limit = Math.max(20, ids && ids.length ? ids.length : 50);
-		const response = await request<any[]>('draw/history/findMany', {
+		const response = await request<any>('draw/history/findMany', {
 			method: 'POST',
 			data: {
 				// 空过滤表示获取最近公开/非删除项；如果需要可按实际后端调整
@@ -672,8 +685,20 @@ async function refreshLocalTasksFromServer(ids?: string[]) {
 			}
 		});
 
-		if (response && Array.isArray(response) && response.length > 0) {
-			const map = new Map(response.map((it: any) => [it._id, it]));
+		// Handle new API format: {total, items: [...]} or legacy array format
+		let items: any[] = [];
+		if (response) {
+			if (Array.isArray(response)) {
+				items = response;
+			} else if (response.items && Array.isArray(response.items)) {
+				items = response.items;
+			} else if (response.data && Array.isArray(response.data.items)) {
+				items = response.data.items;
+			}
+		}
+
+		if (items.length > 0) {
+			const map = new Map(items.map((it: any) => [it._id, it]));
 			// Merge server data into existing localTasks without losing local-only fields
 			const merged = (safeLocalTasks.value || []).map((local: any) => {
 				if (local && local._id && map.has(local._id)) {
@@ -941,7 +966,7 @@ const handleSave = () => {
 }
 
 const handleGotoHistory = () => {
-	uni.navigateTo({ url: '//pagesHistorySub/history_fui/history_fui' })
+	uni.navigateTo({ url: '/pagesHistorySub/history_fui/history_fui' })
 }
 
 // 下载网络图片并保存到相册
