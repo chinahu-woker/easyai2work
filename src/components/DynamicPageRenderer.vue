@@ -2,47 +2,47 @@
   <!-- 移除背景图片组件，让背景图透过 -->
   <view class="dynamic-page-renderer" :style="pageLayoutStyle">
     <view 
-      v-for="(componentConfig, index) in filteredComponents" 
-      :key="componentConfig.id"
+      v-for="(componentItem, index) in filteredComponents" 
+      :key="componentItem.config.id"
       class="dynamic-component"
-      :style="getComponentStyle(componentConfig)"
+      :style="getComponentStyle(componentItem.config)"
     >
-      <block v-if="componentConfig.component === 'Newhead'">
-        <Newhead v-bind="getComponentProps(componentConfig)" :page-type="pageType" />
+      <block v-if="componentItem.config.component === 'Newhead'">
+        <Newhead v-bind="componentItem.props" :page-type="pageType" />
       </block>
-      <block v-else-if="componentConfig.component === 'NewSwiper'">
-        <NewSwiper v-bind="getComponentProps(componentConfig)" :page-type="pageType" />
+      <block v-else-if="componentItem.config.component === 'NewSwiper'">
+        <NewSwiper v-bind="componentItem.props" :page-type="pageType" />
       </block>
-      <block v-else-if="componentConfig.component === 'NewIcon'">
-        <NewIcon v-bind="getComponentProps(componentConfig)" :page-type="pageType" />
+      <block v-else-if="componentItem.config.component === 'NewIcon'">
+        <NewIcon v-bind="componentItem.props" :page-type="pageType" />
       </block>
-      <block v-else-if="componentConfig.component === 'NewWaterFall'">
-        <NewWaterFall v-bind="getComponentProps(componentConfig)" :page-type="pageType" />
+      <block v-else-if="componentItem.config.component === 'NewWaterFall'">
+        <NewWaterFall v-bind="componentItem.props" :page-type="pageType" />
       </block>
-      <block v-else-if="componentConfig.component === 'NewStore'">
-        <NewStore v-bind="getComponentProps(componentConfig)" :page-type="pageType" />
+      <block v-else-if="componentItem.config.component === 'NewStore'">
+        <NewStore v-bind="componentItem.props" :page-type="pageType" />
       </block>
-      <block v-else-if="componentConfig.component === 'NewClassWaterFall'">
-        <NewClassWaterFall v-bind="getComponentProps(componentConfig)" :page-type="pageType" />
+      <block v-else-if="componentItem.config.component === 'NewClassWaterFall'">
+        <NewClassWaterFall v-bind="componentItem.props" :page-type="pageType" />
       </block>
-      <block v-else-if="componentConfig.component === 'NewPayWork'">
-        <NewPayWork v-bind="getComponentProps(componentConfig)" :page-type="pageType" />
+      <block v-else-if="componentItem.config.component === 'NewPayWork'">
+        <NewPayWork v-bind="componentItem.props" :page-type="pageType" />
       </block>
-      <block v-else-if="componentConfig.component === 'UserMemberInfo'">
-        <UserMemberInfo v-bind="getComponentProps(componentConfig)" :page-type="pageType" />
+      <block v-else-if="componentItem.config.component === 'UserMemberInfo'">
+        <UserMemberInfo v-bind="componentItem.props" :page-type="pageType" />
       </block>
-      <block v-else-if="componentConfig.component === 'NewCommunity'">
-        <NewCommunity v-bind="getComponentProps(componentConfig)" :page-type="pageType" />
+      <block v-else-if="componentItem.config.component === 'NewCommunity'">
+        <NewCommunity v-bind="componentItem.props" :page-type="pageType" />
       </block>
-      <block v-else-if="componentConfig.component === 'NewLoginInfo'">
-        <NewLoginInfo v-bind="getComponentProps(componentConfig)" :page-type="pageType" />
+      <block v-else-if="componentItem.config.component === 'NewLoginInfo'">
+        <NewLoginInfo v-bind="componentItem.props" :page-type="pageType" />
       </block>
-      <block v-else-if="componentConfig.component === 'HorizontalAnnouncement'">
-        <HorizontalAnnouncement v-bind="getComponentProps(componentConfig)" :page-type="pageType" />
+      <block v-else-if="componentItem.config.component === 'HorizontalAnnouncement'">
+        <HorizontalAnnouncement v-bind="componentItem.props" :page-type="pageType" />
       </block>
       <block v-else>
         <view class="component-placeholder">
-          组件 {{ componentConfig.component }} 未找到
+          组件 {{ componentItem.config.component }} 未找到
         </view>
       </block>
     </view>
@@ -83,6 +83,11 @@ interface ComponentConfig {
   component: string
   props: Record<string, any>
   style: Record<string, string>
+}
+
+interface ComponentRenderItem {
+  config: ComponentConfig
+  props: Record<string, any>
 }
 
 interface PageConfig {
@@ -176,16 +181,43 @@ const shouldShowComponent = (componentId: string) => {
 }
 
 // 过滤后的组件列表
-const filteredComponents = computed(() => {
+const filteredComponents = computed<ComponentRenderItem[]>(() => {
   try {
     const configValue = pageConfig.value || { components: [] }
     const components = Array.isArray(configValue.components) ? configValue.components : []
-    return components.filter(comp => shouldShowComponent(comp.id))
+    return components
+      .map(componentConfig => {
+        const resolvedProps = getComponentProps(componentConfig)
+        return {
+          config: componentConfig,
+          props: resolvedProps
+        }
+      })
+      .filter(({ config, props }) => shouldShowComponent(config.id) && componentHasData(config, props))
   } catch (error) {
     console.error('Error in filteredComponents:', error)
     return []
   }
 })
+
+const hasMeaningfulValue = (value: any): boolean => {
+  if (value === null || value === undefined) return false
+  if (typeof value === 'string') return value.trim().length > 0
+  if (Array.isArray(value)) return value.some(item => hasMeaningfulValue(item))
+  if (typeof value === 'object') {
+    const entries = Object.values(value)
+    if (entries.length === 0) return false
+    return entries.some(entry => hasMeaningfulValue(entry))
+  }
+  return true
+}
+
+const componentHasData = (componentConfig: ComponentConfig, resolvedProps: Record<string, any>) => {
+  const hasDefinedProps = componentConfig.props && Object.keys(componentConfig.props).length > 0
+  if (!hasDefinedProps) return true
+  if (!resolvedProps || Object.keys(resolvedProps).length === 0) return false
+  return Object.values(resolvedProps).some(value => hasMeaningfulValue(value))
+}
 
 // 解析属性值，处理模板变量
 const parsePropValue = (value: any): any => {

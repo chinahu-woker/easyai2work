@@ -59,7 +59,7 @@
                  :webp="true"
                  :fade-show="true"
                  @error="onThumbnailError" />
-          <!-- 视频图标覆�层 -->
+          <!-- 视频 -->
           <view class="video-thumbnail-overlay">
             <fui-icon name="play" color="#fff" size="16"></fui-icon>
           </view>

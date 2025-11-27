@@ -179,7 +179,7 @@
 <template>
 	<view :class="[ns.b()]" @tap="cardClickEvent">
 		<!-- 简要信息 -->
-		<view :class="[ns.e('brief-info')]">
+		<view v-if="showBriefInfo" :class="[ns.e('brief-info')]">
 			<view :class="[ns.e('brief-info__content')]">
 				<view :class="[ns.e('brief-info__avatar')]" @tap.stop="handleAvatarClick">
 					<!--          <image class="image" :src="avatar" mode="aspectFill" />-->
@@ -272,7 +272,7 @@
 		</view>
 
 		<!-- 标签区域（底部显示） -->
-		<view v-if="tags && tags.length" :class="[ns.e('tags')]">
+		<view v-if="showTags && tags && tags.length" :class="[ns.e('tags')]">
 			<view v-for="(tagItem, tagIndex) in tags" :key="tagIndex" class="tag-item" :class="[tagClass]"
 				:style="tagStyle">
 				<TnIcon name="topics-fill" />
@@ -281,7 +281,7 @@
 		</view>
 
 		<!-- 底部信息 -->
-		<view :class="[ns.e('bottom-info'), ns.is('no-content', !!$slots.bottomRight)]">
+		<view v-if="showBottomInfo" :class="[ns.e('bottom-info'), ns.is('no-content', !!$slots.bottomRight)]">
 			<view :class="[ns.e('bottom-info__actions')]">
 				<view :class="[ns.e('bottom-info__left')]">
 					<view v-if="showHot" class="count-item-data" :class="[hotClass]" :style="hotStyle"

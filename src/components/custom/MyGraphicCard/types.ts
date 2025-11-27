@@ -26,6 +26,27 @@ export const graphicCardProps = buildProps({
         required: true,
     },
     /**
+     * @description 是否显示顶部的简要信息
+     */
+    showBriefInfo: {
+        type: Boolean,
+        default: true,
+    },
+    /**
+     * @description 是否显示标签
+     */
+    showTags: {
+        type: Boolean,
+        default: true,
+    },
+    /**
+     * @description 是否显示底部信息
+     */
+    showBottomInfo: {
+        type: Boolean,
+        default: true,
+    },
+    /**
      * @description 描述
      */
     description: {

@@ -13,6 +13,9 @@
       "index": 2
     }
   ],
+  "defaultAssets": {
+    "avatar": "https://ai-1357282892.cos.ap-shanghai.myqcloud.com/6811db59c58c28287e07e45c/upload/20250521115936505-3434-06.png"
+  },
   "globalAppData": {
     "name": "globalAppData",
     "share": {

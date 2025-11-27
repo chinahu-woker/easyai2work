@@ -30,14 +30,15 @@
         </view>
 
         <!-- 瀑布流容器 -->
-        <view v-else-if="graphicDatas.length > 0 && isComponentReady" class="waterfall-container">
+        <view v-else-if="graphicDatas.length > 0" class="waterfall-container">
             <view class="waterfall-column">
                 <view v-for="(item, index) in leftColumnData" :key="`left-${item.id}-${index}`" class="waterfall-item"
                     @click="goToEntire(item.id)">
                     <MyGraphicCard :avatar="item.avatar" :title="item.title" :username="item.username"
                         :description="item.description" :tags="item.tags" :content="item.content" :images="item.images"
                         :view-count="item.viewCount" :show-hot="false" :show-comment="false" :show-like="false"
-                        :view-user-avatars="item.viewUserAvatars">
+                        :view-user-avatars="item.viewUserAvatars" :show-more="false" :show-view-user="false"
+                        :show-brief-info="true" :show-tags="false" :show-bottom-info="false">
                         <template #bottomRight>
                             <!-- 暂时注释分享按钮 -->
                             <!-- <view class="share-actions">
@@ -56,7 +57,8 @@
                     <MyGraphicCard :avatar="item.avatar" :title="item.title" :username="item.username"
                         :description="item.description" :tags="item.tags" :content="item.content" :images="item.images"
                         :view-count="item.viewCount" :show-hot="false" :show-comment="false" :show-like="false"
-                        :view-user-avatars="item.viewUserAvatars">
+                        :view-user-avatars="item.viewUserAvatars" :show-more="false" :show-view-user="false"
+                        :show-brief-info="true" :show-tags="false" :show-bottom-info="false">
                         <template #bottomRight>
                             <!-- 暂时注释分享按钮 -->
                             <!-- <view class="share-actions">
@@ -96,39 +98,185 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, computed, watch, nextTick } from 'vue'
+import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 import MyGraphicCard from "@/components/custom/MyGraphicCard/MyGraphicCard.vue"
 import { request } from "@/utils/request.ts"
-import type { IDrawHistoryItem } from "@/types"
+import type { IDrawHistoryItem, User } from "@/types"
 import { formatDateTime } from "@/utils/common.ts"
 import fuiFooter from "@/components/firstui/fui-footer/fui-footer.vue"
 import fuiIcon from "@/components/firstui/fui-icon/fui-icon.vue"
 import { PosterGenerator, type PosterData } from "@/utils/posterGenerator.ts"
 import { setShareData, generateDetailShareData } from "@/utils/shareManager.ts"
+import { defaultAssets } from "@/cofigs/data/globalAppData"
+
+type HistoryApiItem = IDrawHistoryItem & {
+    user?: User
+    user_id?: string | User
+    output_content?: Array<{ url?: string | null; type?: string | null; mediaSize?: unknown }>
+    workflow?: { title?: string; name?: string }
+    workflow_title?: string
+    workflow_name?: string
+}
+
+const FALLBACK_AVATAR = typeof defaultAssets.avatar === 'string' && defaultAssets.avatar.trim().length
+    ? defaultAssets.avatar
+    : 'https://ai-1357282892.cos.ap-shanghai.myqcloud.com/6811db59c58c28287e07e45c/upload/20250521115936505-3434-06.png'
+const FALLBACK_SUMMARY = '精彩内容敬请期待'
+const VIDEO_SUMMARY = '视频内容'
+const MEDIA_URL_PATTERN = /\.(jpg|jpeg|png|gif|bmp|webp|avif|svg|tiff|tif|ico|mp4|mov|webm|avi|mkv|wmv)(\?|$)/i
+
+type CommunityCard = {
+    id: string
+    avatar: string
+    title: string
+    username: string
+    description: string
+    tags: string[]
+    content: string
+    type: string
+    mediaSize: HistoryApiItem['mediaSize'] | null
+    workflowName: string
+    images: string[]
+    viewCount: number
+    viewUserAvatars: string[]
+    originalData: HistoryApiItem
+}
+
+const resolveHistoryItems = (payload: unknown): HistoryApiItem[] => {
+    if (Array.isArray(payload)) {
+        return payload as HistoryApiItem[]
+    }
+    if (payload && typeof payload === 'object') {
+        const record = payload as Record<string, unknown>
+        const directItems = record.items
+        if (Array.isArray(directItems)) {
+            return directItems as HistoryApiItem[]
+        }
+        const data = record.data
+        if (data && typeof data === 'object') {
+            const nestedItems = (data as Record<string, unknown>).items
+            if (Array.isArray(nestedItems)) {
+                return nestedItems as HistoryApiItem[]
+            }
+        }
+    }
+    return []
+}
+
+const resolveHistoryTotal = (payload: unknown, fallback: number): number => {
+    if (payload && typeof payload === 'object') {
+        const record = payload as Record<string, unknown>
+        const totalValue = record.total ?? (record.data && typeof record.data === 'object' ? (record.data as Record<string, unknown>).total : undefined)
+        if (typeof totalValue === 'number' && Number.isFinite(totalValue)) {
+            return totalValue
+        }
+    }
+    return fallback
+}
+
+const resolveUserInfo = (item: HistoryApiItem): User | undefined => {
+    if (item.user && typeof item.user === 'object') {
+        return item.user
+    }
+    if (item.user_id && typeof item.user_id === 'object') {
+        return item.user_id as User
+    }
+    return undefined
+}
+
+const isValidMediaUrl = (url?: string | null): url is string => {
+    if (!url || typeof url !== 'string') return false
+    const trimmed = url.trim()
+    if (!trimmed) return false
+    if (!trimmed.startsWith('http://') && !trimmed.startsWith('https://')) return false
+    return MEDIA_URL_PATTERN.test(trimmed)
+}
+
+const truncateText = (value: string, maxLength: number) => {
+    if (!value) return ''
+    return value.length > maxLength ? `${value.slice(0, maxLength)}...` : value
+}
+
+const toPlainObject = (value: unknown): Record<string, any> => (value && typeof value === 'object') ? value as Record<string, any> : {}
+
+const toArray = <T>(value: unknown): T[] => Array.isArray(value) ? value as T[] : []
+
+const parseHistoryResponse = (payload: unknown) => {
+    const items = resolveHistoryItems(payload)
+    const total = Math.max(resolveHistoryTotal(payload, items.length), items.length)
+    return { items, total }
+}
+
+const mergeHistoryItems = (current: HistoryApiItem[], incoming: HistoryApiItem[]) => {
+    if (!incoming.length) return current
+    const merged = current.slice()
+    const indexMap = new Map<string, number>()
+    merged.forEach((item, idx) => {
+        if (item?._id) indexMap.set(item._id, idx)
+    })
+    incoming.forEach(item => {
+        if (!item) return
+        if (item._id && indexMap.has(item._id)) {
+            merged[indexMap.get(item._id)!] = item
+        } else {
+            if (item?._id) indexMap.set(item._id, merged.length)
+            merged.push(item)
+        }
+    })
+    return merged
+}
+
+const collectResultMediaUrls = (entry: HistoryApiItem) => {
+    const fromOutputs = toArray(entry?.output)
+        .map(value => {
+            if (typeof value === 'string') return value
+            if (value && typeof value === 'object' && 'url' in value) {
+                const possible = (value as { url?: string | null }).url
+                return typeof possible === 'string' ? possible : undefined
+            }
+            return undefined
+        })
+        .filter(isValidMediaUrl)
+
+    const fromOutputContent = toArray<{ url?: string | null }>(entry?.output_content)
+        .map(item => item?.url)
+        .filter(isValidMediaUrl)
+
+    return Array.from(new Set([...fromOutputs, ...fromOutputContent]))
+}
+
+const createSummary = (typeValue: unknown, workflowTitle: string | undefined, positive: string) => {
+    if (typeValue === 'video') {
+        if (workflowTitle && positive) return `${workflowTitle}: ${truncateText(positive, 80)}`
+        if (workflowTitle) return workflowTitle
+        if (positive) return truncateText(positive, 120)
+        return VIDEO_SUMMARY
+    }
+    return positive ? truncateText(positive, 120) : FALLBACK_SUMMARY
+}
 
 // 数据获取
 const loading = ref(true)
 const errorMsg = ref('')
-const isComponentReady = ref(false)
 
 // 分页状态管理
-const currentPage = ref(1)
 const pageSize = ref(10)
 const hasMoreData = ref(true)
 const loadingMore = ref(false)
-const allImageData = ref<IDrawHistoryItem[]>([])
-const displayedCount = ref(10) // 当前显示的数据数量
+const totalCount = ref(0)
+const allImageData = ref<HistoryApiItem[]>([])
+const displayedCount = ref(pageSize.value)
 
 const getTestImageData = async (isLoadMore = false) => {
     try {
-        if (!isLoadMore) {
+        if (isLoadMore) {
+            loadingMore.value = true
+        } else {
             loading.value = true
             errorMsg.value = ''
-        } else {
-            loadingMore.value = true
         }
 
-        const response = await request<IDrawHistoryItem[]>('draw/history/findMany', {
+        const response = await request<unknown>('draw/history/findMany', {
             method: 'POST',
             data: {
                 history: {
@@ -138,32 +286,29 @@ const getTestImageData = async (isLoadMore = false) => {
             }
         })
 
-        if (response && Array.isArray(response) && response.length > 0) {
-            if (!isLoadMore) {
-                // 首次加载，重置所有数据
-                allImageData.value = response
-                displayedCount.value = Math.min(pageSize.value, response.length)
-                hasMoreData.value = response.length > pageSize.value
-            } else {
-                // 加载更多，保持原有数据不变，只增加显示数量
-                const newDisplayCount = Math.min(displayedCount.value + pageSize.value, allImageData.value.length)
-                displayedCount.value = newDisplayCount
-                hasMoreData.value = newDisplayCount < allImageData.value.length
-            }
+        const { items, total } = parseHistoryResponse(response)
+
+        if (isLoadMore) {
+            allImageData.value = mergeHistoryItems(allImageData.value, items)
+            totalCount.value = Math.max(totalCount.value, total, allImageData.value.length)
+            const maxAvailable = Math.max(totalCount.value, allImageData.value.length)
+            displayedCount.value = Math.min(displayedCount.value + pageSize.value, maxAvailable)
         } else {
-            if (!isLoadMore) {
-                allImageData.value = []
-                displayedCount.value = 0
-            }
-            hasMoreData.value = false
+            allImageData.value = items
+            totalCount.value = total
+            displayedCount.value = Math.min(pageSize.value, allImageData.value.length)
         }
 
+        const available = Math.max(totalCount.value, allImageData.value.length)
+        hasMoreData.value = displayedCount.value < available
     } catch (err) {
         console.error('=== NewCommunity组件：获取数据失败 ===', err)
         if (!isLoadMore) {
-            errorMsg.value = '数据加载失败: ' + (err as any)?.message || '未知错误'
+            const message = (err as { message?: string })?.message || '未知错误'
+            errorMsg.value = '数据加载失败: ' + message
             allImageData.value = []
             displayedCount.value = 0
+            totalCount.value = 0
         } else {
             uni.showToast({
                 title: '加载失败，请重试',
@@ -183,170 +328,80 @@ const getTestImageData = async (isLoadMore = false) => {
 // 加载更多数据
 const loadMoreData = async () => {
     if (loadingMore.value || !hasMoreData.value) return
-    
-    console.log('触发加载更多数据')
     await getTestImageData(true)
 }
 
-const imageData = ref<IDrawHistoryItem[]>([])
-
 // 图文卡片展示的数据 - 基于显示数量控制
-const graphicDatas = computed(() => {
-    if (!Array.isArray(allImageData.value)) {
-        return []
-    }
+const graphicDatas = computed<CommunityCard[]>(() => {
+    const source = Array.isArray(allImageData.value) ? allImageData.value : []
+    const limited = source.slice(0, displayedCount.value)
+    const cards: CommunityCard[] = []
 
-    // 只取当前应该显示的数据数量
-    const dataToShow = allImageData.value.slice(0, displayedCount.value)
+    limited.forEach((entry, index) => {
+        const plain = toPlainObject(entry)
+        const entryId = entry?._id || plain._id || `history-${index}`
+        const userInfo = resolveUserInfo(entry)
+        const displayName = userInfo?.nickname || userInfo?.username || '匿名用户'
+        const avatarUrl = userInfo?.avatar_url || FALLBACK_AVATAR
 
-    const result = dataToShow.map((item, index) => {
-        const it: any = item || {}
+        const createdAtValue = plain.created_at ?? entry?.created_at ?? Date.now()
+        const createdAt = new Date(createdAtValue)
+        const description = Number.isNaN(createdAt.getTime()) ? formatDateTime(new Date()) : formatDateTime(createdAt)
 
-        // 调试信息：输出视频类型的数据
-        if (it.type === 'video') {
-            console.log('处理视频数据:', {
-                id: it._id,
-                type: it.type,
-                workflowName: it.workflow_name,
-                outputCount: it.output?.length || 0,
-                outputUrls: it.output
-            })
+        const paramsRecord = toPlainObject(entry?.params)
+        const positive = typeof paramsRecord.positive === 'string' ? paramsRecord.positive : ''
+        const workflowTitle = [entry?.workflow?.title, entry?.workflow?.name, entry?.workflow_title, entry?.workflow_name, plain.workflow_title, plain.workflow_name]
+            .find(value => typeof value === 'string' && value.trim()) as string | undefined
+
+        const tags: string[] = []
+
+        const images = collectResultMediaUrls(entry)
+        if (!images.length) {
+            return
         }
+        const typeValue = typeof entry?.type === 'string' ? entry.type : typeof plain.type === 'string' ? plain.type : 'image'
 
-        const mappedItem = {
-            id: it._id,
-            avatar: it.user_id?.avatar_url || 'https://ai-1357282892.cos.ap-shanghai.myqcloud.com/6811db59c58c28287e07e45c/upload/20250521115936505-3434-06.png',
-            title: it.user_id?.nickname || it.user_id?.username || '匿名用户',
-            username: it.user_id?.nickname || it.user_id?.username || '匿名用户',
-            description: formatDateTime(new Date(it.created_at || Date.now())),
-            tags: it.tags || [],
-            content: (() => {
-                if (it.type === 'video') {
-                    // 视频类型显示工作流名称和描述
-                    const workflowTitle = it.workflow_title || it.workflow_name || ''
-                    const positive = it.params?.positive || ''
-                    if (workflowTitle && positive) {
-                        return `${workflowTitle}: ${positive.slice(0, 80)}...`
-                    } else if (workflowTitle) {
-                        return workflowTitle
-                    } else if (positive) {
-                        return positive.slice(0, 120) + '...'
-                    } else {
-                        return '视频内容'
-                    }
-                } else {
-                    // 图片类型显示原来的逻辑
-                    return (it.params?.positive?.slice(0, 120) || '') + "..."
-                }
-            })(),
-            type: it.type || 'image', // 添加类型信息
-            mediaSize: it.mediaSize || null, // 添加媒体尺寸信息
-            workflowName: it.workflow_name || it.workflow_title || '', // 工作流名称
-            images: (() => {
-                const inputImages: string[] = []
-                // 添加防御性检查，确保 it.params 是对象类型
-                const paramsAny = (it.params && typeof it.params === 'object') ? it.params as Record<string, any> : undefined
-                
-                // 收集输入图片
-                if (paramsAny) {
-                    for (const key in paramsAny) {
-                        if (key.startsWith('image_path_') && paramsAny[key]) {
-                            // 只有当参数值是图片URL时才添加
-                            const value = paramsAny[key]
-                            if (typeof value === 'string' && 
-                                value.match(/\.(jpg|jpeg|png|gif|bmp|webp|avif|svg|tiff|tif|ico)(\?|$)/i)) {
-                                inputImages.push(value)
-                            }
-                        }
-                    }
-                }
-                
-                let allMediaUrls = []
-                
-                // 根据数据类型处理输出内容
-                if (it.type === 'video') {
-                    // 如果是视频类型，output 中的内容应该作为视频处理
-                    if (it.output && Array.isArray(it.output)) {
-                        allMediaUrls = [...inputImages, ...it.output]
-                    } else {
-                        allMediaUrls = inputImages
-                    }
-                } else {
-                    // 如果不是视频类型，按原来的逻辑处理（主要是图片）
-                    if (it.output && Array.isArray(it.output)) {
-                        allMediaUrls = [...inputImages, ...it.output]
-                    } else {
-                        allMediaUrls = inputImages
-                    }
-                }
-                
-                // 过滤无效的媒体URL
-                const validMediaUrls = allMediaUrls.filter(media => 
-                    media && 
-                    typeof media === 'string' && 
-                    media.trim() !== '' &&
-                    (media.startsWith('http://') || media.startsWith('https://'))
-                )
-                
-                // 如果没有有效媒体，返回空数组
-                return validMediaUrls.length > 0 ? validMediaUrls : []
-            })(),
-            viewCount: (it.view_count ?? it.viewCount ?? Math.floor(Math.random() * 1000)),
-            viewUserAvatars: it.view_user_avatars ?? it.viewUserAvatars ?? [],
-            // 原始数据，用于海报生成
-            originalData: it
-        }
+        const viewCountSource = plain.view_count ?? plain.viewCount
+        const viewCount = typeof viewCountSource === 'number' ? viewCountSource : Math.floor(Math.random() * 1000)
 
-        return mappedItem
+        const rawViewAvatars = plain.view_user_avatars ?? plain.viewUserAvatars
+        const viewUserAvatars = toArray<string>(rawViewAvatars).filter(Boolean)
+
+        cards.push({
+            id: entryId,
+            avatar: avatarUrl,
+            title: displayName,
+            username: displayName,
+            description,
+            tags,
+            content: createSummary(typeValue, workflowTitle, positive),
+            type: typeValue,
+            mediaSize: entry?.mediaSize || plain.mediaSize || null,
+            workflowName: workflowTitle || '',
+            images,
+            viewCount,
+            viewUserAvatars,
+            originalData: entry
+        })
     })
-
-    return result
+    return cards
 })
 
-// 监听数据变化，确保组件准备状态正确设置
-watch(graphicDatas, (newData) => {
-    if (newData && newData.length > 0 && !loading.value) {
-        nextTick(() => {
-            isComponentReady.value = true
-        })
-    }
-}, { immediate: true })
-
-// 收集图片并通过事件总线发送给其他组件（如任务进度背景）
-const emitCommunityImages = () => {
+const emitCommunityImages = (items: CommunityCard[]) => {
     try {
-        const imgs: string[] = []
-        graphicDatas.value.forEach(item => {
-            if (Array.isArray((item as any).images)) {
-                ;(item as any).images.forEach((url: string) => {
-                    if (/\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(url)) {
-                        imgs.push(url)
-                    }
-                })
-            }
-        })
-        const unique = Array.from(new Set(imgs)).slice(0, 60) // 最多取 60 张，供瀑布流循环
-        // 事件派发
-        uni.$emit && uni.$emit('community-images', unique)
-        // 备份到本地缓存，供其他页面首次进入时获取
-        try { uni.setStorageSync && uni.setStorageSync('communityImages', unique) } catch (e) {}
-    } catch (e) {
-        console.warn('emitCommunityImages error', e)
+        const uniqueImages = Array.from(new Set(
+            items.flatMap(item => item.images.filter(url => MEDIA_URL_PATTERN.test(url)))
+        )).slice(0, 60)
+        uni.$emit && uni.$emit('community-images', uniqueImages)
+        try { uni.setStorageSync && uni.setStorageSync('communityImages', uniqueImages) } catch (error) {}
+    } catch (error) {
+        console.warn('emitCommunityImages error', error)
     }
 }
 
-watch(graphicDatas, (v) => {
-    if (v && v.length) {
-        emitCommunityImages()
-    }
-})
-
-onMounted(() => {
-    // 初次进入如果已经有数据也发一次
-    if (graphicDatas.value && graphicDatas.value.length) {
-        emitCommunityImages()
-    }
-})
+watch(graphicDatas, (cards) => {
+    emitCommunityImages(cards)
+}, { immediate: true })
 
 // 左列数据（偶数索引）
 const leftColumnData = computed(() => {
@@ -365,9 +420,17 @@ function goToEntire(id: any) {
     isNavigating = true
 
     uni.navigateTo({
-        url: `/pages/drawLike/alike?id=${id}`,
-        complete: () => {
+        url: `/pagesDrawLike/alike?id=${encodeURIComponent(id)}`,
+        success: () => {
             isNavigating = false
+        },
+        fail: (error) => {
+            isNavigating = false
+            console.error('navigateTo /pagesDrawLike/alike 失败:', error)
+            uni.showToast({
+                title: '打开作品失败',
+                icon: 'none'
+            })
         }
     })
 }
@@ -563,25 +626,10 @@ function copyShareLink(itemData?: any) {
 }
 
 onMounted(() => {
-    console.log('=== NewCommunity组件：已挂载 ===')
     getTestImageData(false)
 })
 
-// 组件挂载时处理已有数据
-onMounted(async () => {
-    // 获取数据
-    await getTestImageData(false)
-    
-    // 如果数据已经存在，立即初始化
-    if (graphicDatas.value && graphicDatas.value.length > 0) {
-        nextTick(() => {
-            isComponentReady.value = true
-        })
-    }
-})
-
 onUnmounted(() => {
-    console.log('=== NewCommunity组件：已卸载 ===')
     // 销毁当前组件
     allImageData.value = []
     displayedCount.value = 0

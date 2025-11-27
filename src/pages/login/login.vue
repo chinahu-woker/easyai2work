@@ -68,7 +68,7 @@
 			</view>
 			<view class="divider">
 				<view class="divider-line"></view>
-				<text class="divider-text">版本号：v2025.11.1</text>
+				<text class="divider-text">版本号：v2025.11.27</text>
 				<view class="divider-line"></view>
 			</view>
 		</view>

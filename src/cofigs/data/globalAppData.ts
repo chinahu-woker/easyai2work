@@ -15,3 +15,4 @@ export const iconTagName = pagesGlobalDataJson.iconTagName || []
 export const pageComponents = pagesGlobalDataJson.pageComponents || {}
 export const dynamicComponentRules = pagesGlobalDataJson.dynamicComponentRules || {}
 export const globalTabbarData = pagesGlobalDataJson.tabbarData || []
+export const defaultAssets = pagesGlobalDataJson.defaultAssets || {}

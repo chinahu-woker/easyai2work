@@ -242,7 +242,7 @@ const handleLoginOut = () => {
 // 跳转到历史记录
 const handleGotoHistory = () => {
   uni.navigateTo({
-    url: '/pages/history/history_fui/history_fui'
+    url: '/pagesHistorySub/history_fui/history_fui'
   })
 }
 
