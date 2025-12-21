@@ -1,0 +1,112 @@
+{
+  "easycom": {
+    "autoscan": true,
+    "custom": {
+      "^u--(.*)": "uview-plus/components/u-$1/u-$1.vue",
+      "^up-(.*)": "uview-plus/components/u-$1/u-$1.vue",
+      "^u-([^-].*)": "uview-plus/components/u-$1/u-$1.vue",
+      "^tn-(.*)-(item|group)": "@tuniao/tnui-vue3-uniapp/components/$1/src/$1-$2.vue",
+      "^tn-(.*)": "@tuniao/tnui-vue3-uniapp/components/$1/src/$1.vue",
+      "fui-(.*)": "@/components/firstui/fui-$1/fui-$1.vue"
+    }
+  },
+  "pages": [
+    {
+      "path": "pages/index/index",
+      "style": {
+        "navigationBarTitleText": " ",
+        "navigationStyle": "custom",
+        "enablePullDownRefresh": false,
+        "disableScroll": true,
+        "maxWidth": "100%"
+      },
+      "onReachBottomDistance": 50,
+      "enableShareAppMessage": true,
+      "enableShareTimeline": true
+    },
+    { "path": "pages/creative/creative", "style": { "navigationBarTitleText": " " } },
+    { "path": "pages/home/home", "style": { "navigationBarTitleText": " " } },
+    { "path": "pages/setting/setting", "style": { "navigationBarTitleText": " " } },
+    { "path": "pages/history/history", "style": { "navigationBarTitleText": " " } },
+    { "path": "pages/draw/apps/apps", "style": { "navigationBarTitleText": " ", "navigationStyle": "custom" } },
+    { "path": "pages/Empty/Empty", "style": { "navigationBarTitleText": "" } },
+    { "path": "pages/console/console", "style": { "navigationBarTitleText": "" } },
+    { "path": "pages/login/login", "style": { "navigationBarTitleText": "" } },
+    { "path": "pages/login/Qr_login", "style": { "navigationBarTitleText": "扫码登录" } },
+    { "path": "pages/login/register", "style": { "navigationBarTitleText": "" } }
+  ],
+  "subPackages": [
+    {
+      "root": "pagesDrawSub",
+      "name": "drawSub",
+      "pages": [
+        { "path": "draw_info/draw_info", "style": { "navigationBarTitleText": "" } },
+        { "path": "image-editor", "style": { "navigationBarTitleText": "图片编辑" } }
+      ]
+    },
+    {
+      "root": "pagesHistorySub",
+      "name": "historySub",
+      "pages": [
+        { "path": "history_fui/history_fui", "style": { "navigationBarTitleText": "" } }
+      ]
+    },
+    {
+      "root": "pagesDrawLike",
+      "name": "drawLike",
+      "pages": [
+        { 
+          "path": "alike", 
+          "style": { 
+            "navigationBarTitleText": "作品详情",
+            "enablePullDownRefresh": false,
+            "backgroundTextStyle": "dark",
+            "app-plus": {
+              "animationType": "slide-in-right",
+              "animationDuration": 200
+            }
+          } 
+        }
+      ]
+    }
+  ],
+  "preloadRule": {
+    "pages/index/index": {
+      "network": "all",
+      "packages": ["drawSub"]
+    },
+    "pages/creative/creative": {
+      "network": "all",
+      "packages": ["drawSub"]
+    },
+    "pages/home/home": {
+      "network": "all",
+      "packages": ["historySub"]
+    }
+  },
+  "globalStyle": {
+    "navigationBarTextStyle": "white",
+    "navigationBarTitleText": " ",
+    "navigationStyle": "custom",
+    "navigationBarBackgroundColor": "#ffffff",
+    "backgroundColor": "#f6f7fa",
+    "backgroundTextStyle": "light",
+    "enablePullDownRefresh": false,
+    "onReachBottomDistance": 50,
+    "pageOrientation": "portrait",
+    "animationType": "pop-in",
+    "animationDuration": 200,
+    "app-plus": {
+      "bounce": "none",
+      "scrollIndicator": "none",
+      "softinputMode": "adjustResize",
+      "popGesture": "close"
+    }
+  },
+  "condition": {
+    "current": 0,
+    "list": [
+      { "name": "", "path": "", "query": "" }
+    ]
+  }
+}

@@ -1,0 +1,333 @@
+@use './mixins/mixins.scss' as *;
+
+@include b(graphic-card) {
+  position: relative;
+  width: 100%;
+  padding: 30rpx;
+  // background-color: var(--tn-color-white);
+  background-color: transparent;
+
+  /* 简要信息 start */
+  @include e(brief-info) {
+    display: flex;
+    align-items: center;
+
+    /* 简要内容 start */
+    &__content {
+      flex-grow: 1;
+      display: flex;
+      margin-left: -10rpx;
+    }
+    &__avatar {
+      flex-shrink: 0;
+      width: 40rpx;
+      height: 40rpx;
+      border-radius: 50%;
+      background-color: var(--tn-color-gray--disabled);
+      .image {
+        width: 100%;
+        height: 100%;
+        border-radius: inherit;
+      }
+    }
+    &__data {
+      flex-grow: 1;
+      margin-left: 24rpx;
+      color: var(--tn-text-color-primary);
+      line-height: 1;
+      padding-top: 6rpx;
+      .title {
+        font-size: 30rpx;
+      }
+      .desc {
+        margin-top: 16rpx;
+        font-size: 24rpx;
+        color: var(--tn-color-gray);
+      }
+    }
+    /* 简要内容 end */
+
+    /* 操作按钮 start */
+    &__operation {
+      flex-grow: 0;
+
+      &--more {
+        font-size: 40rpx;
+        font-weight: bold;
+        color: var(--tn-color-gray-disabled);
+        padding-left: 20rpx;
+      }
+    }
+    /* 操作按钮 end */
+  }
+  /* 简要信息 end */
+
+  /* 内容 start */
+  @include e(container) {
+    margin-top: 20rpx;
+  }
+  @include e(content) {
+    /* 内容标签 start */
+    &__tags {
+      display: flex;
+      float: left;
+      align-items: center;
+      margin-top: 4rpx;
+      .tag-item {
+        display: inline-flex;
+        align-items: center;
+        padding: 8rpx 16rpx;
+        border-radius: 6rpx;
+        margin-right: 16rpx;
+        font-size: 24rpx;
+        line-height: 1;
+        max-width: 360rpx; /* 根据设计调整最大宽度 */
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+    /* 内容标签 end */
+
+    /* 内容数据 start */
+    &__data {
+      font-size: 28rpx;
+      line-height: 1.8em;
+      // display: inline-block;
+      color: var(--tn-text-color-primary);
+      // 文字两端对齐
+      text-align: justify;
+    }
+    /* 内容数据 end */
+  }
+
+  /* 图片列表 start */
+  @include e(images) {
+    width: 100%;
+    margin-top: 20rpx;
+
+    .image-swiper, .video-swiper {
+      width: 100%;
+      height: 400rpx;
+    }
+
+    @include m(item) {
+      /* 轮播图片样式 */
+      @include when(swiper) {
+        width: 100%;
+        height: 400rpx;
+        border-radius: 15rpx;
+        overflow: hidden;
+      }
+
+      /* 一张图片 start */
+      @include when(one) {
+        width: 100%;
+        height: 400rpx;
+        border-radius: 15rpx;
+      }
+      /* 一张图片 end */
+
+      /* 两张图片 start */
+      @include when(two) {
+        width: 80%;
+      }
+      /* 两张图片 end */
+
+      /* 三张图片 start */
+      @include when(three) {
+        position: relative;
+        width: 100%;
+        height: 332rpx;
+        display: flex;
+        align-items: center;
+
+        /* 左边单图 start */
+        .image-wrapper-left {
+          position: relative;
+          width: 50%;
+          height: 100%;
+
+          .image-container {
+            width: 100%;
+            height: 100%;
+            border-radius: 15rpx;
+          }
+        }
+        /* 左边单图 end */
+        /* 右边双图 start */
+        .image-wrapper-right {
+          position: relative;
+          flex: 1;
+          height: 100%;
+          margin-left: 28rpx;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+
+          .image-container {
+            flex: 1;
+            width: 100%;
+            border-radius: 15rpx;
+
+            & + .image-container {
+              margin-top: 28rpx;
+            }
+          }
+        }
+        /* 右边双图 end */
+      }
+      /* 三张图片 end */
+
+      /* 四张图片 start */
+      @include when(four) {
+        width: 80%;
+      }
+      /* 四张图片 end */
+    }
+  }
+  /* 图片列表 end */
+  
+  /* 轮播图容器 start */
+  @include e(swiper-container) {
+    width: 100%;
+    height: 400rpx;
+    border-radius: 12rpx;
+    overflow: hidden;
+    margin-top: 16rpx;
+    
+    .media-swiper {
+      width: 100%;
+      height: 100%;
+      border-radius: 12rpx;
+    }
+  }
+  
+  @include e(swiper-item) {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    .swiper-image {
+      width: 100% !important;
+      height: 100% !important;
+      border-radius: 12rpx;
+      object-fit: cover;
+    }
+    
+    .swiper-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 12rpx;
+    }
+    
+    // 原生image组件样式
+    image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 12rpx;
+    }
+    
+    // 确保懒加载组件内部的图片正确显示
+    // 移除:deep()选择器，改用类名选择器
+    .tn-lazy-load {
+      width: 100%;
+      height: 100%;
+      
+      .tn-lazy-load__image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 12rpx;
+      }
+    }
+  }
+  /* 轮播图容器 end */
+  
+  /* 内容 end */
+
+  /* 标签区域 start */
+  @include e(tags) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12rpx;
+    margin: 20rpx 0;
+    
+    .tag-item {
+      display: inline-flex;
+      align-items: center;
+      padding: 8rpx 16rpx;
+      font-size: 24rpx;
+      color: var(--tn-color-primary);
+      background: rgba(var(--tn-color-primary-rgb), 0.1);
+      border-radius: 20rpx;
+      border: 1rpx solid rgba(var(--tn-color-primary-rgb), 0.2);
+      max-width: 360rpx; /* 防止单个标签过长撑破布局 */
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      vertical-align: middle;
+      .tn-icon {
+        flex: 0 0 auto;
+        margin-right: 6rpx;
+        font-size: 20rpx;
+      }
+      .tag-text {
+        display: inline-block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 260rpx; /* 给文本留出图标和内边距空间 */
+        flex: 1 1 auto;
+        min-width: 0; /* 允许子元素收缩以触发 ellipsis */
+      }
+    }
+  }
+  /* 标签区域 end */
+
+  /* 底部信息 start */
+  @include e(bottom-info) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 16rpx;
+
+    /* 左边查看数据 start */
+    &__left {
+      display: flex;
+      align-items: center;
+
+      .count-item-data {
+        display: flex;
+        align-items: center;
+        margin-right: 20rpx;
+
+        .count {
+          margin-left: 6rpx;
+        }
+      }
+    }
+    /* 左边查看数据 end */
+
+    /* 右边查看用户头像数据 start */
+    &__right {
+      display: flex;
+      align-items: center;
+    }
+    /* 右边查看用户头像数据 end */
+
+    @include when(no-content) {
+      margin-top: 24rpx;
+    }
+  }
+  @include e(view-user-count) {
+    margin-left: 8rpx;
+    font-size: 26rpx;
+    color: var(--tn-color-gray);
+  }
+  /* 底部信息 end */
+}

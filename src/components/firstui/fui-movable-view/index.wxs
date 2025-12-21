@@ -1,0 +1,145 @@
+// 本文件由FirstUI授权予佛山市航电梦联网络科技有限公司（会员ID：1 12  7，营业执照号：91    4 4  0 605M A 5 5 6 H  1KX  H）专用，请尊重知识产权，勿私下传播，违者追究法律责任。
+var movable = {
+	width: 100,
+	height: 100,
+	direction: '',
+	left: 0,
+	top: 0,
+	app: false
+}
+
+function isPC() {
+	if (typeof navigator !== 'object') return false;
+	var userAgentInfo = navigator.userAgent;
+	var Agents = ["Android", "iPhone", "SymbianOS", "Windows Phone", "iPad", "iPod"];
+	var flag = true;
+	for (var v = 0; v < Agents.length - 1; v++) {
+		if (userAgentInfo.indexOf(Agents[v]) > 0) {
+			flag = false;
+			break;
+		}
+	}
+	return flag;
+}
+var isH5 = false
+if (typeof window === 'object') isH5 = true
+
+function setInitValue(dataset, isChange) {
+	movable.width = +dataset.width
+	movable.height = +dataset.height
+	movable.top = +dataset.top
+	movable.left = +dataset.left
+	movable.direction = dataset.direction
+	movable.app = (+dataset.app) == 1 ? true : false;
+}
+
+function touchstart(e, ins) {
+	var state = e.instance.getState()
+	var touch = e.touches[0] || e.changedTouches[0];
+	if (isH5 && isPC()) {
+		touch = e;
+	}
+	var dataset = e.instance.getDataset()
+	if (dataset.direction == 'all') {
+		state.startX = touch.clientX
+		state.startY = touch.clientY
+	} else if (dataset.direction == 'vertical') {
+		state.startY = touch.clientY
+	} else {
+		state.startX = touch.clientX
+	}
+	setInitValue(dataset)
+}
+
+function styleChange(left, top, ins) {
+	if (!ins) return;
+	var mview = ins.selectComponent('.fui-movable__view');
+	if (!mview) return;
+	mview.setStyle({
+		transform: 'translate3d(' + left + 'px,' + top + 'px,0)'
+	})
+	ins.callMethod('change', {
+		left: left,
+		top: top
+	})
+}
+
+function getLeft(pageX, state) {
+	var left = pageX - state.startX + (state.lastLeft || 0);
+	left = left < -movable.left ? -movable.left : left;
+	left = left > movable.width ? movable.width : left;
+
+	return left
+}
+
+function getTop(pageY, state) {
+	var top = pageY - state.startY + (state.lastTop || 0);
+	top = top < -movable.top ? -movable.top : top;
+	top = top > movable.height ? movable.height : top;
+
+	return top
+}
+
+function touchmove(e, ins, events) {
+	if (movable.direction == 'none') return;
+	if (e.preventDefault) {
+		e.preventDefault()
+	}
+	if (movable.app && event && event.preventDefault) {
+		event.preventDefault()
+	}
+	var state = {}
+	var touch = {}
+	if (isH5 && isPC()) {
+		touch = e;
+		if (events && events.instance) {
+			state = events.instance.getState()
+		}
+	} else {
+		touch = e.touches[0] || e.changedTouches[0]
+		state = e.instance.getState()
+	}
+	var pageX = touch.clientX;
+	var pageY = touch.clientY;
+	var left = 0,
+		top = 0;
+	if (movable.direction == 'all') {
+		left = getLeft(pageX, state)
+		state.startX = pageX
+		top = getTop(pageY, state)
+		state.startY = pageY
+	} else if (movable.direction == 'vertical') {
+		top = getTop(pageY, state)
+		state.startY = pageY
+	} else {
+		left = getLeft(pageX, state)
+		state.startX = pageX
+	}
+
+	state.lastLeft = left
+	state.lastTop = top
+	styleChange(left, top, ins)
+}
+
+var _movable = false;
+
+function mousedown(e, ins) {
+	if (!isH5 || !isPC()) return
+	touchstart(e, ins)
+	_movable = true
+	window.onmousemove = function(event) {
+		if (!isH5 || !isPC() || !_movable) return
+		touchmove(event, ins, e)
+	}
+	window.onmouseup = function(event) {
+		if (!isH5 || !isPC() || !_movable) return
+		_movable = false
+	}
+}
+
+
+module.exports = {
+	touchstart: touchstart,
+	touchmove: touchmove,
+	mousedown: mousedown
+}

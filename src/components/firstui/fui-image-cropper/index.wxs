@@ -1,0 +1,348 @@
+// 本文件由FirstUI授权予佛山市航电梦联网络科技有限公司（会员ID： 11  27，营业执照号：914 406    05  M  A 5 56H1K  X    H）专用，请尊重知识产权，勿私下传播，违者追究法律责任。
+function isPC() {
+	if (typeof navigator !== 'object') return false;
+	var userAgentInfo = navigator.userAgent;
+	var Agents = ["Android", "iPhone", "SymbianOS", "Windows Phone", "iPad", "iPod"];
+	var flag = true;
+	for (var v = 0; v < Agents.length - 1; v++) {
+		if (userAgentInfo.indexOf(Agents[v]) > 0) {
+			flag = false;
+			break;
+		}
+	}
+	return flag;
+}
+var isH5 = false;
+if (typeof window === 'object') isH5 = true;
+var cropper = {
+	cutX: 0,
+	cutY: 0,
+	touchRelative: [{
+		x: 0,
+		y: 0
+	}],
+	hypotenuseLength: 0,
+	flagEndTouch: false,
+	canvasWidth: 0,
+	canvasHeight: 0,
+	imgWidth: 0,
+	imgHeight: 0,
+	scale: 1,
+	angle: 0,
+	imgTop: 0,
+	imgLeft: 0,
+	windowHeight: 0,
+	windowWidth: 0,
+	init: true,
+	app: false
+}
+
+function touchstart(e, ins) {
+	var touch = null
+	if (isH5 && isPC()) {
+		touch = [e];
+	} else {
+		touch = e.touches || e.changedTouches
+	}
+	var dataset = e.instance.getDataset()
+	cropper.app = (+dataset.app) == 1 ? true : false;
+	cropper.flagEndTouch = false;
+	if (touch.length == 1) {
+		cropper.touchRelative[0] = {
+			x: touch[0].pageX - cropper.imgLeft,
+			y: touch[0].pageY - cropper.imgTop
+		};
+	} else {
+		var width = Math.abs(touch[0].pageX - touch[1].pageX);
+		var height = Math.abs(touch[0].pageY - touch[1].pageY);
+		cropper.touchRelative = [{
+				x: touch[0].pageX - cropper.imgLeft,
+				y: touch[0].pageY - cropper.imgTop
+			},
+			{
+				x: touch[1].pageX - cropper.imgLeft,
+				y: touch[1].pageY - cropper.imgTop
+			}
+		];
+		cropper.hypotenuseLength = Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2));
+	}
+
+}
+
+function moveDuring(ins) {
+	if (!ins) return;
+	ins.callMethod('moveDuring')
+}
+
+function moveStop(ins) {
+	if (!ins) return;
+	ins.callMethod('moveStop')
+};
+
+function setCutCenter(ins) {
+	var cutY = (cropper.windowHeight - cropper.canvasHeight) * 0.5;
+	var cutX = (cropper.windowWidth - cropper.canvasWidth) * 0.5;
+	cropper.imgTop = cropper.imgTop - cropper.cutY + cutY;
+	cropper.cutY = cutY;
+	cropper.imgLeft = cropper.imgLeft - cropper.cutX + cutX;
+	cropper.cutX = cutX;
+	cutDetectionPosition(ins)
+	imgTransform(ins)
+	updateData(ins)
+}
+
+function touchmove(e, ins) {
+	if (e.preventDefault) {
+		e.preventDefault()
+	}
+	if (cropper.app && event && event.preventDefault && event.cancelable) {
+		event.preventDefault()
+	}
+	var touch = null
+	if (isH5 && isPC()) {
+		touch = [e];
+	} else {
+		touch = e.touches || e.changedTouches
+	}
+	if (cropper.flagEndTouch) return;
+	moveDuring(ins);
+	if (touch.length == 1) {
+		var left = touch[0].pageX - cropper.touchRelative[0].x,
+			top = touch[0].pageY - cropper.touchRelative[0].y;
+		cropper.imgLeft = left;
+		cropper.imgTop = top;
+		imgTransform(ins);
+		imgMarginDetectionPosition(ins);
+	} else {
+		var res = e.instance.getDataset();
+		var width = Math.abs(touch[0].pageX - touch[1].pageX),
+			height = Math.abs(touch[0].pageY - touch[1].pageY),
+			hypotenuse = Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2)),
+			scale = cropper.scale * (hypotenuse / cropper.hypotenuseLength),
+			current_deg = 0;
+		scale = scale <= 0.5 ? 0.5 : scale;
+		scale = scale >= 2 ? 2 : scale;
+		cropper.scale = scale;
+		imgMarginDetectionScale(ins, true);
+		var touchRelative = [{
+				x: touch[0].pageX - cropper.imgLeft,
+				y: touch[0].pageY - cropper.imgTop
+			},
+			{
+				x: touch[1].pageX - cropper.imgLeft,
+				y: touch[1].pageY - cropper.imgTop
+			}
+		];
+		cropper.touchRelative = touchRelative;
+		cropper.hypotenuseLength = Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2));
+		cropper.angle = cropper.angle + current_deg;
+		imgTransform(ins);
+	}
+}
+
+function touchend(e, ins) {
+	cropper.flagEndTouch = true;
+	moveStop(ins);
+	updateData(ins)
+}
+
+function cutDetectionPosition(ins) {
+	var windowHeight = cropper.windowHeight,
+		windowWidth = cropper.windowWidth;
+
+	var cutDetectionPositionTop = function() {
+		if (cropper.cutY < 0) {
+			cropper.cutY = 0;
+		}
+		if (cropper.cutY > windowHeight - cropper.canvasHeight) {
+			cropper.cutY = windowHeight - cropper.canvasHeight;
+		}
+	}
+
+	var cutDetectionPositionLeft = function() {
+		if (cropper.cutX < 0) {
+			cropper.cutX = 0;
+		}
+		if (cropper.cutX > windowWidth - cropper.canvasWidth) {
+			cropper.cutX = windowWidth - cropper.canvasWidth;
+		}
+	}
+	if (cropper.cutY == null && cropper.cutX == null) {
+		var cutY = (windowHeight - cropper.canvasHeight) * 0.5;
+		var cutX = (windowWidth - cropper.canvasWidth) * 0.5;
+		cropper.cutY = cutY;
+		cropper.cutX = cutX;
+	} else if (cropper.cutY != null && cropper.cutX != null) {
+		cutDetectionPositionTop();
+		cutDetectionPositionLeft();
+	} else if (cropper.cutY != null && cropper.cutX == null) {
+		cutDetectionPositionTop();
+		cropper.cutX = (windowWidth - cropper.canvasWidth) / 2;
+	} else if (cropper.cutY == null && cropper.cutX != null) {
+		cutDetectionPositionLeft();
+		cropper.cutY = (windowHeight - cropper.canvasHeight) / 2;
+	}
+}
+
+function imgMarginDetectionScale(ins, delay) {
+	var scale = cropper.scale;
+	var imgWidth = cropper.imgWidth;
+	var imgHeight = cropper.imgHeight;
+	if ((cropper.angle / 90) % 2) {
+		imgWidth = cropper.imgHeight;
+		imgHeight = cropper.imgWidth;
+	}
+	if (imgWidth * scale < cropper.canvasWidth) {
+		scale = cropper.canvasWidth / imgWidth;
+	}
+	if (imgHeight * scale < cropper.canvasHeight) {
+		scale = Math.max(scale, cropper.canvasHeight / imgHeight);
+	}
+	imgMarginDetectionPosition(ins, scale, delay);
+}
+
+function imgMarginDetectionPosition(ins, scale, delay) {
+	var left = cropper.imgLeft;
+	var top = cropper.imgTop;
+	scale = scale || cropper.scale;
+	var imgWidth = cropper.imgWidth;
+	var imgHeight = cropper.imgHeight;
+	if ((cropper.angle / 90) % 2) {
+		imgWidth = cropper.imgHeight;
+		imgHeight = cropper.imgWidth;
+	}
+	left = cropper.cutX + (imgWidth * scale) / 2 >= left ? left : cropper.cutX + (imgWidth * scale) / 2;
+	left = cropper.cutX + cropper.canvasWidth - (imgWidth * scale) / 2 <= left ? left : cropper.cutX + cropper
+		.canvasWidth -
+		(imgWidth * scale) / 2;
+	top = cropper.cutY + (imgHeight * scale) / 2 >= top ? top : cropper.cutY + (imgHeight * scale) / 2;
+	top = cropper.cutY + cropper.canvasHeight - (imgHeight * scale) / 2 <= top ? top : cropper.cutY + cropper
+		.canvasHeight -
+		(imgHeight * scale) / 2;
+
+	cropper.imgLeft = left;
+	cropper.imgTop = top;
+	cropper.scale = scale;
+	if (!delay || delay === 'null') {
+		imgTransform(ins);
+	}
+}
+
+function computeCutSize(ins) {
+	if (cropper.canvasWidth > cropper.windowWidth) {
+		cropper.canvasWidth = cropper.windowWidth;
+	} else if (cropper.canvasWidth + cropper.cutX > cropper.windowWidth) {
+		cropper.cutX = cropper.windowWidth - cropper.cutX;
+	}
+	if (cropper.canvasHeight > cropper.windowHeight) {
+		cropper.canvasHeight = cropper.windowHeight;
+	} else if (cropper.canvasHeight + cropper.cutY > cropper.windowHeight) {
+		cropper.cutY = cropper.windowHeight - cropper.cutY;
+	}
+}
+
+function imgTransform(ins) {
+	var owner = ins.selectComponent('.fui-cropper__img')
+	if (!owner) return
+	var x = cropper.imgLeft - cropper.imgWidth / 2;
+	var y = cropper.imgTop - cropper.imgHeight / 2;
+	owner.setStyle({
+		'transform': 'translate3d(' + x + 'px,' + y + 'px,0) scale(' + cropper.scale + ') rotate(' + cropper
+			.angle + 'deg)'
+	})
+}
+
+function imageReset(ins) {
+	cropper.scale = 1;
+	cropper.angle = 0;
+	imgTransform(ins);
+}
+
+function updateData(ins) {
+	if (!ins) return;
+	ins.callMethod('change', {
+		cutX: cropper.cutX,
+		cutY: cropper.cutY,
+		imgWidth: cropper.imgWidth,
+		imgHeight: cropper.imgHeight,
+		scale: cropper.scale,
+		angle: cropper.angle,
+		imgTop: cropper.imgTop,
+		imgLeft: cropper.imgLeft
+	})
+}
+
+function valsChange(prop, oldProp, ownerInstance, ins) {
+	if (prop && prop !== 'null' && ins) {
+		var params = prop.split('_')
+		var type = +params[0]
+		var dataset = ins.getDataset();
+		if (cropper.init || type == 4) {
+			cropper.canvasWidth = +dataset.width;
+			cropper.canvasHeight = +dataset.height;
+			cropper.windowHeight = +dataset.windowheight;
+			cropper.windowWidth = +dataset.windowwidth;
+			cropper.imgTop = (+dataset.windowheight) / 2;
+			cropper.imgLeft = (+dataset.windowwidth) / 2;
+			cropper.imgWidth = +dataset.imgwidth;
+			cropper.imgHeight = +dataset.imgheight;
+			cropper.init = false
+		} else if (type == 2 || type == 3) {
+			cropper.imgTop = (+dataset.windowheight) / 2;
+			cropper.imgLeft = (+dataset.windowwidth) / 2;
+			cropper.imgWidth = +dataset.imgwidth;
+			cropper.imgHeight = +dataset.imgheight;
+		}
+		cropper.angle = +dataset.angle;
+		if (type == 3) {
+			imgTransform(ownerInstance);
+		}
+
+		switch (type) {
+			case 1:
+				setCutCenter(ownerInstance);
+				computeCutSize(ownerInstance);
+				cutDetectionPosition(ownerInstance);
+				break;
+			case 2:
+				setCutCenter(ownerInstance);
+				break;
+			case 3:
+				imgMarginDetectionScale(ownerInstance)
+				break;
+			case 4:
+				imageReset(ownerInstance);
+				break;
+			case 5:
+				setCutCenter(ownerInstance);
+				break;
+			default:
+				break;
+		}
+	}
+}
+
+var movable = false;
+
+function mousedown(e, ins) {
+	if (!isH5 || !isPC()) return
+	touchstart(e, ins)
+	movable = true
+	window.onmousemove = function(event) {
+		if (!isH5 || !isPC() || !movable) return
+		touchmove(event, ins, e)
+	}
+	window.onmouseup = function(event) {
+		if (!isH5 || !isPC() || !movable) return
+		touchend(event, ins, e)
+		movable = false
+	}
+}
+
+module.exports = {
+	touchstart: touchstart,
+	touchmove: touchmove,
+	touchend: touchend,
+	valsChange: valsChange,
+	mousedown: mousedown
+}

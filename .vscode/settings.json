@@ -1,0 +1,5 @@
+{
+    "i18n-ally.localesPaths": [
+        "src/components/firstui/fui-parse/high-light/languages"
+    ]
+}

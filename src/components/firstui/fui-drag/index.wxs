@@ -1,0 +1,289 @@
+// 本文件由FirstUI授权予佛山市航电梦联网络科技有限公司（会员ID：1  12 7，营业执照号：9   1  44060      5MA   556H1 KX  H）专用，请尊重知识产权，勿私下传播，违者追究法律责任。
+var wrapParam = {}
+
+function isPC() {
+	if (typeof navigator !== 'object') return false;
+	var userAgentInfo = navigator.userAgent;
+	var Agents = ["Android", "iPhone", "SymbianOS", "Windows Phone", "iPad", "iPod"];
+	var flag = true;
+	for (var v = 0; v < Agents.length - 1; v++) {
+		if (userAgentInfo.indexOf(Agents[v]) > 0) {
+			flag = false;
+			break;
+		}
+	}
+	return flag;
+}
+var isH5 = false
+if (typeof window === 'object') isH5 = true
+
+function outOfRange(x1, y1, x2, y2, x3, y3) {
+	return x1 < 0 || x1 >= y1 || x2 < 0 || x2 >= y2 || x3 < 0 || x3 >= y3
+};
+
+function listSort(sKey, eKey, st) {
+	var param = st.param
+	var endRealKey = -1;
+	st.list.forEach(function(item) {
+		if (item.sortKey === eKey) endRealKey = item.realKey;
+	});
+
+	return st.list.map(function(item) {
+		var cKey = item.sortKey;
+		var rKey = item.realKey;
+		if (sKey < eKey) {
+			if (cKey > sKey && cKey <= eKey) {
+				--rKey;
+				--cKey;
+			} else if (cKey === sKey) {
+				rKey = endRealKey;
+				cKey = eKey;
+			}
+		} else if (sKey > eKey) {
+			if (cKey >= eKey && cKey < sKey) {
+				++rKey;
+				++cKey;
+			} else if (cKey === sKey) {
+				rKey = endRealKey;
+				cKey = eKey;
+			}
+		}
+		if (item.sortKey !== cKey) {
+			item.transX = (cKey % param.columns) * param.cellWidth + "px";
+			item.transY = Math.floor(cKey / param.columns) * param.cellHeight + "px";
+			item.sortKey = cKey;
+			item.realKey = rKey;
+		}
+		return item;
+	});
+}
+
+function emitsEvent(list, type, ins) {
+	if (!ins) return;
+	var changeList = [],
+		itemList = [];
+
+	list.forEach(function(item) {
+		changeList[item.sortKey] = item;
+	});
+
+	changeList.forEach(function(item) {
+		itemList.push(item.entity);
+	});
+	if (type == "change") {
+		ins.callMethod("change", {
+			itemList: itemList
+		});
+	} else {
+		ins.callMethod("sortend", {
+			itemList: itemList
+		});
+	}
+}
+
+function longPress(e, ownerInstance) {
+	var ins = e.instance;
+	var dataset = ins.getDataset()
+	var st = ins.getState();
+	st.isDrag = +dataset.isdrag == 1 ? true : false
+	if (!st.isDrag) return;
+
+	st.app = +dataset.app == 1 ? true : false;
+
+	if (!st.param || st.param == 'undefined') {
+		st.param = JSON.parse(dataset.param)
+	}
+	var param = st.param;
+	var touch = null
+	if (isH5 && isPC()) {
+		touch = e;
+	} else {
+		touch = e.changedTouches ? e.changedTouches[0] : st.startTouch
+	}
+	if (!touch) return;
+	st.cur = +dataset.index;
+
+	if (st.dragging) return;
+	ownerInstance.callMethod("drag", {
+		wxdrag: true
+	});
+	st.transX = param.columns === 1 ? 0 : touch.pageX - (param.cellWidth / 2 + param.wrapLeft);
+	st.transY = touch.pageY - (param.cellHeight / 2 + param.wrapTop);
+	st.sId = touch.identifier;
+	st.prevIns && st.prevIns.removeClass("fui-drag__trans-end")
+	ins.setStyle({
+		'transform': 'translate3d(' + st.transX + 'px, ' + st.transY + 'px, 0)'
+	});
+	st.itemsInstance.forEach(function(item, index) {
+		item.removeClass("fui-drag__cur").removeClass("fui-drag__trans")
+		item.addClass(index === st.cur ? "fui-drag__cur" : "fui-drag__trans");
+	})
+	st.dragging = true;
+}
+
+function touchStart(e, ownerInstance) {
+	var ins = e.instance;
+	var st = ins.getState()
+	st.list = wrapParam.list
+	st.itemsInstance = wrapParam.itemsInstance
+	st.param = wrapParam.param
+	if (isH5 && isPC()) {
+		st.startTouch = e;
+	} else {
+		st.startTouch = e.changedTouches[0] || e.touches[0]
+	}
+	var dataset = ins.getDataset()
+	st.isDrag = +dataset.isdrag == 1 ? true : false
+	ownerInstance.callMethod("drag", {
+		wxdrag: false
+	});
+}
+
+function touchMove(e, ownerInstance, events) {
+	var st = {}
+	var touch = null
+	var ins = null
+	if (isH5 && isPC()) {
+		touch = e;
+		st = events.instance.getState()
+		ins = events.instance;
+	} else {
+		touch = e.changedTouches[0] || e.touches[0]
+		st = e.instance.getState()
+		ins = e.instance
+	}
+	if (e.preventDefault && st.dragging) {
+		e.preventDefault()
+	}
+	if (st.app && st.dragging && event && event.preventDefault) {
+		event.preventDefault()
+	}
+	var param = st.param;
+
+	if (!st.dragging || !st.isDrag) return;
+	if (!touch || st.sId !== touch.identifier) return;
+
+	var transX = param.columns === 1 ? 0 : touch.pageX - (param.cellWidth / 2 + param.wrapLeft);
+	var transY = touch.pageY - (param.cellHeight / 2 + param.wrapTop);
+
+	if (touch.clientY > param.windowHeight - param.cellHeight) {
+		ownerInstance.callMethod("pageScroll", {
+			scrollTop: touch.pageY + param.cellHeight - param.windowHeight
+		});
+	} else if (touch.clientY < param.cellHeight) {
+		ownerInstance.callMethod("pageScroll", {
+			scrollTop: touch.pageY - param.cellHeight
+		});
+	}
+
+	ins.setStyle({
+		'transform': 'translate3d(' + transX + 'px, ' + transY + 'px, 0)'
+	})
+
+	var startKey = st.list[st.cur].sortKey;
+	var curX = Math.round(transX / param.cellWidth);
+	var curY = Math.round(transY / param.cellHeight);
+	var endKey = curX + param.columns * curY;
+
+	if (outOfRange(curX, param.columns, curY, param.rows, endKey, st.list.length)) return;
+
+	if (startKey === endKey || startKey === st.preStartKey) return;
+	st.preStartKey = startKey;
+
+	var list = listSort(startKey, endKey, st);
+	st.itemsInstance.forEach(function(itemIns, index) {
+		var item = list[index];
+		if (index !== st.cur) {
+			itemIns.setStyle({
+				'transform': 'translate3d(' + item.transX + ',' + item.transY + ', 0)'
+			});
+		}
+	});
+	ownerInstance.callMethod("listChange", {
+		itemList: list
+	});
+	emitsEvent(list, "change", ownerInstance);
+}
+
+function touchEnd(e, ownerInstance, event) {
+	var ins = null
+	var st = {}
+	if (isH5 && isPC()) {
+		ins = event.instance
+		st = event.instance.getState()
+	} else {
+		st = e.instance.getState()
+		ins = e.instance
+	}
+	if (!st.dragging || !st.isDrag) return;
+	emitsEvent(st.list, "sortend", ownerInstance);
+	ins.addClass("fui-drag__trans-end")
+	ins.setStyle({
+		'transform': 'translate3d(' + st.list[st.cur].transX + ',' + st.list[st.cur].transY + ', 0)'
+	});
+	st.itemsInstance.forEach(function(item, index) {
+		item.removeClass("fui-drag__trans").removeClass("fui-drag__cur");
+	})
+	st.prevIns = ins
+	st.preStartKey = -1;
+	st.dragging = false;
+	ownerInstance.callMethod("drag", {
+		wxdrag: false
+	});
+	st.cur = -1;
+	st.transX = 0;
+	st.transY = 0;
+}
+
+function paramChange(newVal, oldVal, ownerInstance, ins) {
+	wrapParam.param = newVal;
+}
+
+function listChange(newVal, oldVal, ownerInstance, ins) {
+	wrapParam.itemsInstance = ownerInstance.selectAllComponents('.fui-drag-item__wrap');
+	wrapParam.list = newVal || [];
+	if (!wrapParam.itemsInstance || wrapParam.itemsInstance.length === 0) return;
+
+	wrapParam.list.forEach(function(item, index) {
+		var itemIns = wrapParam.itemsInstance[index];
+		if (item && itemIns) {
+			itemIns.setStyle({
+				'transform': 'translate3d(' + item.transX + ',' + item.transY + ', 0)'
+			});
+		}
+	})
+}
+
+var movable = false;
+
+function mousedown(e, ins) {
+	if (!isH5 || !isPC()) return
+	touchStart(e, ins)
+	longPress(e, ins)
+	movable = true
+	window.onmousemove = function(event) {
+		if (!isH5 || !isPC() || !movable) return
+		touchMove(event, ins, e)
+	}
+	window.onmouseup = function(event) {
+		if (!isH5 || !isPC() || !movable) return
+		touchEnd(event, ins, e)
+		movable = false
+	}
+}
+
+
+function stopTouchMove(e) {
+	return true
+}
+
+module.exports = {
+	longPress: longPress,
+	touchStart: touchStart,
+	touchMove: touchMove,
+	touchEnd: touchEnd,
+	paramChange: paramChange,
+	listChange: listChange,
+	mousedown: mousedown,
+	stopTouchMove: stopTouchMove
+}

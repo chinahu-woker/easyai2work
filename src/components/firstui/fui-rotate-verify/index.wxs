@@ -1,0 +1,143 @@
+// 本文件由FirstUI授权予佛山市航电梦联网络科技有限公司（会员ID： 112  7，营业执照号：91  4  406   05M A5 56H 1     K X H）专用，请尊重知识产权，勿私下传播，违者追究法律责任。
+var twidth = 0
+var swidth = 0
+var app = false
+
+function isPC() {
+	if (typeof navigator !== 'object') return false;
+	var userAgentInfo = navigator.userAgent;
+	var Agents = ["Android", "iPhone", "SymbianOS", "Windows Phone", "iPad", "iPod"];
+	var flag = true;
+	for (var v = 0; v < Agents.length - 1; v++) {
+		if (userAgentInfo.indexOf(Agents[v]) > 0) {
+			flag = false;
+			break;
+		}
+	}
+	return flag;
+}
+var isH5 = false
+if (typeof window === 'object') isH5 = true
+
+function bool(str) {
+	return str === 'true' || str == true ? true : false
+}
+
+function touchstart(e, ins) {
+	var state = e.instance.getState()
+	var touch = {}
+	if (isH5 && isPC()) {
+		touch = e;
+	} else {
+		touch = e.touches[0] || e.changedTouches[0]
+	}
+	var dataset = e.instance.getDataset()
+	state.startX = touch.pageX
+	twidth = +dataset.width
+	swidth = +dataset.swidth
+	app = (+dataset.app) == 1 ? true : false
+	state.disabled = (+dataset.disabled) == 1 ? true : false
+}
+
+function styleChange(left, deg, ins) {
+	if (!ins) return;
+	var block = ins.selectComponent('.fui-rv__slider');
+	var image = ins.selectComponent('.fui-rv__image')
+	if (!image || !block) return;
+	if (left == 0 && deg == 0) {
+		block.removeClass('fui-rv__un-ani')
+		image.removeClass('fui-rv__un-ani')
+		block.addClass('fui-rv__rest-ani')
+		image.addClass('fui-rv__rest-ani')
+	} else {
+		block.removeClass('fui-rv__rest-ani')
+		image.removeClass('fui-rv__rest-ani')
+		block.addClass('fui-rv__un-ani')
+		image.addClass('fui-rv__un-ani')
+	}
+	block.setStyle({
+		transform: 'translate3d(' + left + 'px,0,0)'
+	})
+	image.setStyle({
+		transform: 'rotate(' + deg + 'deg)'
+	})
+}
+
+function touchmove(e, ins, events) {
+	if (e.preventDefault) {
+		e.preventDefault()
+	}
+	if (app && event && event.preventDefault && event.cancelable) {
+		event.preventDefault()
+	}
+	var state = {}
+	var touch = {}
+	if (isH5 && isPC()) {
+		touch = e;
+		state = events.instance.getState()
+	} else {
+		state = e.instance.getState()
+		touch = e.touches[0] || e.changedTouches[0]
+	}
+	if (state.disabled) return;
+	var pageX = touch.pageX;
+	var left = pageX - state.startX + (state.lastLeft || 0);
+	left = left < 0 ? 0 : left;
+	var width = twidth - swidth;
+	left = left >= width ? width : left;
+	state.startX = pageX
+	state.lastLeft = left
+	var deg = 360 / width * left
+	styleChange(left, deg, ins)
+}
+
+function touchend(e, ins, event) {
+	var state = {}
+	if (isH5 && isPC()) {
+		state = event.instance.getState()
+	} else {
+		state = e.instance.getState()
+	}
+	if (state.disabled) return;
+	var left = twidth - swidth
+	var deg = 360 / left * state.lastLeft
+	ins.callMethod('verify', {
+		angle: deg
+	})
+}
+
+function slidereset(reset, oldreset, owner, ins) {
+	var state = ins.getState()
+	if (reset > 0) {
+		state.startX = 0;
+		state.lastLeft = 0;
+		state.disabled = false;
+		styleChange(0, 0, owner)
+	}
+}
+
+var movable = false;
+
+function mousedown(e, ins) {
+	if (!isH5 || !isPC()) return
+	touchstart(e, ins)
+	movable = true
+	window.onmousemove = function(event) {
+		if (!isH5 || !isPC() || !movable) return
+		touchmove(event, ins, e)
+	}
+	window.onmouseup = function(event) {
+		if (!isH5 || !isPC() || !movable) return
+		touchend(event, ins, e)
+		movable = false
+	}
+}
+
+
+module.exports = {
+	touchstart: touchstart,
+	touchmove: touchmove,
+	touchend: touchend,
+	mousedown: mousedown,
+	slidereset: slidereset
+}

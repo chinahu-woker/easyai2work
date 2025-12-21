@@ -1,0 +1,419 @@
+{
+  "iconTagName": [
+    {
+      "name": "Style-depth-510nail_8style",
+      "index": 0
+    },
+    {
+      "name": "fakenail2manicure1",
+      "index": 1
+    },
+    {
+      "name": "text-llm-depth-10nail",
+      "index": 2
+    }
+  ],
+  "defaultAssets": {
+    "avatar": "https://ai-1357282892.cos.ap-shanghai.myqcloud.com/6811db59c58c28287e07e45c/upload/20250521115936505-3434-06.png"
+  },
+  "globalAppData": {
+    "name": "globalAppData",
+    "share": {
+      "appInfo": "酒店修图神器",
+      "backGroundImage":"https://aikna.cn/api/upload/files/output%2F2025-10-28%2F68fde4230d9708fed01e3d7d%2Fe236b0ec1b07485264ab254599d18d3d5a65a9470ea506a4e0a829f647d2289d-20251027163427701.png"
+    }
+  },
+  "organizations_store": [
+    "None",
+    "None"
+  ],
+  "tabbarData": [
+    {
+      "text": "首页",
+      "tabText": "home",
+      "iconPath": "https://static.nailoffice.cn/2025-09-21/6841119cb9df852ec0a2c684/upload/20250921152153882-画板1.svg",
+      "selectedIconPath": "https://static.nailoffice.cn/2025-09-17/6841119cb9df852ec0a2c684/upload/20250917223323627-画板2(2).png",
+      "organizations": ["None"]
+    },
+    {
+      "text": "应用",
+      "tabText": "store",
+      "iconPath": "https://static.nailoffice.cn/2025-09-21/6841119cb9df852ec0a2c684/upload/20250921152304246-默认变量(1).svg",
+      "selectedIconPath": "https://static.nailoffice.cn/2025-09-21/6841119cb9df852ec0a2c684/upload/20250921152249772-默认变量.svg",
+      "organizations":["None"]
+    },
+	{
+	  "text": "社区",
+	  "tabText": "community",
+	  "iconPath": "https://static.nailoffice.cn/2025-09-21/6841119cb9df852ec0a2c684/upload/20250921152304246-默认变量(1).svg",
+	  "selectedIconPath": "https://static.nailoffice.cn/2025-09-21/6841119cb9df852ec0a2c684/upload/20250921152249772-默认变量.svg",
+	  "organizations":["None"],
+	  "navigateToMiniProgram": {
+	    "appId": "wxafd78799c19542f9",
+	    "path": "pages/index/index",
+	    "extraData": {},
+	    "envVersion": "release",
+	    "shortLink": "#小程序://酒旅邦/NgruQmzjAqGk7nm"
+	  }
+	},
+    {
+      "text": "我的",
+      "tabText": "profile",
+      "iconPath": "https://static.nailoffice.cn/2025-09-21/6841119cb9df852ec0a2c684/upload/20250921152428670-画板5.svg",
+      "selectedIconPath": "https://static.nailoffice.cn/2025-09-21/6841119cb9df852ec0a2c684/upload/20250921152442877-画板5(1).svg",
+      "organizations":["None"]
+    }
+  ],
+  "backGroundImage": "https://chinahu-ai-server.oss-cn-chengdu.aliyuncs.com/2025-12-21/68fdc2c9b0a684401fc8abde/upload/20251221124421885-iPhone-11-Pro-Max-1-83l0ha.svg",
+
+  "HeadProps": {
+    "logo": "https://aihotel.oss-cn-hangzhou.aliyuncs.com/682c6a4900383be1dea9e72f/upload/20250520212845105-ChatGPTImage2025年5月20日21_22_20拷贝.png",
+    "appName": "TOPAI",
+    "title": "智能修图",
+    "subtitle": "上传图片\nAI生成宣传级精修图",
+    "image": "https://static.nailoffice.cn/2025-09-19/6841119cb9df852ec0a2c684/upload/20250919115203543-微信图片_20250919115018_1016_164.jpg",
+    "image2": "https://static.nailoffice.cn/2025-09-19/6841119cb9df852ec0a2c684/upload/20250919135340532-12.svg",
+    "primaryText": "免费体验",
+    "rightButtonText": "人气功能",
+    "rightTitle": "AI视频",
+    "rightDesc": "上传图片\n生成短视频",
+    "badgeText": "VIP"
+  },
+  "iconData": {
+    "icons": [
+		
+
+		
+		{
+		  "id": "icon-huihua",
+		  "symbol": "iconfontIndex ",
+		  "label": "室内精修",
+		  "iconUrl": "https://chinahu-ai-server.oss-cn-chengdu.aliyuncs.com/2025-12-21/68fdc2c9b0a684401fc8abde/upload/20251221121758937-026_-13-1-glusai.svg",
+		  "action": "local_draw",
+		  "matchKeywords": [
+		    "修被子修床单",
+		    "室内精修"
+		  ],
+		  "actionButton": "false"
+		},
+	
+	
+		
+	{
+			     "id": "icon-huihua",
+			     "symbol": "iconfontIndex ",
+			     "label": "室外精修",
+			     "iconUrl": "",
+			     "action": "local_draw",
+			     "matchKeywords": [
+			       "外观精修",
+			       "室外精修"
+			     ],
+			     "actionButton": "false"
+			   },
+					 
+		
+		
+      {
+        "id": "icon-remen",
+        "symbol": "iconfontIndex ",
+        "label": "图生视频",
+        "iconUrl": "",
+        "action": "ai_expand",
+        "matchKeywords": [
+          "精选",
+          "精选应用"
+        ],
+        "actionButton": "false"
+      },
+      {
+        "id": "icon-x_touxiang",
+        "symbol": "iconfontIndex ",
+        "label": "其他",
+        "iconUrl": "",
+        "action": "local_draw",
+        "matchKeywords": [
+          "修被子修床单",
+          "室内精修"
+        ],
+        "actionButton": "false"
+      },
+	  
+	  
+	  
+	  
+      {
+        "id": "icon-huihua",
+        "symbol": "iconfontIndex ",
+        "label": "室外精修",
+        "iconUrl": "",
+        "action": "local_draw",
+        "matchKeywords": [
+          "外观精修",
+          "室外精修"
+        ],
+        "actionButton": "false"
+      },
+      {
+        "id": "icon-huazhizengqiang",
+        "symbol": "iconfontIndex ",
+        "label": "画质增强",
+        "iconUrl": "",
+        "action": "ai_headshot",
+        "matchKeywords": [
+          "画质",
+          "增强"
+        ],
+        "actionButton": "true"
+      }
+    ],
+    "columns": 4,
+    "iconSize": 100,
+    "gap": 42
+  },
+  "storeProps": {
+    "showTag": "应用中心",
+    "showTags": [
+      "图生视频",
+      "外观精修1",
+	   "修被子修床单",
+      "全能修图"
+	  "室内精修"
+	    "室外精修"
+    ],
+    "filterMode": "any"
+  },
+  "aiTeamProps": {
+    "title": "精选-AI应用",
+    "filterMode": "single"
+  },
+  "payWorkProps": {
+    "title": "应用",
+    "showTag": "高级应用"
+  },
+  "loginInfoIcons": {
+    "scanIcon": "scan",
+    "arrowIcon": "arrow-right",
+    "historyIcon": "https://chinahu-ai-server.oss-cn-chengdu.aliyuncs.com/Iconly_Glass_Gallery.png",
+    "chatIcon": "https://chinahu-ai-server.oss-cn-chengdu.aliyuncs.com/Iconly_Glass_Chat.png",
+    "logoutIcon": "https://chinahu-ai-server.oss-cn-chengdu.aliyuncs.com/Iconly_Glass_Home.png",
+    "consoleIcon": "https://chinahu-ai-server.oss-cn-chengdu.aliyuncs.com/Iconly_Glass_Setting.png",
+    "bannerImage": "https://chinahu-ai-server.oss-cn-chengdu.aliyuncs.com/67873d6c232a3c5d52240dd6/upload/20250703230841666-banner.png"
+  },
+  "pageComponents": {
+    "home": {
+      "title": "首页",
+      "components": [
+        
+        {
+          "id": "home-header",
+          "component": "Newhead",
+          "props": {
+            "logo": "{{HeadProps.logo}}",
+            "appName": "{{HeadProps.appName}}",
+            "title": "{{HeadProps.title}}",
+            "subtitle": "{{HeadProps.subtitle}}"
+          },
+          "style": {
+            "marginBottom": "20rpx"
+          }
+        },
+        {
+          "id": "home-message",
+          "component": "HorizontalAnnouncement",
+          "props": {},
+          "style": {
+            "marginBottom": "20rpx"
+          }
+        },
+        {
+          "id": "home-swiper",
+          "component": "NewSwiper",
+          "props": {},
+          "style": {
+            "marginBottom": "30rpx"
+          }
+        },
+        {
+          "id": "home-icons",
+          "component": "NewIcon",
+          "props": {
+            "iconData": "{{iconData}}"
+          },
+          "style": {
+            "marginBottom": "30rpx"
+          }
+        },
+        
+        {
+          "id": "profile-community",
+          "component": "NewCommunity",
+          "props": {},
+          "style": {
+            "marginBottom": "20rpx"
+          }
+        }
+      ],
+      "layout": {
+        "padding": "20rpx",
+        "backgroundColor": "#f5f5f5"
+      }
+    },
+    "store": {
+      "title": "应用",
+      "components": [
+        
+        {
+          "id": "store-sidebar-class",
+          "component": "SidebarClassList",
+          "props": {},
+          "style": {
+            "marginBottom": "20rpx"
+          }
+        }
+        
+      ],
+      "layout": {
+        "padding": "20rpx",
+        "backgroundColor": "#f5f5f5"
+      }
+    },
+    "profile": {
+      "title": "我的",
+      "components": [
+        {
+          "id": "profile-user",
+          "component": "NewLoginInfo",
+          "props": {},
+          "style": {
+            "marginBottom": "20rpx"
+          }
+        }
+        
+      ],
+      "layout": {
+        "padding": "20rpx",
+        "backgroundColor": "#f5f5f5"
+      }
+    },
+    "login": {
+      "title": "登录",
+      "components": [
+        {
+          "id": "login-info",
+          "component": "NewLoginInfo",
+          "props": {
+            "scanIcon": "{{loginInfoIcons.scanIcon}}",
+            "arrowIcon": "{{loginInfoIcons.arrowIcon}}",
+            "historyIcon": "{{loginInfoIcons.historyIcon}}",
+            "chatIcon": "{{loginInfoIcons.chatIcon}}",
+            "logoutIcon": "{{loginInfoIcons.logoutIcon}}",
+            "consoleIcon": "{{loginInfoIcons.consoleIcon}}",
+            "bannerImage": "{{loginInfoIcons.bannerImage}}"
+          },
+          "style": {
+            "marginBottom": "20rpx"
+          }
+        }
+      ],
+      "layout": {
+        "padding": "20rpx",
+        "backgroundColor": "#f5f5f5"
+      }
+    }
+  },
+  "dynamicComponentRules": {
+    "home": [
+      {
+        "componentId": "home-header",
+        "conditions": {
+          "userStatus": "all"
+        }
+      },
+      {
+        "componentId": "home-swiper",
+        "conditions": {
+          "userStatus": "all"
+        }
+      },
+      {
+        "componentId": "home-icons",
+        "conditions": {
+          "userStatus": "all"
+        }
+      },
+      {
+        "componentId": "home-message",
+        "conditions": {
+          "userStatus": "all"
+        }
+      },
+      {
+        "componentId": "home-waterfall",
+        "conditions": {
+          "userStatus": "all"
+        }
+      }
+    ],
+    "store": [
+      {
+        "componentId": "store-header",
+        "conditions": {
+          "userStatus": "all"
+        }
+      },
+      {
+        "componentId": "store-sidebar-class",
+        "conditions": {
+          "userStatus": "all"
+        }
+      },
+      {
+        "componentId": "store-waterfall",
+        "conditions": {
+          "userStatus": "all"
+        }
+      },
+      {
+        "componentId": "store-paywork",
+        "conditions": {
+          "userStatus": "loggedIn",
+          "organizations": [
+            "68d23a545ae1fbd83108633a",
+            "68c4d63fd9d81c765dd8c3cd"
+          ]
+        }
+      }
+    ],
+    "profile": [
+      {
+        "componentId": "profile-user",
+        "conditions": {
+          "userStatus": "loggedIn"
+        }
+      },
+      {
+        "componentId": "profile-community",
+        "conditions": {
+          "userStatus": "loggedIn"
+        }
+      }
+    ],
+    "ListClass": [
+      {
+        "componentId": "Class-List",
+        "conditions": {
+          "userStatus": "all"
+        }
+      }
+    ],
+    "login": [
+      {
+        "componentId": "login-info",
+        "conditions": {
+          "userStatus": "notLoggedIn"
+        }
+      }
+    ]
+  }
+}

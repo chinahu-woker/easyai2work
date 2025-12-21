@@ -1,0 +1,172 @@
+// 本文件由FirstUI授权予佛山市航电梦联网络科技有限公司（会员ID： 11  27，营业执照号：       91 44  0 6 0 5 MA5 56H1K X H）专用，请尊重知识产权，勿私下传播，违者追究法律责任。
+var twidth = 300
+var swidth = 32
+var range = 3
+var start = 0
+var end = 0
+var type = 1
+var app = false
+
+function isPC() {
+	if (typeof navigator !== 'object') return false;
+	var userAgentInfo = navigator.userAgent;
+	var Agents = ["Android", "iPhone", "SymbianOS", "Windows Phone", "iPad", "iPod"];
+	var flag = true;
+	for (var v = 0; v < Agents.length - 1; v++) {
+		if (userAgentInfo.indexOf(Agents[v]) > 0) {
+			flag = false;
+			break;
+		}
+	}
+	return flag;
+}
+var isH5 = false
+if (typeof window === 'object') isH5 = true
+
+function bool(str) {
+	return str === 'true' || str == true ? true : false
+}
+
+function getSlipDistance(left) {
+	var width = twidth - start - 44
+	var distance = left / (twidth - swidth) * width
+	return distance > width ? width : distance
+}
+
+function styleChange(left, ins) {
+	if (!ins || !ins.selectComponent('.fui-sc__slot-box')) return;
+	var slotLeft = getSlipDistance(left)
+	var slider = ins.selectComponent('.fui-sc__slider')
+	var slot = ins.selectComponent('.fui-sc__slot-box')
+	if (!slider || !slot) return;
+
+	if (left == 0) {
+		slider.removeClass('fui-sc__un-ani')
+		slot.removeClass('fui-sc__un-ani')
+		slider.addClass('fui-sc__reset-ani')
+		slot.addClass('fui-sc__reset-ani')
+	} else {
+		slider.removeClass('fui-sc__reset-ani')
+		slot.removeClass('fui-sc__reset-ani')
+		slider.addClass('fui-sc__un-ani')
+		slot.addClass('fui-sc__un-ani')
+	}
+	slider.setStyle({
+		transform: 'translate3d(' + left + 'px,0,0)'
+	})
+	slot.setStyle({
+		transform: 'translate3d(' + slotLeft + 'px,0,0)'
+	})
+}
+
+function touchstart(e, ins) {
+	var state = e.instance.getState()
+	var touch = e.touches[0] || e.changedTouches[0]
+	if (isH5 && isPC()) {
+		touch = e;
+	}
+	var dataset = e.instance.getDataset()
+	state.startX = touch.pageX
+	type = +dataset.type
+	start = +dataset.start
+	end = +dataset.end
+	swidth = +dataset.swidth
+	range = +dataset.range
+	twidth = +dataset.width
+	app = (+dataset.app) == 1 ? true : false
+	//H5获取bool值为undefined
+	state.disabled = (+dataset.disabled) == 1 ? true : false
+}
+
+function touchmove(e, ins, events) {
+	if (e.preventDefault) {
+		e.preventDefault()
+	}
+	if (app && event && event.preventDefault && event.cancelable) {
+		event.preventDefault()
+	}
+	var state = {}
+	var touch = {}
+	if (isH5 && isPC()) {
+		touch = e;
+		state = events.instance.getState()
+	} else {
+		state = e.instance.getState()
+		touch = e.touches[0] || e.changedTouches[0]
+	}
+	if (state.disabled) return;
+	var pageX = touch.pageX;
+	var left = pageX - state.startX + (state.lastLeft || 0);
+	left = left < 0 ? 0 : left;
+	var width = twidth - swidth;
+	left = left >= width ? width : left;
+	state.startX = pageX
+	state.lastLeft = left
+	styleChange(left, ins)
+}
+
+function touchend(e, ins, event) {
+	var state = {}
+	if (isH5 && isPC()) {
+		state = event.instance.getState()
+	} else {
+		state = e.instance.getState()
+	}
+	if (state.disabled) return;
+	//前端验证
+	var slotLeft = getSlipDistance(state.lastLeft)
+	if (type == 1) {
+		var width = end - start
+		if (Math.abs(slotLeft - width) <= range) {
+			state.disabled = true
+			ins.callMethod('success')
+		} else {
+			state.startX = 0;
+			state.lastLeft = 0;
+			state.disabled = false;
+			styleChange(0, ins)
+			ins.callMethod('fail')
+		}
+	} else {
+		//后端验证
+		ins.callMethod('verify', {
+			slip: slotLeft
+		})
+	}
+}
+
+function slidereset(reset, oldreset, owner, ins) {
+	var state = ins.getState()
+	if (reset > 0) {
+		state.startX = 0;
+		state.lastLeft = 0;
+		state.disabled = false;
+		styleChange(0, owner)
+	}
+}
+
+var movable = false;
+
+function mousedown(e, ins) {
+	if (!isH5 || !isPC()) return
+	touchstart(e, ins)
+	movable = true
+	window.onmousemove = function(event) {
+		if (!isH5 || !isPC() || !movable) return
+		touchmove(event, ins, e)
+	}
+	window.onmouseup = function(event) {
+		if (!isH5 || !isPC() || !movable) return
+		touchend(event, ins, e)
+		movable = false
+	}
+}
+
+
+module.exports = {
+	touchstart: touchstart,
+	touchmove: touchmove,
+	touchend: touchend,
+	mousedown: mousedown,
+	slidereset: slidereset
+}

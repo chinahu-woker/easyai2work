@@ -1,0 +1,35 @@
+@import "/src/static/icon/iconfont.css"; /* 全局导入 iconfont，便于小程序端加载字体 */
+
+.reset-button {
+    padding: 0;
+    background-color: transparent;
+    font-size: inherit;
+    line-height: inherit;
+    color: inherit;
+
+    &::after {
+        border: none;
+    }
+}
+
+@import 'weapp-tailwindcss';
+
+/* 防止 iOS Safari / WKWebView 橡皮筋回弹和页面无限拖动 */
+html, body, #app {
+    height: 100%;
+    overscroll-behavior: none; /* 阻止滚动链和回弹 */
+    -webkit-overflow-scrolling: touch; /* 平滑滚动 */
+}
+
+/* 对常见可滚动容器进行保护，避免在 iOS 上超出边界时回弹 */
+.scrollable, .u-scroll, .u-scroll-y, .fui-wrap, .fui-chat__box {
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* 如果需要完全禁止全局页面拖拽（保守启用），可在移动端启用以下规则： */
+@media (pointer: coarse) {
+    html, body {
+        touch-action: pan-y; /* 允许垂直滚动，禁止双轴滚动 */
+    }
+}
