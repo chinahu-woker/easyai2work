@@ -43,17 +43,17 @@
       "organizations":["None"]
     },
 	{
-	  "text": "社区",
+	  "text": "跳转小程序",
 	  "tabText": "community",
 	  "iconPath": "https://static.nailoffice.cn/2025-09-21/6841119cb9df852ec0a2c684/upload/20250921152304246-默认变量(1).svg",
 	  "selectedIconPath": "https://static.nailoffice.cn/2025-09-21/6841119cb9df852ec0a2c684/upload/20250921152249772-默认变量.svg",
 	  "organizations":["None"],
 	  "navigateToMiniProgram": {
-	    "appId": "wxafd78799c19542f9",
+	    "appId": "wxappid",
 	    "path": "pages/index/index",
 	    "extraData": {},
 	    "envVersion": "release",
-	    "shortLink": "#小程序://酒旅邦/NgruQmzjAqGk7nm"
+	    "shortLink": "#小程序分享链接"
 	  }
 	},
     {
@@ -67,18 +67,18 @@
   "backGroundImage": "https://chinahu-ai-server.oss-cn-chengdu.aliyuncs.com/2025-12-21/68fdc2c9b0a684401fc8abde/upload/20251221124421885-iPhone-11-Pro-Max-1-83l0ha.svg",
 
   "HeadProps": {
-    "logo": "https://aihotel.oss-cn-hangzhou.aliyuncs.com/682c6a4900383be1dea9e72f/upload/20250520212845105-ChatGPTImage2025年5月20日21_22_20拷贝.png",
-    "appName": "TOPAI",
-    "title": "智能修图",
-    "subtitle": "上传图片\nAI生成宣传级精修图",
-    "image": "https://static.nailoffice.cn/2025-09-19/6841119cb9df852ec0a2c684/upload/20250919115203543-微信图片_20250919115018_1016_164.jpg",
-    "image2": "https://static.nailoffice.cn/2025-09-19/6841119cb9df852ec0a2c684/upload/20250919135340532-12.svg",
-    "primaryText": "免费体验",
-    "rightButtonText": "人气功能",
-    "rightTitle": "AI视频",
-    "rightDesc": "上传图片\n生成短视频",
-    "badgeText": "VIP"
-  },
+      "logo": "https://static.nailoffice.cn/2025-09-21/6841119cb9df852ec0a2c684/upload/20250921163322818-分组1.svg",
+      "appName": "聚类AI",
+      "title": "AIGC",
+      "subtitle": "上传图片\n生成专属内容",
+      "image": "https://static.nailoffice.cn/2025-09-19/6841119cb9df852ec0a2c684/upload/20250919115203543-微信图片_20250919115018_1016_164.jpg",
+      "image2": "https://static.nailoffice.cn/2025-09-19/6841119cb9df852ec0a2c684/upload/20250919135340532-12.svg",
+      "primaryText": "免费体验",
+      "rightButtonText": "人气功能",
+      "rightTitle": "AI视频",
+      "rightDesc": "上传图片\n生成趣味视频",
+      "badgeText": "VIP"
+    },
   "iconData": {
     "icons": [
 		
@@ -87,100 +87,46 @@
 		{
 		  "id": "icon-huihua",
 		  "symbol": "iconfontIndex ",
-		  "label": "室内精修",
+		  "label": "自定义图标",
 		  "iconUrl": "https://chinahu-ai-server.oss-cn-chengdu.aliyuncs.com/2025-12-21/68fdc2c9b0a684401fc8abde/upload/20251221121758937-026_-13-1-glusai.svg",
 		  "action": "local_draw",
 		  "matchKeywords": [
-		    "修被子修床单",
-		    "室内精修"
+		    "自定义图标",
+		    "支持网络链接"
 		  ],
 		  "actionButton": "false"
-		},
-	
-	
-		
-	{
-			     "id": "icon-huihua",
-			     "symbol": "iconfontIndex ",
-			     "label": "室外精修",
-			     "iconUrl": "",
-			     "action": "local_draw",
-			     "matchKeywords": [
-			       "外观精修",
-			       "室外精修"
-			     ],
-			     "actionButton": "false"
-			   },
-					 
-		
-		
-      {
-        "id": "icon-remen",
-        "symbol": "iconfontIndex ",
-        "label": "图生视频",
-        "iconUrl": "",
-        "action": "ai_expand",
-        "matchKeywords": [
-          "精选",
-          "精选应用"
-        ],
-        "actionButton": "false"
-      },
-      {
-        "id": "icon-x_touxiang",
-        "symbol": "iconfontIndex ",
-        "label": "其他",
-        "iconUrl": "",
-        "action": "local_draw",
-        "matchKeywords": [
-          "修被子修床单",
-          "室内精修"
-        ],
-        "actionButton": "false"
-      },
-	  
-	  
-	  
-	  
-      {
-        "id": "icon-huihua",
-        "symbol": "iconfontIndex ",
-        "label": "室外精修",
-        "iconUrl": "",
-        "action": "local_draw",
-        "matchKeywords": [
-          "外观精修",
-          "室外精修"
-        ],
-        "actionButton": "false"
-      },
-      {
-        "id": "icon-huazhizengqiang",
-        "symbol": "iconfontIndex ",
-        "label": "画质增强",
-        "iconUrl": "",
-        "action": "ai_headshot",
-        "matchKeywords": [
-          "画质",
-          "增强"
-        ],
-        "actionButton": "true"
-      }
+		},{
+          "id": "icon-x_touxiang",
+          "symbol": "iconfontIndex ",
+          "label": "趣味像素",
+          "action": "quality_enhance",
+          "matchKeywords": ["趣味", "趣味像素"],
+          "actionButton": "false"
+        },
+        {
+          "id": "icon-huihua",
+          "symbol": "iconfontIndex ",
+          "label": "AI绘画",
+          "action": "local_draw",
+          "matchKeywords": ["绘画", "AI绘画"],
+          "actionButton": "false"
+        },
+        {
+          "id": "icon-huazhizengqiang",
+          "symbol": "iconfontIndex ",
+          "label": "画质增强",
+          "action": "ai_headshot",
+          "matchKeywords": ["画质", "增强"],
+          "actionButton": "true"
+        }
     ],
     "columns": 4,
     "iconSize": 100,
     "gap": 42
   },
   "storeProps": {
-    "showTag": "应用中心",
-    "showTags": [
-      "图生视频",
-      "外观精修1",
-	   "修被子修床单",
-      "全能修图"
-	  "室内精修"
-	    "室外精修"
-    ],
+      "showTag": "AI工具",
+      "showTags": ["图生视频", "AI产品生成", "AI重绘"],
     "filterMode": "any"
   },
   "aiTeamProps": {
